@@ -1,0 +1,169 @@
+import { CreateApplicationDto, UpdateApplicationStatusDto } from "../dtos/application.dto";
+import { ApplicationRepository } from "../repositories/application.repository";
+import { JobRepository } from "../repositories/job.repository";
+import { HttpError } from "../errors/http-error";
+import { ApplicationStatusType } from "../types/application.type";
+import { UserRoleType } from "../types/user.type";
+import mongoose from "mongoose";
+
+let applicationRepository = new ApplicationRepository();
+let jobRepository = new JobRepository();
+
+interface ListApplicationsParams {
+    page?: number;
+    size?: number;
+    status?: ApplicationStatusType;
+}
+
+export class ApplicationService {
+
+    async applyToJob(data: CreateApplicationDto, authenticatedUserId: string) {
+        if (!mongoose.Types.ObjectId.isValid(authenticatedUserId)) {
+            throw new HttpError(400, "Invalid user ID");
+        }
+        if (!mongoose.Types.ObjectId.isValid(data.jobId)) {
+            throw new HttpError(400, "Invalid job ID");
+        }
+
+        const job = await jobRepository.getJobById(data.jobId);
+        if (!job) {
+            throw new HttpError(404, "Job not found");
+        }
+
+        if (!job.isVerified) {
+            throw new HttpError(403, "This job is not currently accepting applications");
+        }
+
+        if (job.deadline && new Date(job.deadline) < new Date()) {
+            throw new HttpError(403, "Application deadline has passed");
+        }
+
+        const alreadyApplied = await applicationRepository.hasUserAppliedToJob(
+            authenticatedUserId,
+            data.jobId
+        );
+        if (alreadyApplied) {
+            throw new HttpError(409, "You have already applied to this job");
+        }
+
+        // Derive employerId from the job, never trust the client for it
+        const applicationData = {
+            ...data,
+            userId: new mongoose.Types.ObjectId(authenticatedUserId),
+            jobId: new mongoose.Types.ObjectId(data.jobId),
+            employerId: job.employerId,
+        };
+
+        return await applicationRepository.createApplication(applicationData);
+    }
+
+    async getMyApplications(userId: string, params: ListApplicationsParams) {
+        const page = params.page ?? 1;
+        const size = params.size ?? 50;
+        return await applicationRepository.getAllApplications({
+            ...params,
+            page,
+            size,
+            userId,
+        });
+    }
+
+    async getApplicationsForJob(jobId: string, requesterId: string, requesterRole: UserRoleType, params: ListApplicationsParams) {
+        if (!mongoose.Types.ObjectId.isValid(jobId)) {
+            throw new HttpError(400, "Invalid job ID");
+        }
+
+        const job = await jobRepository.getJobById(jobId);
+        if (!job) {
+            throw new HttpError(404, "Job not found");
+        }
+
+        if (requesterRole !== "admin" && job.employerId.toString() !== requesterId) {
+            throw new HttpError(403, "Not authorized to view applications for this job");
+        }
+
+        const page = params.page ?? 1;
+        const size = params.size ?? 20;
+        return await applicationRepository.getAllApplications({
+            ...params,
+            page,
+            size,
+            jobId,
+        });
+    }
+
+    async getEmployerApplications(employerId: string, params: ListApplicationsParams) {
+        const page = params.page ?? 1;
+        const size = params.size ?? 20;
+        return await applicationRepository.getAllApplications({
+            ...params,
+            page,
+            size,
+            employerId,
+        });
+    }
+
+    async getAllApplications(params: ListApplicationsParams) {
+        const page = params.page ?? 1;
+        const size = params.size ?? 20;
+        return await applicationRepository.getAllApplications({ ...params, page, size });
+    }
+
+    async getApplicationById(applicationId: string, requesterId: string, requesterRole: UserRoleType) {
+        if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+            throw new HttpError(400, "Invalid application ID");
+        }
+
+        const application = await applicationRepository.getApplicationById(applicationId);
+        if (!application) {
+            throw new HttpError(404, "Application not found");
+        }
+
+        // Admin sees all; applicant sees their own; employer sees applications to their jobs
+        if (requesterRole !== "admin") {
+            const isOwner =
+                application.userId.toString() === requesterId ||
+                application.employerId.toString() === requesterId;
+            if (!isOwner) {
+                throw new HttpError(403, "Not authorized to view this application");
+            }
+        }
+
+        return application;
+    }
+
+    async updateApplicationStatus(applicationId: string, data: UpdateApplicationStatusDto, requesterId: string, requesterRole: UserRoleType) {
+        if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+            throw new HttpError(400, "Invalid application ID");
+        }
+
+        const application = await applicationRepository.getApplicationById(applicationId);
+        if (!application) {
+            throw new HttpError(404, "Application not found");
+        }
+
+        if (requesterRole !== "admin" && application.employerId.toString() !== requesterId) {
+            throw new HttpError(403, "Not authorized to update this application");
+        }
+
+        return await applicationRepository.updateApplicationStatus(applicationId, data.status);
+    }
+
+    async withdrawApplication(applicationId: string, requesterId: string, requesterRole: UserRoleType) {
+        if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+            throw new HttpError(400, "Invalid application ID");
+        }
+
+        const application = await applicationRepository.getApplicationById(applicationId);
+        if (!application) {
+            throw new HttpError(404, "Application not found");
+        }
+
+        // Only the applicant or an admin can withdraw
+        if (requesterRole !== "admin" && application.userId.toString() !== requesterId) {
+            throw new HttpError(403, "Not authorized to withdraw this application");
+        }
+
+        return await applicationRepository.deleteOneApplication(applicationId);
+    }
+}
