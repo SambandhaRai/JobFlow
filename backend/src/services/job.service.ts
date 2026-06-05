@@ -1,6 +1,7 @@
 import { CreateJobDto, UpdateJobDto } from "../dtos/job.dto";
 import { JobRepository } from "../repositories/job.repository";
 import { ApplicationRepository } from "../repositories/application.repository";
+import { UserRepository } from "../repositories/user.repository";
 import { HttpError } from "../errors/http-error";
 import { JobTypeEnumType, WorkModeType, ExperienceLevelType } from "../types/job.type";
 import { UserRoleType } from "../types/user.type";
@@ -8,6 +9,7 @@ import mongoose from "mongoose";
 
 let jobRepository = new JobRepository();
 let applicationRepository = new ApplicationRepository();
+let userRepository = new UserRepository();
 
 interface GetAllJobsServiceParams {
     page?: number;
@@ -29,9 +31,14 @@ export class JobService {
             throw new HttpError(400, "Invalid employer ID");
         }
 
-        // Override body's employerId with the authenticated user's ID — never trust the client
+        const employer = await userRepository.getEmployerById(authenticatedEmployerId);
+        if (!employer) {
+            throw new HttpError(404, "Employer not found");
+        }
+
         const jobData = {
             ...data,
+            company: employer.companyName,
             employerId: new mongoose.Types.ObjectId(authenticatedEmployerId),
         };
 

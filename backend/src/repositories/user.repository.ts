@@ -1,31 +1,50 @@
 import mongoose, { QueryFilter } from "mongoose";
-import { IUser, UserModel } from "../models/user.model";
-import { ResumeType, UserRoleType } from "../types/user.type";
+import { AdminModel, EmployerModel, IEmployer, IJobSeeker, IUser, JobSeekerModel, UserModel } from "../models/user.model";
+import { ResumeType, UserRoleType, UserType } from "../types/user.type";
+
+type CreateUserData = Partial<UserType> & {
+    role?: UserRoleType;
+    skills?: string[];
+    resumes?: Partial<ResumeType>[];
+    savedJobs?: mongoose.Types.ObjectId[];
+    companyName?: string;
+    companyWebsite?: string;
+};
+
+type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone">> & {
+    skills?: string[];
+};
 
 export interface IUserRepository {
-    createUser(data: Partial<IUser>): Promise<IUser>;
+    createUser(data: CreateUserData): Promise<IUser>;
     getAllUsers({ page, size, search, role }: { page: number, size: number, search?: string, role?: UserRoleType }): Promise<{ users: IUser[], totalUsers: number }>;
     getUserById(id: string): Promise<IUser | null>;
-    updateOneUser(id: string, data: Partial<IUser>): Promise<IUser | null>;
+    getEmployerById(id: string): Promise<IEmployer | null>;
+    updateOneUser(id: string, data: UpdateUserData): Promise<IUser | null>;
     deleteOneUser(id: string): Promise<boolean | null>;
 
     getUserByEmail(email: string): Promise<IUser | null>;
     getUserByPhone(phone: string): Promise<IUser | null>;
 
-    addResume(userId: string, resume: Partial<ResumeType>): Promise<IUser | null>;
-    removeResume(userId: string, resumeId: string): Promise<IUser | null>;
-    setDefaultResume(userId: string, resumeId: string): Promise<IUser | null>;
+    addResume(userId: string, resume: Partial<ResumeType>): Promise<IJobSeeker | null>;
+    removeResume(userId: string, resumeId: string): Promise<IJobSeeker | null>;
+    setDefaultResume(userId: string, resumeId: string): Promise<IJobSeeker | null>;
 
-    addSavedJob(userId: string, jobId: string): Promise<IUser | null>;
-    removeSavedJob(userId: string, jobId: string): Promise<IUser | null>;
-    getSavedJobs(userId: string): Promise<IUser | null>;
+    addSavedJob(userId: string, jobId: string): Promise<IJobSeeker | null>;
+    removeSavedJob(userId: string, jobId: string): Promise<IJobSeeker | null>;
+    getSavedJobs(userId: string): Promise<IJobSeeker | null>;
 }
 
 export class UserRepository implements IUserRepository {
 
-    async createUser(data: Partial<IUser>): Promise<IUser> {
-        const user = new UserModel(data);
-        return await user.save();
+    async createUser(data: CreateUserData): Promise<IUser> {
+        if (data.role === "employer") {
+            return await EmployerModel.create({ ...data, role: "employer" });
+        }
+        if (data.role === "admin") {
+            return await AdminModel.create({ ...data, role: "admin" });
+        }
+        return await JobSeekerModel.create({ ...data, role: "user" });
     }
 
     async getAllUsers({ page, size, search, role }: { page: number, size: number, search?: string, role?: UserRoleType }): Promise<{ users: IUser[], totalUsers: number }> {
@@ -54,7 +73,15 @@ export class UserRepository implements IUserRepository {
         return user;
     }
 
-    async updateOneUser(id: string, data: Partial<IUser>): Promise<IUser | null> {
+    async getEmployerById(id: string): Promise<IEmployer | null> {
+        const employer = await EmployerModel.findById(id);
+        return employer;
+    }
+
+    async updateOneUser(id: string, data: UpdateUserData): Promise<IUser | null> {
+        if (data.skills !== undefined) {
+            return await JobSeekerModel.findByIdAndUpdate(id, data, { new: true });
+        }
         const updatedUser = await UserModel.findByIdAndUpdate(id, data, { new: true });
         return updatedUser;
     }
@@ -74,54 +101,54 @@ export class UserRepository implements IUserRepository {
         return user;
     }
 
-    async addResume(userId: string, resume: Partial<ResumeType>): Promise<IUser | null> {
-        return await UserModel.findByIdAndUpdate(
+    async addResume(userId: string, resume: Partial<ResumeType>): Promise<IJobSeeker | null> {
+        return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $push: { resumes: resume } },
             { new: true }
         );
     }
 
-    async removeResume(userId: string, resumeId: string): Promise<IUser | null> {
-        return await UserModel.findByIdAndUpdate(
+    async removeResume(userId: string, resumeId: string): Promise<IJobSeeker | null> {
+        return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $pull: { resumes: { _id: new mongoose.Types.ObjectId(resumeId) } } },
             { new: true }
         );
     }
 
-    async setDefaultResume(userId: string, resumeId: string): Promise<IUser | null> {
+    async setDefaultResume(userId: string, resumeId: string): Promise<IJobSeeker | null> {
         // Unset isDefault on all resumes for this user
-        await UserModel.updateOne(
+        await JobSeekerModel.updateOne(
             { _id: userId },
             { $set: { "resumes.$[].isDefault": false } }
         );
         // Set the chosen resume as default
-        return await UserModel.findOneAndUpdate(
+        return await JobSeekerModel.findOneAndUpdate(
             { _id: userId, "resumes._id": new mongoose.Types.ObjectId(resumeId) },
             { $set: { "resumes.$.isDefault": true } },
             { new: true }
         );
     }
 
-    async addSavedJob(userId: string, jobId: string): Promise<IUser | null> {
-        return await UserModel.findByIdAndUpdate(
+    async addSavedJob(userId: string, jobId: string): Promise<IJobSeeker | null> {
+        return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $addToSet: { savedJobs: new mongoose.Types.ObjectId(jobId) } },
             { new: true }
         );
     }
 
-    async removeSavedJob(userId: string, jobId: string): Promise<IUser | null> {
-        return await UserModel.findByIdAndUpdate(
+    async removeSavedJob(userId: string, jobId: string): Promise<IJobSeeker | null> {
+        return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $pull: { savedJobs: new mongoose.Types.ObjectId(jobId) } },
             { new: true }
         );
     }
 
-    async getSavedJobs(userId: string): Promise<IUser | null> {
-        return await UserModel.findById(userId).populate("savedJobs");
+    async getSavedJobs(userId: string): Promise<IJobSeeker | null> {
+        return await JobSeekerModel.findById(userId).populate("savedJobs");
     }
 
 }

@@ -1,5 +1,6 @@
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from "../dtos/user.dto";
 import { UserRepository } from "../repositories/user.repository";
+import { IJobSeeker, IUser } from "../models/user.model";
 import { HttpError } from "../errors/http-error";
 import { JWT_SECRET } from "../config";
 import { ResumeType, UserRoleType } from "../types/user.type";
@@ -11,9 +12,16 @@ let userRepository = new UserRepository();
 
 export class UserService {
 
+    private ensureJobSeeker(user: IUser, action: string): asserts user is IJobSeeker {
+        if (user.role !== "user") {
+            throw new HttpError(403, `Only job seekers can ${action}`);
+        }
+    }
+
     async registerUser(data: CreateUserDto) {
         // Block self-registration as admin
-        if (data.role === "admin") {
+        const requestedRole = data.role as UserRoleType;
+        if (requestedRole === "admin") {
             throw new HttpError(403, "Cannot self-register as admin");
         }
 
@@ -75,6 +83,9 @@ export class UserService {
         if (!user) {
             throw new HttpError(404, "User not found");
         }
+        if (data.skills !== undefined) {
+            this.ensureJobSeeker(user, "update skills");
+        }
 
         const updatedUser = await userRepository.updateOneUser(userId, data);
         return updatedUser;
@@ -99,6 +110,7 @@ export class UserService {
         if (!user) {
             throw new HttpError(404, "User not found");
         }
+        this.ensureJobSeeker(user, "add resumes");
 
         // First resume becomes default automatically
         if (user.resumes.length === 0) {
@@ -117,6 +129,7 @@ export class UserService {
         if (!user) {
             throw new HttpError(404, "User not found");
         }
+        this.ensureJobSeeker(user, "remove resumes");
 
         const target = user.resumes.find(r => r._id.toString() === resumeId);
         if (!target) {
@@ -143,6 +156,7 @@ export class UserService {
         if (!user) {
             throw new HttpError(404, "User not found");
         }
+        this.ensureJobSeeker(user, "set default resumes");
 
         const exists = user.resumes.some(r => r._id.toString() === resumeId);
         if (!exists) {
@@ -159,6 +173,12 @@ export class UserService {
             throw new HttpError(400, "Invalid job ID");
         }
 
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
+        this.ensureJobSeeker(user, "save jobs");
+
         const updatedUser = await userRepository.addSavedJob(userId, jobId);
         if (!updatedUser) {
             throw new HttpError(404, "User not found");
@@ -171,6 +191,12 @@ export class UserService {
             throw new HttpError(400, "Invalid job ID");
         }
 
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
+        this.ensureJobSeeker(user, "unsave jobs");
+
         const updatedUser = await userRepository.removeSavedJob(userId, jobId);
         if (!updatedUser) {
             throw new HttpError(404, "User not found");
@@ -179,6 +205,12 @@ export class UserService {
     }
 
     async getSavedJobs(userId: string) {
+        const existingUser = await userRepository.getUserById(userId);
+        if (!existingUser) {
+            throw new HttpError(404, "User not found");
+        }
+        this.ensureJobSeeker(existingUser, "view saved jobs");
+
         const user = await userRepository.getSavedJobs(userId);
         if (!user) {
             throw new HttpError(404, "User not found");

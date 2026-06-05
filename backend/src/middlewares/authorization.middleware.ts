@@ -54,3 +54,60 @@ export const authorizedMiddleware = (req: Request, res: Response, next: NextFunc
         });
     }
 };
+
+export const adminOnlyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user) {
+            throw new HttpError(401, "Authentication required");
+        }
+
+        if (req.user.role !== "admin") {
+            throw new HttpError(403, "Admin access required");
+        }
+
+        next();
+    } catch (error: any) {
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || "Authorization failed",
+        });
+    }
+};
+
+export const employerOnlyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user) {
+            throw new HttpError(401, "Authentication required");
+        }
+
+        if (req.user.role !== "employer") {
+            throw new HttpError(403, "Employer access required");
+        }
+
+        next();
+    } catch (error: any) {
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || "Authorization failed",
+        });
+    }
+};
+
+export const userOnlyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user) {
+            throw new HttpError(401, "Authentication required");
+        }
+
+        if (req.user.role !== "user") {
+            throw new HttpError(403, "Job seeker access required");
+        }
+
+        next();
+    } catch (error: any) {
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || "Authorization failed",
+        });
+    }
+};

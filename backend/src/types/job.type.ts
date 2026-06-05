@@ -7,6 +7,7 @@ export const ExperienceLevelEnum = z.enum(["no-experience", "entry-level", "juni
 export const SalarySchema = z.object({
     min: z.number().nonnegative(),
     max: z.number().nonnegative(),
+    currency: z.string().trim().optional(),
 }).refine((data) => data.max >= data.min, {
     message: "Max salary must be greater than or equal to min salary",
 });

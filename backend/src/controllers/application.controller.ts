@@ -11,7 +11,8 @@ export class ApplicationController {
     async applyToJob(req: Request, res: Response) {
         try {
             const userId = req.user?.id;
-            if (!userId) {
+            const userRole = req.user?.role;
+            if (!userId || !userRole) {
                 return res.status(401).json({ success: false, message: "Unauthorized" });
             }
             const parsedData = CreateApplicationDto.safeParse(req.body);
@@ -21,7 +22,7 @@ export class ApplicationController {
                     errors: z.prettifyError(parsedData.error)
                 });
             }
-            const newApplication = await applicationService.applyToJob(parsedData.data, userId);
+            const newApplication = await applicationService.applyToJob(parsedData.data, userId, userRole);
             return res.status(201).json({
                 success: true,
                 data: newApplication,

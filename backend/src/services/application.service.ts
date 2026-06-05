@@ -17,7 +17,10 @@ interface ListApplicationsParams {
 
 export class ApplicationService {
 
-    async applyToJob(data: CreateApplicationDto, authenticatedUserId: string) {
+    async applyToJob(data: CreateApplicationDto, authenticatedUserId: string, userRole: UserRoleType) {
+        if (userRole !== "user") {
+            throw new HttpError(403, "Only job seekers can apply to jobs");
+        }
         if (!mongoose.Types.ObjectId.isValid(authenticatedUserId)) {
             throw new HttpError(400, "Invalid user ID");
         }

@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { UserType, ResumeType } from "../types/user.type";
+import { EmployerType, ResumeType, UserRoleType, UserType } from "../types/user.type";
 
 const ResumeSchema: Schema = new Schema({
     fileName: { type: String, required: true, trim: true },
@@ -16,23 +16,60 @@ const UserSchema: Schema = new Schema({
     phone: { type: String, trim: true, minLength: 10, maxLength: 15 },
     password: { type: String, required: true, minLength: 6 },
     role: { type: String, enum: ["user", "employer", "admin"], default: "user" },
+}, {
+    discriminatorKey: "role",
+    timestamps: true,
+});
+
+UserSchema.set("toJSON", {
+    transform: (_doc, ret) => {
+        const serialized = ret as Record<string, unknown>;
+        delete serialized.password;
+        delete serialized.__v;
+        return ret;
+    },
+});
+
+const JobSeekerSchema: Schema = new Schema({
     skills: { type: [String], default: [] },
     resumes: { type: [ResumeSchema], default: [] },
     savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],
-}, {
-    timestamps: true,
 });
+
+const EmployerSchema: Schema = new Schema({
+    companyName: { type: String, required: true, trim: true },
+    companyWebsite: { type: String, trim: true },
+});
+
+const AdminSchema: Schema = new Schema({});
 
 export interface IResume extends ResumeType {
     _id: mongoose.Types.ObjectId;
 }
 
-export interface IUser extends Omit<UserType, "resumes" | "savedJobs">, Document {
+export interface IUser extends UserType, Document {
     _id: mongoose.Types.ObjectId;
-    resumes: IResume[];
-    savedJobs: mongoose.Types.ObjectId[];
+    role: UserRoleType;
     createdAt: Date;
     updatedAt: Date;
 }
 
+export interface IJobSeeker extends IUser {
+    role: "user";
+    skills: string[];
+    resumes: IResume[];
+    savedJobs: mongoose.Types.ObjectId[];
+}
+
+export interface IEmployer extends IUser, Pick<EmployerType, "companyName" | "companyWebsite"> {
+    role: "employer";
+}
+
+export interface IAdmin extends IUser {
+    role: "admin";
+}
+
 export const UserModel = mongoose.model<IUser>("User", UserSchema);
+export const JobSeekerModel = UserModel.discriminator<IJobSeeker>("JobSeeker", JobSeekerSchema, "user");
+export const EmployerModel = UserModel.discriminator<IEmployer>("Employer", EmployerSchema, "employer");
+export const AdminModel = UserModel.discriminator<IAdmin>("Admin", AdminSchema, "admin");

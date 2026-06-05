@@ -4,6 +4,7 @@ import { JobType } from "../types/job.type";
 const SalarySchema: Schema = new Schema({
     min: { type: Number, required: true, min: 0 },
     max: { type: Number, required: true, min: 0 },
+    currency: { type: String, trim: true },
 }, { _id: false });
 
 const JobSchema: Schema = new Schema({

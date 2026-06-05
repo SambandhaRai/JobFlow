@@ -3,8 +3,6 @@ import { JobSchema } from "../types/job.type";
 
 export const CreateJobDto = JobSchema.pick({
     title: true,
-    company: true,
-    employerId: true,
     location: true,
     jobType: true,
     workMode: true,
@@ -20,5 +18,5 @@ export const CreateJobDto = JobSchema.pick({
 });
 export type CreateJobDto = z.infer<typeof CreateJobDto>;
 
-export const UpdateJobDto = CreateJobDto.omit({ employerId: true }).partial();
+export const UpdateJobDto = CreateJobDto.partial();
 export type UpdateJobDto = z.infer<typeof UpdateJobDto>;
