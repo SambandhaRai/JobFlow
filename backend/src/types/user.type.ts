@@ -4,7 +4,7 @@ export const UserRoleEnum = z.enum(["user", "employer", "admin"]);
 
 export const ResumeSchema = z.object({
     fileName: z.string().trim(),
-    fileUrl: z.string().url(),
+    fileUrl: z.string().trim().min(1),
     fileSize: z.number().positive(),
     score: z.number().min(0).max(10).optional(),
     isDefault: z.boolean().default(false),
