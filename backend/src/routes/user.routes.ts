@@ -5,6 +5,7 @@ import {
     adminOnlyMiddleware,
     userOnlyMiddleware
 } from "../middlewares/authorization.middleware";
+import { uploads } from "../middlewares/upload.middleware";
 
 const router = Router();
 const userController = new UserController();
@@ -14,7 +15,7 @@ router.get("/me", authorizedMiddleware, userController.getProfile);
 router.put("/me", authorizedMiddleware, userController.updateProfile);
 
 // Resume management
-router.post("/me/resumes", authorizedMiddleware, userController.addResume);
+router.post("/me/resumes", authorizedMiddleware, uploads.single("resume"), userController.addResume);
 router.delete("/me/resumes/:resumeId", authorizedMiddleware, userController.removeResume);
 router.patch("/me/resumes/:resumeId/default", authorizedMiddleware, userController.setDefaultResume);
 

@@ -127,7 +127,15 @@ export class UserController {
             if (!userId) {
                 return res.status(401).json({ success: false, message: "Unauthorized" });
             }
-            const parsedData = CreateResumeDto.safeParse(req.body);
+            const resumeData = req.file
+                ? {
+                    fileName: req.file.originalname,
+                    fileUrl: req.file.filename,
+                    fileSize: req.file.size,
+                }
+                : req.body;
+
+            const parsedData = CreateResumeDto.safeParse(resumeData);
             if (!parsedData.success) {
                 return res.status(400).json({
                     success: false,
