@@ -81,7 +81,7 @@ export class JobRepository implements IJobRepository {
     }
 
     async updateOneJob(id: string, data: Partial<IJob>): Promise<IJob | null> {
-        const updatedJob = await JobModel.findByIdAndUpdate(id, data, { new: true });
+        const updatedJob = await JobModel.findByIdAndUpdate(id, data, { returnDocument: "after" });
         return updatedJob;
     }
 
@@ -94,7 +94,7 @@ export class JobRepository implements IJobRepository {
         const updatedJob = await JobModel.findByIdAndUpdate(
             id,
             { $set: { isVerified: true } },
-            { new: true }
+            { returnDocument: "after" }
         );
         return updatedJob;
     }

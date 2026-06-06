@@ -80,9 +80,9 @@ export class UserRepository implements IUserRepository {
 
     async updateOneUser(id: string, data: UpdateUserData): Promise<IUser | null> {
         if (data.skills !== undefined) {
-            return await JobSeekerModel.findByIdAndUpdate(id, data, { new: true });
+            return await JobSeekerModel.findByIdAndUpdate(id, data, { returnDocument: "after" });
         }
-        const updatedUser = await UserModel.findByIdAndUpdate(id, data, { new: true });
+        const updatedUser = await UserModel.findByIdAndUpdate(id, data, { returnDocument: "after" });
         return updatedUser;
     }
 
@@ -105,7 +105,7 @@ export class UserRepository implements IUserRepository {
         return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $push: { resumes: resume } },
-            { new: true }
+            { returnDocument: "after" }
         );
     }
 
@@ -113,7 +113,7 @@ export class UserRepository implements IUserRepository {
         return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $pull: { resumes: { _id: new mongoose.Types.ObjectId(resumeId) } } },
-            { new: true }
+            { returnDocument: "after" }
         );
     }
 
@@ -127,7 +127,7 @@ export class UserRepository implements IUserRepository {
         return await JobSeekerModel.findOneAndUpdate(
             { _id: userId, "resumes._id": new mongoose.Types.ObjectId(resumeId) },
             { $set: { "resumes.$.isDefault": true } },
-            { new: true }
+            { returnDocument: "after" }
         );
     }
 
@@ -135,7 +135,7 @@ export class UserRepository implements IUserRepository {
         return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $addToSet: { savedJobs: new mongoose.Types.ObjectId(jobId) } },
-            { new: true }
+            { returnDocument: "after" }
         );
     }
 
@@ -143,7 +143,7 @@ export class UserRepository implements IUserRepository {
         return await JobSeekerModel.findByIdAndUpdate(
             userId,
             { $pull: { savedJobs: new mongoose.Types.ObjectId(jobId) } },
-            { new: true }
+            { returnDocument: "after" }
         );
     }
 

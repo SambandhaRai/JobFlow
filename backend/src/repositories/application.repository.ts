@@ -65,7 +65,7 @@ export class ApplicationRepository implements IApplicationRepository {
         const updatedApplication = await ApplicationModel.findByIdAndUpdate(
             id,
             { $set: { status } },
-            { new: true }
+            { returnDocument: "after" }
         );
         return updatedApplication;
     }
