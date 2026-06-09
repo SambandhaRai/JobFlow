@@ -35,10 +35,10 @@ export default function Navbar() {
 
                 <div className="ml-auto flex items-center gap-3">
                     <Link
-                        href="/sign-in"
+                        href="/login"
                         className="text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors"
                     >
-                        Sign in
+                        Login
                     </Link>
                     <Link
                         href="/sign-up"

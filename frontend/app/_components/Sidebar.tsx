@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -19,7 +20,7 @@ import CompanyAvatar from "./CompanyAvatar";
 interface NavItem {
     label: string;
     href: string;
-    icon: React.ReactNode;
+    icon: ReactNode;
     badge?: number;
     badgeDot?: boolean;
 }
@@ -58,7 +59,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
         <Link
             href={item.href}
             className={[
-                "flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-md)] text-sm transition-colors duration-150",
+                "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors duration-150",
                 active
                     ? "bg-cobalt-50 text-cobalt-600 font-medium"
                     : "text-ink-600 hover:bg-ink-50 hover:text-ink-900",
@@ -71,12 +72,12 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
             {item.badge !== undefined && (
                 <span
                     className={[
-                        "text-xs font-medium px-1.5 py-0.5 rounded-full min-w-[20px] text-center",
+                        "text-xs font-medium px-1.5 py-0.5 rounded-full min-w-5 text-center",
                         item.badgeDot
                             ? "bg-danger-50 text-danger-700"
                             : active
-                            ? "bg-cobalt-100 text-cobalt-700"
-                            : "bg-ink-100 text-ink-500",
+                                ? "bg-cobalt-100 text-cobalt-700"
+                                : "bg-ink-100 text-ink-500",
                     ].join(" ")}
                 >
                     {item.badgeDot && (

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "../context/AuthContext";
 import "./globals.css";
+import "react-toastify/dist/ReactToastify.css";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -35,7 +38,12 @@ export default function RootLayout({
       lang="en"
       className={`${bricolage.variable} ${inter.variable} ${jetBrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+          <ToastContainer position="top-right" autoClose={2500} />
+        </AuthProvider>
+      </body>
     </html>
   );
 }
