@@ -2,6 +2,16 @@
 
 import { loginUser, registerUser } from "../api/auth";
 import type { LoginPayload, RegisterPayload } from "../api/endpoints";
+import { setAuthToken, setUserData } from "../cookie";
+
+type AuthUser = {
+    _id?: string;
+    id?: string;
+    fullName?: string;
+    email?: string;
+    role?: "user" | "employer" | "admin";
+    [key: string]: unknown;
+};
 
 type AuthApiResult<TData = unknown> = {
     success: boolean;
@@ -29,14 +39,22 @@ const getActionErrorMessage = (err: unknown, fallback: string) => {
 
 export const handleRegister = async (
     formData: RegisterPayload,
-): Promise<AuthActionResult> => {
+): Promise<AuthActionResult<AuthUser>> => {
     try {
-        const result = await registerUser(formData) as AuthApiResult;
+        const result = await registerUser(formData) as AuthApiResult<AuthUser>;
 
         if (result.success) {
+            if (result.token) {
+                await setAuthToken(result.token);
+            }
+            if (result.data) {
+                await setUserData(result.data);
+            }
+
             return {
                 success: true,
                 data: result.data,
+                token: result.token,
                 message: "Registration Successful",
             };
         }
@@ -57,11 +75,18 @@ export const handleRegister = async (
 
 export const handleLogin = async (
     formData: LoginPayload,
-): Promise<AuthActionResult> => {
+): Promise<AuthActionResult<AuthUser>> => {
     try {
-        const result = await loginUser(formData) as AuthApiResult;
+        const result = await loginUser(formData) as AuthApiResult<AuthUser>;
 
         if (result.success) {
+            if (result.token) {
+                await setAuthToken(result.token);
+            }
+            if (result.data) {
+                await setUserData(result.data);
+            }
+
             return {
                 success: true,
                 data: result.data,

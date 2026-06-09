@@ -31,7 +31,21 @@ export type LoginPayload = {
 export type UpdateProfilePayload = {
     fullName?: string;
     phone?: string;
+    educations?: Array<{
+        level: "see" | "+2" | "diploma" | "bachelor" | "master" | "phd" | "other";
+        institutionName: string;
+        status: "currently-studying" | "completed";
+        completionYear?: string;
+    }>;
     skills?: string[];
+};
+
+export type InstitutionType = "school" | "college" | "university";
+
+export type InstitutionListQuery = {
+    search?: string;
+    type?: InstitutionType;
+    limit?: number;
 };
 
 export type CreateResumePayload = {
@@ -174,6 +188,10 @@ export const API = {
         GET_BY_ID: (id: string) => `/api/applications/${id}`,
         UPDATE_STATUS: (id: string) => `/api/applications/${id}/status`,
         WITHDRAW: (id: string) => `/api/applications/${id}`,
+    },
+
+    INSTITUTION: {
+        GET_ALL: (params?: InstitutionListQuery) => withQuery("/api/institutions", params),
     },
 
     ADMIN: {
