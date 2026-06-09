@@ -10,6 +10,21 @@ const ResumeSchema: Schema = new Schema({
     uploadedAt: { type: Date, default: () => new Date() },
 }, { _id: true });
 
+const EducationSchema: Schema = new Schema({
+    level: {
+        type: String,
+        enum: ["see", "+2", "diploma", "bachelor", "master", "phd", "other"],
+        required: true,
+    },
+    institutionName: { type: String, required: true, trim: true },
+    status: {
+        type: String,
+        enum: ["currently-studying", "completed"],
+        required: true,
+    },
+    completionYear: { type: String, trim: true },
+}, { _id: true });
+
 const UserSchema: Schema = new Schema({
     fullName: { type: String, required: true, trim: true, minLength: 2 },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
@@ -31,6 +46,7 @@ UserSchema.set("toJSON", {
 });
 
 const JobSeekerSchema: Schema = new Schema({
+    educations: { type: [EducationSchema], default: [] },
     skills: { type: [String], default: [] },
     resumes: { type: [ResumeSchema], default: [] },
     savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],
@@ -47,6 +63,14 @@ export interface IResume extends ResumeType {
     _id: mongoose.Types.ObjectId;
 }
 
+export interface IEducation {
+    _id: mongoose.Types.ObjectId;
+    level: "see" | "+2" | "diploma" | "bachelor" | "master" | "phd" | "other";
+    institutionName: string;
+    status: "currently-studying" | "completed";
+    completionYear?: string;
+}
+
 export interface IUser extends UserType, Document {
     _id: mongoose.Types.ObjectId;
     role: UserRoleType;
@@ -56,6 +80,7 @@ export interface IUser extends UserType, Document {
 
 export interface IJobSeeker extends IUser {
     role: "user";
+    educations: IEducation[];
     skills: string[];
     resumes: IResume[];
     savedJobs: mongoose.Types.ObjectId[];

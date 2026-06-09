@@ -1,5 +1,5 @@
 import z from "zod";
-import { BaseUserSchema, ResumeSchema } from "../types/user.type";
+import { BaseUserSchema, JobSeekerSchema, ResumeSchema } from "../types/user.type";
 
 const CreateUserBaseDto = BaseUserSchema.pick({
     fullName: true,
@@ -53,7 +53,8 @@ export const UpdateUserDto = BaseUserSchema.pick({
     fullName: true,
     phone: true,
 }).extend({
-    skills: z.array(z.string()).optional(),
+    educations: JobSeekerSchema.shape.educations,
+    skills: z.array(z.string().trim()).optional(),
 }).partial();
 export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
 
