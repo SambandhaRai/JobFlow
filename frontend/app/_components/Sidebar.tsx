@@ -10,8 +10,6 @@ import {
     FileText,
     Bell,
     File,
-    Building2,
-    BookOpen,
     Settings,
     ChevronRight,
 } from "lucide-react";
@@ -35,8 +33,6 @@ const JOB_SEARCH_NAV: NavItem[] = [
 
 const PROFILE_NAV: NavItem[] = [
     { label: "Resume", href: "/profile/resume", icon: <File size={16} /> },
-    { label: "Companies followed", href: "/profile/companies", icon: <Building2 size={16} /> },
-    { label: "Career guide", href: "/career-guide", icon: <BookOpen size={16} /> },
 ];
 
 interface ProfileCompletion {
@@ -61,11 +57,11 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
             className={[
                 "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors duration-150",
                 active
-                    ? "bg-cobalt-50 text-cobalt-600 font-medium"
-                    : "text-ink-600 hover:bg-ink-50 hover:text-ink-900",
+                    ? "bg-surface text-ink-900 font-medium shadow-card"
+                    : "text-ink-500 hover:bg-surface/70 hover:text-ink-900",
             ].join(" ")}
         >
-            <span className={active ? "text-cobalt-600" : "text-ink-400"}>
+            <span className={active ? "text-ink-700" : "text-ink-400"}>
                 {item.icon}
             </span>
             <span className="flex-1">{item.label}</span>
@@ -94,7 +90,7 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const pathname = usePathname();
 
     return (
-        <aside className="fixed left-0 top-0 h-full w-sidebar bg-surface border-r border-ink-200 flex flex-col z-20">
+        <aside className="fixed left-0 top-0 z-20 hidden h-full w-sidebar flex-col bg-cobalt-50 lg:flex">
             {/* Logo */}
             <div className="px-4 pt-5 pb-4">
                 <Link href="/" className="flex items-center gap-2">
@@ -134,7 +130,7 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
 
             {/* Profile completion card */}
             {profileCompletion && (
-                <div className="mx-3 mb-3 p-3 rounded-md border border-ink-200 bg-ink-50">
+                <div className="mx-4 mb-4 rounded-md bg-surface p-3 shadow-card">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-ink-700">
                             Profile {profileCompletion.percent}% done
@@ -152,8 +148,8 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
             )}
 
             {/* User footer */}
-            <div className="px-3 py-3 border-t border-ink-200 flex items-center gap-2.5">
-                <CompanyAvatar name={user.name} size="sm" />
+            <div className="flex items-center gap-2.5 px-4 pb-5 pt-1">
+                <CompanyAvatar name={user.name} size="sm" className="rounded-full bg-cobalt-500 text-white" />
                 <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-ink-900 truncate leading-tight">
                         {user.name}

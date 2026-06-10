@@ -1,24 +1,32 @@
 import Link from "next/link";
 import {
     BarChart3,
+    BookOpen,
     Code2,
-    Handshake,
     Headphones,
+    Hotel,
     Megaphone,
+    MessageCircle,
     Palette,
     PenLine,
+    ReceiptText,
     Settings2,
+    Store,
 } from "lucide-react";
 
 const categories = [
-    { icon: Code2, name: "Tech & Engineering", count: 412 },
+    { icon: Code2, name: "IT & Software", count: 412 },
     { icon: Palette, name: "Design & Creative", count: 168 },
-    { icon: BarChart3, name: "Data & Analytics", count: 94 },
-    { icon: Megaphone, name: "Marketing & Growth", count: 233 },
+    { icon: Megaphone, name: "Marketing & Social Media", count: 233 },
     { icon: PenLine, name: "Writing & Content", count: 87 },
-    { icon: Settings2, name: "Business & Ops", count: 156 },
-    { icon: Headphones, name: "Customer Success", count: 79 },
-    { icon: Handshake, name: "Sales & BD", count: 142 },
+    { icon: Headphones, name: "Sales & Customer Service", count: 221 },
+    { icon: Settings2, name: "Business & Administration", count: 156 },
+    { icon: ReceiptText, name: "Finance & Accounting", count: 118 },
+    { icon: BookOpen, name: "Education & Tutoring", count: 96 },
+    { icon: Hotel, name: "Hospitality & Tourism", count: 134 },
+    { icon: Store, name: "Retail & Store Jobs", count: 109 },
+    { icon: BarChart3, name: "Data & Research", count: 94 },
+    { icon: MessageCircle, name: "Media & Communication", count: 82 },
 ];
 
 export default function CategorySection() {
