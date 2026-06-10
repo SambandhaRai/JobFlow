@@ -8,7 +8,8 @@ interface GetAllApplicationsParams {
     status?: ApplicationStatusType;
     userId?: string;
     jobId?: string;
-    employerId?: string;
+    postedByUserId?: string;
+    companyId?: string;
 }
 
 export interface IApplicationRepository {
@@ -34,21 +35,23 @@ export class ApplicationRepository implements IApplicationRepository {
         status,
         userId,
         jobId,
-        employerId,
+        postedByUserId,
+        companyId,
     }: GetAllApplicationsParams): Promise<{ applications: IApplication[], totalApplications: number }> {
         let filter: QueryFilter<IApplication> = {};
 
         if (status) filter.status = status;
         if (userId) filter.userId = new mongoose.Types.ObjectId(userId);
         if (jobId) filter.jobId = new mongoose.Types.ObjectId(jobId);
-        if (employerId) filter.employerId = new mongoose.Types.ObjectId(employerId);
+        if (postedByUserId) filter.postedByUserId = new mongoose.Types.ObjectId(postedByUserId);
+        if (companyId) filter.companyId = new mongoose.Types.ObjectId(companyId);
 
         const [applications, totalApplications] = await Promise.all([
             ApplicationModel.find(filter)
                 .sort({ appliedAt: -1 })
                 .skip((page - 1) * size)
                 .limit(size)
-                .populate("jobId", "title company location jobType workMode")
+                .populate("jobId", "title company hiringName hiringType location jobType workMode")
                 .populate("userId", "fullName email phone"),
             ApplicationModel.countDocuments(filter)
         ]);

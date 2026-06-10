@@ -11,7 +11,7 @@ const router = Router();
 const applicationController = new ApplicationController();
 
 // Job seeker submits and views their own
-router.post("/", authorizedMiddleware, applicationController.applyToJob);
+router.post("/", authorizedMiddleware, userOnlyMiddleware, applicationController.applyToJob);
 router.get("/me", authorizedMiddleware, applicationController.getMyApplications);
 
 // Employer views all applications across their jobs
@@ -36,7 +36,5 @@ router.patch("/:id/status", authorizedMiddleware, applicationController.updateAp
 
 // Applicant or admin withdraws (service checks)
 router.delete("/:id", authorizedMiddleware, applicationController.withdrawApplication);
-
-router.post("/", authorizedMiddleware, userOnlyMiddleware, applicationController.applyToJob);
 
 export default router;

@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { EmployerType, ResumeType, UserRoleType, UserType } from "../types/user.type";
+import { ResumeType, UserRoleType, UserType } from "../types/user.type";
 
 const ResumeSchema: Schema = new Schema({
     fileName: { type: String, required: true, trim: true },
@@ -31,6 +31,7 @@ const UserSchema: Schema = new Schema({
     phone: { type: String, trim: true, minLength: 10, maxLength: 15 },
     password: { type: String, required: true, minLength: 6 },
     role: { type: String, enum: ["user", "employer", "admin"], default: "user" },
+    seedTag: { type: String, trim: true },
 }, {
     discriminatorKey: "role",
     timestamps: true,
@@ -52,10 +53,7 @@ const JobSeekerSchema: Schema = new Schema({
     savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],
 });
 
-const EmployerSchema: Schema = new Schema({
-    companyName: { type: String, required: true, trim: true },
-    companyWebsite: { type: String, trim: true },
-});
+const EmployerSchema: Schema = new Schema({});
 
 const AdminSchema: Schema = new Schema({});
 
@@ -86,7 +84,7 @@ export interface IJobSeeker extends IUser {
     savedJobs: mongoose.Types.ObjectId[];
 }
 
-export interface IEmployer extends IUser, Pick<EmployerType, "companyName" | "companyWebsite"> {
+export interface IEmployer extends IUser {
     role: "employer";
 }
 

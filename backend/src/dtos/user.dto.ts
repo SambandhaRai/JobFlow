@@ -16,8 +16,6 @@ const CreateJobSeekerDto = CreateUserBaseDto.extend({
 
 const CreateEmployerDto = CreateUserBaseDto.extend({
     role: z.literal("employer"),
-    companyName: z.string().trim().min(1, "Company name is required"),
-    companyWebsite: z.string().trim().optional(),
 });
 
 const CreateAdminDto = CreateUserBaseDto.extend({

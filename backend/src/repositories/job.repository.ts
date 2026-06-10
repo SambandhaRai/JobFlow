@@ -1,6 +1,6 @@
 import mongoose, { QueryFilter } from "mongoose";
 import { IJob, JobModel } from "../models/job.model";
-import { JobTypeEnumType, WorkModeType, ExperienceLevelType } from "../types/job.type";
+import { HiringTypeType, JobCategoryType, JobTypeEnumType, WorkModeType, ExperienceLevelType } from "../types/job.type";
 
 interface GetAllJobsParams {
     page: number;
@@ -9,10 +9,15 @@ interface GetAllJobsParams {
     jobType?: JobTypeEnumType;
     workMode?: WorkModeType;
     experienceLevel?: ExperienceLevelType;
+    category?: JobCategoryType;
     location?: string;
+    minSalary?: number;
+    maxSalary?: number;
     isBeginnerFriendly?: boolean;
     isVerified?: boolean;
-    employerId?: string;
+    postedByUserId?: string;
+    companyId?: string;
+    hiringType?: HiringTypeType;
 }
 
 export interface IJobRepository {
@@ -39,20 +44,30 @@ export class JobRepository implements IJobRepository {
         jobType,
         workMode,
         experienceLevel,
+        category,
         location,
+        minSalary,
+        maxSalary,
         isBeginnerFriendly,
         isVerified,
-        employerId,
+        postedByUserId,
+        companyId,
+        hiringType,
     }: GetAllJobsParams): Promise<{ jobs: IJob[], totalJobs: number }> {
         let filter: QueryFilter<IJob> = {};
 
         if (jobType) filter.jobType = jobType;
         if (workMode) filter.workMode = workMode;
         if (experienceLevel) filter.experienceLevel = experienceLevel;
+        if (category) filter.category = category;
         if (location) filter.location = { $regex: location, $options: "i" };
+        if (typeof minSalary === "number") filter["salary.max"] = { $gte: minSalary };
+        if (typeof maxSalary === "number") filter["salary.min"] = { $lte: maxSalary };
         if (typeof isBeginnerFriendly === "boolean") filter.isBeginnerFriendly = isBeginnerFriendly;
         if (typeof isVerified === "boolean") filter.isVerified = isVerified;
-        if (employerId) filter.employerId = new mongoose.Types.ObjectId(employerId);
+        if (postedByUserId) filter.postedByUserId = new mongoose.Types.ObjectId(postedByUserId);
+        if (companyId) filter.companyId = new mongoose.Types.ObjectId(companyId);
+        if (hiringType) filter.hiringType = hiringType;
 
         if (search) {
             filter.$or = [
@@ -68,7 +83,8 @@ export class JobRepository implements IJobRepository {
                 .sort({ postedAt: -1 })
                 .skip((page - 1) * size)
                 .limit(size)
-                .populate("employerId", "fullName email"),
+                .populate("postedByUserId", "fullName email")
+                .populate("companyId", "name slug logoUrl isVerified"),
             JobModel.countDocuments(filter)
         ]);
 

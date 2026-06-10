@@ -4,7 +4,8 @@ import { ApplicationType } from "../types/application.type";
 const ApplicationSchema: Schema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     jobId: { type: Schema.Types.ObjectId, ref: "Job", required: true },
-    employerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    postedByUserId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    companyId: { type: Schema.Types.ObjectId, ref: "Company" },
     resumeUrl: { type: String, required: true },
     fullName: { type: String, required: true, trim: true, minLength: 2 },
     email: { type: String, required: true, trim: true, lowercase: true },
@@ -23,11 +24,12 @@ const ApplicationSchema: Schema = new Schema({
 // One application per user-job pair
 ApplicationSchema.index({ userId: 1, jobId: 1 }, { unique: true });
 
-export interface IApplication extends Omit<ApplicationType, "userId" | "jobId" | "employerId">, Document {
+export interface IApplication extends Omit<ApplicationType, "userId" | "jobId" | "postedByUserId" | "companyId">, Document {
     _id: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId;
     jobId: mongoose.Types.ObjectId;
-    employerId: mongoose.Types.ObjectId;
+    postedByUserId: mongoose.Types.ObjectId;
+    companyId?: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

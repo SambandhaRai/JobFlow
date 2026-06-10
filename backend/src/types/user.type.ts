@@ -69,8 +69,6 @@ export const JobSeekerSchema = BaseUserSchema.extend({
 
 export const EmployerSchema = BaseUserSchema.extend({
     role: z.literal("employer"),
-    companyName: z.string().trim().min(1, "Company name is required"),
-    companyWebsite: z.string().trim().optional(),
 });
 
 export type UserRoleType = z.infer<typeof UserRoleEnum>;

@@ -12,6 +12,7 @@ import userRoutes from "./routes/user.routes";
 import jobRoutes from "./routes/job.routes";
 import applicationRoutes from "./routes/application.routes";
 import institutionRoutes from "./routes/institution.routes";
+import companyRoutes from "./routes/company.routes";
 
 const app: Application = express();
 
@@ -54,5 +55,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/institutions", institutionRoutes);
+app.use("/api/companies", companyRoutes);
 
 export default app;

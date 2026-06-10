@@ -11,7 +11,8 @@ export const ApplicationStatusEnum = z.enum([
 export const ApplicationSchema = z.object({
     userId: z.string().trim(),
     jobId: z.string().trim(),
-    employerId: z.string().trim(),
+    postedByUserId: z.string().trim(),
+    companyId: z.string().trim().optional(),
     resumeUrl: z.string().url("Invalid resume URL"),
     fullName: z.string().trim().min(2, "Full name must be at least 2 characters"),
     email: z.email("Invalid email address"),

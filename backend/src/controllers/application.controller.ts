@@ -111,8 +111,8 @@ export class ApplicationController {
 
     async getEmployerApplications(req: Request, res: Response) {
         try {
-            const employerId = req.user?.id;
-            if (!employerId) {
+            const posterId = req.user?.id;
+            if (!posterId) {
                 return res.status(401).json({ success: false, message: "Unauthorized" });
             }
             const page = parseInt(req.query.page as string) || 1;
@@ -127,7 +127,7 @@ export class ApplicationController {
                 status = parsed.data;
             }
 
-            const result = await applicationService.getEmployerApplications(employerId, { page, size, status });
+            const result = await applicationService.getEmployerApplications(posterId, { page, size, status });
             return res.status(200).json({
                 success: true,
                 data: result.applications,

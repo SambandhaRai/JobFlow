@@ -1,6 +1,7 @@
 import { CreateApplicationDto, UpdateApplicationStatusDto } from "../dtos/application.dto";
 import { ApplicationRepository } from "../repositories/application.repository";
 import { JobRepository } from "../repositories/job.repository";
+import { CompanyRepository } from "../repositories/company.repository";
 import { HttpError } from "../errors/http-error";
 import { ApplicationStatusType } from "../types/application.type";
 import { UserRoleType } from "../types/user.type";
@@ -8,6 +9,7 @@ import mongoose from "mongoose";
 
 let applicationRepository = new ApplicationRepository();
 let jobRepository = new JobRepository();
+let companyRepository = new CompanyRepository();
 
 interface ListApplicationsParams {
     page?: number;
@@ -49,12 +51,12 @@ export class ApplicationService {
             throw new HttpError(409, "You have already applied to this job");
         }
 
-        // Derive employerId from the job, never trust the client for it
         const applicationData = {
             ...data,
             userId: new mongoose.Types.ObjectId(authenticatedUserId),
             jobId: new mongoose.Types.ObjectId(data.jobId),
-            employerId: job.employerId,
+            postedByUserId: job.postedByUserId,
+            companyId: job.companyId,
         };
 
         return await applicationRepository.createApplication(applicationData);
@@ -81,7 +83,12 @@ export class ApplicationService {
             throw new HttpError(404, "Job not found");
         }
 
-        if (requesterRole !== "admin" && job.employerId.toString() !== requesterId) {
+        const isPoster = job.postedByUserId.toString() === requesterId;
+        const isCompanyMember = job.companyId
+            ? await companyRepository.isCompanyMember(job.companyId.toString(), requesterId)
+            : false;
+
+        if (requesterRole !== "admin" && !isPoster && !isCompanyMember) {
             throw new HttpError(403, "Not authorized to view applications for this job");
         }
 
@@ -95,14 +102,14 @@ export class ApplicationService {
         });
     }
 
-    async getEmployerApplications(employerId: string, params: ListApplicationsParams) {
+    async getEmployerApplications(posterId: string, params: ListApplicationsParams) {
         const page = params.page ?? 1;
         const size = params.size ?? 20;
         return await applicationRepository.getAllApplications({
             ...params,
             page,
             size,
-            employerId,
+            postedByUserId: posterId,
         });
     }
 
@@ -126,7 +133,11 @@ export class ApplicationService {
         if (requesterRole !== "admin") {
             const isOwner =
                 application.userId.toString() === requesterId ||
-                application.employerId.toString() === requesterId;
+                application.postedByUserId.toString() === requesterId ||
+                Boolean(
+                    application.companyId &&
+                    await companyRepository.isCompanyMember(application.companyId.toString(), requesterId)
+                );
             if (!isOwner) {
                 throw new HttpError(403, "Not authorized to view this application");
             }
@@ -145,7 +156,14 @@ export class ApplicationService {
             throw new HttpError(404, "Application not found");
         }
 
-        if (requesterRole !== "admin" && application.employerId.toString() !== requesterId) {
+        const canManage =
+            application.postedByUserId.toString() === requesterId ||
+            Boolean(
+                application.companyId &&
+                await companyRepository.isCompanyMember(application.companyId.toString(), requesterId)
+            );
+
+        if (requesterRole !== "admin" && !canManage) {
             throw new HttpError(403, "Not authorized to update this application");
         }
 

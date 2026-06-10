@@ -7,8 +7,6 @@ type CreateUserData = Partial<UserType> & {
     skills?: string[];
     resumes?: Partial<ResumeType>[];
     savedJobs?: mongoose.Types.ObjectId[];
-    companyName?: string;
-    companyWebsite?: string;
 };
 
 type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone">> & {
