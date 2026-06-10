@@ -19,8 +19,6 @@ export type RegisterPayload =
         password: string;
         confirmPassword: string;
         phone?: string;
-        companyName: string;
-        companyWebsite?: string;
     };
 
 export type LoginPayload = {
@@ -69,6 +67,22 @@ export type ExperienceLevel =
     | "junior"
     | "mid-level"
     | "senior-level";
+export type JobCategory =
+    | "IT & Software"
+    | "Design & Creative"
+    | "Marketing & Social Media"
+    | "Writing & Content"
+    | "Sales & Customer Service"
+    | "Business & Administration"
+    | "Finance & Accounting"
+    | "Education & Tutoring"
+    | "Hospitality & Tourism"
+    | "Retail & Store Jobs"
+    | "Data & Research"
+    | "Media & Communication"
+    | "Other";
+
+export type HiringType = "company" | "small-business" | "individual";
 
 export type SalaryPayload = {
     min: number;
@@ -78,10 +92,18 @@ export type SalaryPayload = {
 
 export type CreateJobPayload = {
     title: string;
+    hiringType?: HiringType;
+    companyId?: string;
+    hiringName: string;
+    hiringEmail?: string;
+    hiringPhone?: string;
+    hiringWebsite?: string;
+    hiringLocation?: string;
     location: string;
     jobType: JobType;
     workMode: WorkMode;
     experienceLevel: ExperienceLevel;
+    category?: JobCategory;
     salary?: SalaryPayload;
     duration?: string;
     skills?: string[];
@@ -101,7 +123,13 @@ export type JobListQuery = {
     jobType?: JobType;
     workMode?: WorkMode;
     experienceLevel?: ExperienceLevel;
+    category?: JobCategory;
     location?: string;
+    postedByUserId?: string;
+    companyId?: string;
+    hiringType?: HiringType;
+    minSalary?: number;
+    maxSalary?: number;
     isBeginnerFriendly?: boolean;
     isVerified?: boolean;
     employerId?: string;
