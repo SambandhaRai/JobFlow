@@ -15,11 +15,11 @@ interface GetAllJobsServiceParams {
     page?: number;
     size?: number;
     search?: string;
-    jobType?: JobTypeEnumType;
-    workMode?: WorkModeType;
-    experienceLevel?: ExperienceLevelType;
-    category?: JobCategoryType;
-    location?: string;
+    jobType?: JobTypeEnumType[];
+    workMode?: WorkModeType[];
+    experienceLevel?: ExperienceLevelType[];
+    category?: JobCategoryType[];
+    location?: string[];
     minSalary?: number;
     maxSalary?: number;
     isBeginnerFriendly?: boolean;

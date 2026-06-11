@@ -6,11 +6,11 @@ interface GetAllJobsParams {
     page: number;
     size: number;
     search?: string;
-    jobType?: JobTypeEnumType;
-    workMode?: WorkModeType;
-    experienceLevel?: ExperienceLevelType;
-    category?: JobCategoryType;
-    location?: string;
+    jobType?: JobTypeEnumType[];
+    workMode?: WorkModeType[];
+    experienceLevel?: ExperienceLevelType[];
+    category?: JobCategoryType[];
+    location?: string[];
     minSalary?: number;
     maxSalary?: number;
     isBeginnerFriendly?: boolean;
@@ -56,11 +56,12 @@ export class JobRepository implements IJobRepository {
     }: GetAllJobsParams): Promise<{ jobs: IJob[], totalJobs: number }> {
         let filter: QueryFilter<IJob> = {};
 
-        if (jobType) filter.jobType = jobType;
-        if (workMode) filter.workMode = workMode;
-        if (experienceLevel) filter.experienceLevel = experienceLevel;
-        if (category) filter.category = category;
-        if (location) filter.location = { $regex: location, $options: "i" };
+        if (jobType?.length) filter.jobType = { $in: jobType };
+        if (workMode?.length) filter.workMode = { $in: workMode };
+        if (experienceLevel?.length) filter.experienceLevel = { $in: experienceLevel };
+        if (category?.length) filter.category = { $in: category };
+        if (location?.length === 1) filter.location = { $regex: location[0], $options: "i" };
+        if (location && location.length > 1) filter.location = { $in: location };
         if (typeof minSalary === "number") filter["salary.max"] = { $gte: minSalary };
         if (typeof maxSalary === "number") filter["salary.min"] = { $lte: maxSalary };
         if (typeof isBeginnerFriendly === "boolean") filter.isBeginnerFriendly = isBeginnerFriendly;
