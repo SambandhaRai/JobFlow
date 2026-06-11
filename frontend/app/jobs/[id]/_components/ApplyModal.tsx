@@ -246,7 +246,7 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
 
     const overlay = (
         <div
-            className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink-900/45 p-4 sm:items-center sm:p-6"
+            className="fixed inset-0 z-100 flex items-start justify-center overflow-y-auto bg-ink-900/45 p-4 sm:items-center sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-label={`Apply to ${job.title}`}
@@ -254,7 +254,7 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
                 if (event.target === event.currentTarget && !submitting && !uploading) closeModal();
             }}
         >
-            <div className="my-auto flex w-full max-w-[720px] flex-col overflow-hidden rounded-xl bg-surface shadow-modal">
+            <div className="my-auto flex w-full max-w-180 flex-col overflow-hidden rounded-xl bg-surface shadow-modal">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-4 px-6 pt-6">
                     <div className="flex min-w-0 items-center gap-3">
@@ -680,7 +680,7 @@ function StepReview({
                     maxLength={MAX_APPLICATION_NOTE}
                     onChange={(event) => onApplicationNoteChange(event.target.value)}
                     placeholder="A sentence or two on why this role is a fit (optional)."
-                    className="min-h-[78px] w-full resize-none rounded-md border border-ink-200 bg-surface px-3 py-2.5 text-sm text-ink-900 outline-none transition-colors duration-150 placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100"
+                    className="min-h-19.5 w-full resize-none rounded-md border border-ink-200 bg-surface px-3 py-2.5 text-sm text-ink-900 outline-none transition-colors duration-150 placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100"
                 />
             </div>
 
