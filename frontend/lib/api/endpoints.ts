@@ -148,7 +148,7 @@ export type CreateApplicationPayload = {
     fullName: string;
     email: string;
     phone: string;
-    coverLetter?: string;
+    applicationNote?: string;
 };
 
 export type UpdateApplicationStatusPayload = {

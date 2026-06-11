@@ -36,7 +36,16 @@ export const updateUserProfile = async (profileData: UpdateProfilePayload) => {
 
 export const addResume = async (resumeData: CreateResumePayload | FormData) => {
     try {
-        const response = await axios.post(API.USER.RESUME.ADD, resumeData);
+        // When uploading a file we must override the instance's default JSON
+        // content type, otherwise axios serializes the FormData into JSON and
+        // drops the file. Setting multipart/form-data lets the browser attach
+        // the correct multipart boundary.
+        const isFormData = typeof FormData !== "undefined" && resumeData instanceof FormData;
+        const response = await axios.post(
+            API.USER.RESUME.ADD,
+            resumeData,
+            isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : undefined,
+        );
         return response.data;
     } catch (err) {
         throw new Error(getUserErrorMessage(err, "Failed to add resume"));

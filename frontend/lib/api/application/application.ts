@@ -10,11 +10,17 @@ import {
 
 type ApiErrorResponse = {
     message?: string;
+    errors?: string;
 };
 
 const getApplicationErrorMessage = (err: unknown, fallback: string) => {
     const error = err as AxiosError<ApiErrorResponse>;
-    return error.response?.data?.message || error.message || fallback;
+    // Validation failures come back under `errors` (from z.prettifyError),
+    // not `message`, so surface those instead of a generic status line.
+    return error.response?.data?.message
+        || error.response?.data?.errors
+        || error.message
+        || fallback;
 };
 
 export const applyToJob = async (applicationData: CreateApplicationPayload) => {
