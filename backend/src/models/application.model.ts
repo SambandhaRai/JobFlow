@@ -10,7 +10,7 @@ const ApplicationSchema: Schema = new Schema({
     fullName: { type: String, required: true, trim: true, minLength: 2 },
     email: { type: String, required: true, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true, minLength: 10, maxLength: 15 },
-    coverLetter: { type: String, trim: true, maxLength: 1000 },
+    applicationNote: { type: String, trim: true, maxLength: 1000 },
     status: {
         type: String,
         enum: ["submitted", "viewed_by_employer", "shortlisted", "interview_scheduled", "not_selected"],
