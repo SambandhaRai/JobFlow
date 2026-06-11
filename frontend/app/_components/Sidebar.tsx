@@ -16,6 +16,8 @@ import {
     PanelLeftOpen,
 } from "lucide-react";
 import CompanyAvatar from "./CompanyAvatar";
+import { getSavedJobs } from "../../lib/api/user/user";
+import { getMyApplications } from "../../lib/api/application/application";
 
 const SIDEBAR_STORAGE_KEY = "jobflow-sidebar-collapsed";
 const SIDEBAR_EXPANDED_WIDTH = "232px";
@@ -58,16 +60,20 @@ function NavLink({
     item,
     active,
     compact,
+    count,
 }: {
     item: NavItem;
     active: boolean;
     compact: boolean;
+    count?: number;
 }) {
+    const hasCount = typeof count === "number" && count > 0;
+
     return (
         <Link
             href={item.href}
             title={compact ? item.label : undefined}
-            aria-label={compact ? item.label : undefined}
+            aria-label={compact ? `${item.label}${hasCount ? `, ${count}` : ""}` : undefined}
             className={[
                 "relative flex items-center rounded-md text-sm transition-colors duration-150",
                 compact ? "mx-auto h-10 w-10 justify-center" : "gap-2.5 px-3 py-2",
@@ -80,13 +86,72 @@ function NavLink({
                 {item.icon}
             </span>
             {!compact && <span className="flex-1">{item.label}</span>}
+            {!compact && hasCount && (
+                <span
+                    className={[
+                        "rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none",
+                        active ? "bg-cobalt-500 text-white" : "bg-ink-100 text-ink-500",
+                    ].join(" ")}
+                >
+                    {count}
+                </span>
+            )}
+            {/* Collapsed rail: show a dot instead of the number */}
+            {compact && hasCount && (
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-cobalt-500 ring-2 ring-cobalt-50" />
+            )}
         </Link>
     );
 }
 
+type NavCounts = {
+    saved?: number;
+    applications?: number;
+};
+
 export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [counts, setCounts] = useState<NavCounts>({});
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const loadCounts = async () => {
+            const [savedResult, applicationsResult] = await Promise.allSettled([
+                getSavedJobs(),
+                getMyApplications(),
+            ]);
+            if (cancelled) return;
+
+            const next: NavCounts = {};
+
+            if (savedResult.status === "fulfilled") {
+                const data = (savedResult.value as { data?: unknown[] })?.data;
+                if (Array.isArray(data)) next.saved = data.length;
+            }
+
+            if (applicationsResult.status === "fulfilled") {
+                const value = applicationsResult.value as { data?: unknown[]; totalApplications?: number };
+                next.applications = value?.totalApplications
+                    ?? (Array.isArray(value?.data) ? value.data.length : undefined);
+            }
+
+            setCounts(next);
+        };
+
+        void loadCounts();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const navCountFor = (href: string) => {
+        if (href === "/saved") return counts.saved;
+        if (href === "/applications") return counts.applications;
+        return undefined;
+    };
 
     useEffect(() => {
         const storedValue = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
@@ -175,7 +240,12 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                 <ul className="space-y-0.5 mb-5">
                     {JOB_SEARCH_NAV.map((item) => (
                         <li key={item.href}>
-                            <NavLink item={item} active={pathname === item.href} compact={isCollapsed} />
+                            <NavLink
+                                item={item}
+                                active={pathname === item.href}
+                                compact={isCollapsed}
+                                count={navCountFor(item.href)}
+                            />
                         </li>
                     ))}
                 </ul>

@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { Bookmark, BriefcaseBusiness, ChevronRight, CreditCard, MapPin, Sparkles } from "lucide-react";
+import { BriefcaseBusiness, ChevronRight, CreditCard, MapPin, Sparkles } from "lucide-react";
 
+import Badge from "../../_components/Badge";
 import CompanyAvatar from "../../_components/CompanyAvatar";
 import VerifiedBadge from "../../_components/VerifiedBadge";
+import SaveJobButton from "./SaveJobButton";
 import type { Job } from "./discoverData";
 
 interface JobCardProps {
     job: Job;
+    isSaved?: boolean;
 }
 
-export default function JobCard({ job }: JobCardProps) {
+export default function JobCard({ job, isSaved = false }: JobCardProps) {
     const hiringTypeLabel = {
         company: "Company",
         "small-business": "Small business",
@@ -17,7 +20,7 @@ export default function JobCard({ job }: JobCardProps) {
     }[job.hiringType];
 
     return (
-        <article className="rounded-lg border border-ink-100 bg-surface p-4 shadow-card transition-colors hover:border-ink-200 sm:p-5">
+        <article className="group relative rounded-lg border border-ink-100 bg-surface p-4 shadow-card transition-all hover:border-cobalt-100 hover:shadow-popover sm:p-5">
             <div className="flex flex-col gap-4 sm:flex-row">
                 <CompanyAvatar name={job.company} size="lg" className="mt-1" />
 
@@ -26,17 +29,22 @@ export default function JobCard({ job }: JobCardProps) {
                         <div className="min-w-0 space-y-2">
                             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
                                 <h2 className="min-w-0 text-lg font-semibold leading-snug tracking-tight text-ink-900">
-                                    {job.title}
+                                    {/* Stretched link: the whole card navigates to the job. */}
+                                    <Link
+                                        href={`/jobs/${job.id}`}
+                                        className="transition-colors after:absolute after:inset-0 after:rounded-lg group-hover:text-cobalt-700"
+                                    >
+                                        {job.title}
+                                    </Link>
                                 </h2>
 
                                 {(job.isVerified || job.isBeginnerFriendly) && (
                                     <div className="flex flex-wrap items-center gap-2">
                                         {job.isVerified && <VerifiedBadge />}
                                         {job.isBeginnerFriendly && (
-                                            <span className="inline-flex items-center gap-1 rounded-md border border-success-500/20 bg-success-50 px-2 py-0.5 text-xs font-medium text-success-700">
-                                                <Sparkles size={12} />
+                                            <Badge tone="success" icon={<Sparkles size={12} />}>
                                                 Beginner-friendly
-                                            </span>
+                                            </Badge>
                                         )}
                                     </div>
                                 )}
@@ -51,9 +59,7 @@ export default function JobCard({ job }: JobCardProps) {
                                 {job.isHiringVerified && (
                                     <>
                                         <span aria-hidden="true">·</span>
-                                        <span className="inline-flex items-center rounded-md border border-cobalt-100 bg-cobalt-50 px-2 py-0.5 text-xs font-medium text-cobalt-600">
-                                            Verified hiring profile
-                                        </span>
+                                        <Badge tone="cobalt">Verified hiring profile</Badge>
                                     </>
                                 )}
                             </div>
@@ -61,13 +67,12 @@ export default function JobCard({ job }: JobCardProps) {
 
                         <div className="flex shrink-0 items-center justify-between gap-3 lg:justify-end">
                             <span className="text-xs text-ink-400">{job.postedAt}</span>
-                            <button
-                                type="button"
-                                className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-100 text-ink-400 transition-colors hover:border-cobalt-100 hover:bg-cobalt-50 hover:text-cobalt-600"
-                                aria-label={`Save ${job.title}`}
-                            >
-                                <Bookmark size={16} />
-                            </button>
+                            <SaveJobButton
+                                jobId={job.id}
+                                title={job.title}
+                                initialSaved={isSaved}
+                                className="relative z-10"
+                            />
                         </div>
                     </div>
 
@@ -86,7 +91,7 @@ export default function JobCard({ job }: JobCardProps) {
                         </span>
                     </div>
 
-                    <div className="mt-4 border-t border-ink-100 pt-4">
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-ink-100 pt-4">
                         {job.skills.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
                                 {job.skills.slice(0, 4).map((skill) => (
@@ -111,16 +116,12 @@ export default function JobCard({ job }: JobCardProps) {
                         ) : (
                             <p className="text-sm text-ink-400">Skills not listed</p>
                         )}
-                    </div>
 
-                    <div className="mt-4 flex justify-start">
-                        <Link
-                            href={`/jobs/${job.id}`}
-                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-cobalt-500 px-4 text-sm font-medium text-white transition-colors hover:bg-cobalt-600 sm:w-auto"
-                        >
+                        {/* Visual affordance only — the stretched link handles the click. */}
+                        <span className="ml-auto inline-flex items-center gap-1 text-sm font-medium text-cobalt-600">
                             View details
-                            <ChevronRight size={16} />
-                        </Link>
+                            <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+                        </span>
                     </div>
                 </div>
             </div>

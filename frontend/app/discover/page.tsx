@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertCircle, ChevronDown, SearchX, SlidersHorizontal } from "lucide-react";
+import { AlertCircle, SearchX, SlidersHorizontal } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -14,6 +14,7 @@ import {
     JOBS_PER_DISCOVER_PAGE,
     fetchDiscoverData,
     getActiveFilters,
+    getSavedJobIds,
     parsePositiveIntegerParam,
     type DiscoverUser,
     type SearchParams,
@@ -96,6 +97,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
         error,
     } = await fetchDiscoverData({ token, searchParams: resolvedSearchParams });
     const user = fetchedUser ?? cookieUser;
+    const savedJobIds = new Set(getSavedJobIds(user));
     const activeFilters = getActiveFilters(resolvedSearchParams);
     const fullName = user?.fullName ?? "Job seeker";
     const currentPage = parsePositiveIntegerParam(resolvedSearchParams.page);
@@ -151,36 +153,20 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
                         </details>
 
                         <div className="rounded-lg border border-ink-100 bg-surface p-4 shadow-card">
-                            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                                <div>
-                                    <h1 className="text-xl font-semibold tracking-tight text-ink-900">
-                                        Discover jobs
-                                    </h1>
-                                    <p className="mt-1 text-sm text-ink-500">
-                                        {totalJobs > 0
-                                            ? `Showing ${firstResult}-${lastResult} of ${totalJobs.toLocaleString("en-US")} verified roles.`
-                                            : "Showing verified roles that match your current search."}
-                                    </p>
-                                </div>
+                            <h1 className="text-xl font-semibold tracking-tight text-ink-900">
+                                Discover jobs
+                            </h1>
+                            <p className="mt-1 text-sm text-ink-500">
+                                {totalJobs > 0
+                                    ? `Showing ${firstResult}-${lastResult} of ${totalJobs.toLocaleString("en-US")} verified roles.`
+                                    : "Showing verified roles that match your current search."}
+                            </p>
 
-                                <div className="flex items-center gap-3 self-start lg:self-auto">
-                                    <div className="text-sm leading-tight text-ink-900 lg:text-right">
-                                        <p className="font-semibold">{totalJobs.toLocaleString("en-US")}</p>
-                                        <p className="text-xs text-ink-500">results</p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="inline-flex h-10 min-w-38 items-center justify-between gap-4 rounded-md border border-ink-100 bg-surface px-4 text-sm font-medium text-ink-700 shadow-card"
-                                    >
-                                        Best match
-                                        <ChevronDown size={16} className="text-ink-400" />
-                                    </button>
+                            {activeFilters.length > 0 && (
+                                <div className="mt-4">
+                                    <FilterChips filters={activeFilters} searchParams={resolvedSearchParams} />
                                 </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <FilterChips filters={activeFilters} searchParams={resolvedSearchParams} />
-                            </div>
+                            )}
                         </div>
 
                         {error && (
@@ -197,7 +183,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
                             {jobs.length > 0 ? (
                                 <>
                                     {jobs.map((job) => (
-                                        <JobCard key={job.id} job={job} />
+                                        <JobCard key={job.id} job={job} isSaved={savedJobIds.has(job.id)} />
                                     ))}
 
                                     <DiscoverPagination

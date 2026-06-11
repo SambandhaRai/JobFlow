@@ -427,6 +427,19 @@ const mapSavedJobs = (user: DiscoverUser | null, fallbackJobs: Job[]): SavedJob[
         .slice(0, 3);
 };
 
+export const getSavedJobIds = (user: DiscoverUser | null): string[] => {
+    const savedJobs = user?.savedJobs;
+    if (!Array.isArray(savedJobs)) return [];
+
+    return savedJobs
+        .map((item) => {
+            if (typeof item === "string") return item;
+            const saved = item as BackendJob;
+            return saved._id ?? saved.id ?? null;
+        })
+        .filter((id): id is string => Boolean(id));
+};
+
 export const getTrendingSearches = (jobs: Job[]): TrendingSearch[] => {
     const counts = new Map<string, number>();
 

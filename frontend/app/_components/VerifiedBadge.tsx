@@ -1,4 +1,6 @@
-import { Check } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
+
+import Badge from "./Badge";
 
 interface VerifiedBadgeProps {
     label?: string;
@@ -7,14 +9,8 @@ interface VerifiedBadgeProps {
 
 export default function VerifiedBadge({ label = "Verified", className = "" }: VerifiedBadgeProps) {
     return (
-        <span
-            className={[
-                "inline-flex items-center gap-1 text-xs font-medium text-cobalt-600",
-                className,
-            ].join(" ")}
-        >
-            <Check size={12} strokeWidth={2.5} />
+        <Badge tone="cobalt" icon={<BadgeCheck size={12} />} className={className}>
             {label}
-        </span>
+        </Badge>
     );
 }

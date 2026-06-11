@@ -1,5 +1,7 @@
 import { Clock, Eye, CheckCircle, Calendar, XCircle } from "lucide-react";
 
+import Badge, { type BadgeTone } from "./Badge";
+
 export type ApplicationStatus =
     | "submitted"
     | "viewed_by_employer"
@@ -7,38 +9,12 @@ export type ApplicationStatus =
     | "interview_scheduled"
     | "not_selected";
 
-interface StatusConfig {
-    label: string;
-    icon: React.ReactNode;
-    className: string;
-}
-
-const STATUS_CONFIG: Record<ApplicationStatus, StatusConfig> = {
-    submitted: {
-        label: "Submitted",
-        icon: <Clock size={12} />,
-        className: "bg-ink-50 text-ink-600 border border-ink-200",
-    },
-    viewed_by_employer: {
-        label: "Viewed by employer",
-        icon: <Eye size={12} />,
-        className: "bg-cobalt-50 text-cobalt-700 border border-cobalt-200",
-    },
-    shortlisted: {
-        label: "Shortlisted",
-        icon: <CheckCircle size={12} />,
-        className: "bg-success-50 text-success-700 border border-success-500/30",
-    },
-    interview_scheduled: {
-        label: "Interview scheduled",
-        icon: <Calendar size={12} />,
-        className: "bg-warning-50 text-warning-700 border border-warning-500/30",
-    },
-    not_selected: {
-        label: "Not selected",
-        icon: <XCircle size={12} />,
-        className: "bg-danger-50 text-danger-700 border border-danger-500/30",
-    },
+const STATUS_CONFIG: Record<ApplicationStatus, { label: string; icon: React.ReactNode; tone: BadgeTone }> = {
+    submitted: { label: "Submitted", icon: <Clock size={12} />, tone: "neutral" },
+    viewed_by_employer: { label: "Viewed by employer", icon: <Eye size={12} />, tone: "cobalt" },
+    shortlisted: { label: "Shortlisted", icon: <CheckCircle size={12} />, tone: "success" },
+    interview_scheduled: { label: "Interview scheduled", icon: <Calendar size={12} />, tone: "warning" },
+    not_selected: { label: "Not selected", icon: <XCircle size={12} />, tone: "danger" },
 };
 
 interface StatusBadgeProps {
@@ -47,18 +23,11 @@ interface StatusBadgeProps {
 }
 
 export default function StatusBadge({ status, className = "" }: StatusBadgeProps) {
-    const config = STATUS_CONFIG[status];
+    const { label, icon, tone } = STATUS_CONFIG[status];
 
     return (
-        <span
-            className={[
-                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-                config.className,
-                className,
-            ].join(" ")}
-        >
-            {config.icon}
-            {config.label}
-        </span>
+        <Badge tone={tone} icon={icon} className={className}>
+            {label}
+        </Badge>
     );
 }

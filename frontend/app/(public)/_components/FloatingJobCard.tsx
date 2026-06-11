@@ -1,7 +1,6 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BadgeCheck } from "lucide-react";
 
 import CompanyAvatar from "../../_components/CompanyAvatar";
-import VerifiedBadge from "../../_components/VerifiedBadge";
 
 interface FloatingJobCardProps {
     company: string;
@@ -30,7 +29,7 @@ export default function FloatingJobCard({
                 <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                         <p className="text-sm font-semibold text-ink-900 truncate">{title}</p>
-                        <VerifiedBadge label="" />
+                        <BadgeCheck size={14} className="shrink-0 text-cobalt-600" aria-label="Verified" />
                     </div>
                     <p className="text-xs text-ink-500 truncate">{company}</p>
                 </div>

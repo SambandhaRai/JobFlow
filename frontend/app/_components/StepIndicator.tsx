@@ -11,7 +11,8 @@ interface StepIndicatorProps {
 
 export default function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
     return (
-        <div className="flex items-start w-full">
+        // pb leaves room for the absolutely-positioned labels below each circle.
+        <div className="flex w-full items-start pb-6">
             {steps.map((step, index) => {
                 const stepNumber = index + 1;
                 const isCompleted = stepNumber < currentStep;
@@ -19,17 +20,26 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
                 const isLast = index === steps.length - 1;
 
                 return (
-                    <div key={step.label} className="flex items-start flex-1 last:flex-none">
-                        {/* Step circle + label */}
-                        <div className="flex flex-col items-center gap-1.5">
+                    <div
+                        key={step.label}
+                        className={[
+                            "flex items-center",
+                            isLast ? "flex-none" : "flex-1",
+                        ].join(" ")}
+                    >
+                        {/* Node: fixed-width circle with the label centered beneath it.
+                            Keeping the label absolute means every node is exactly the
+                            circle's width, so the circles distribute evenly and the
+                            middle step stays centered regardless of label length. */}
+                        <div className="relative flex shrink-0 flex-col items-center">
                             <div
                                 className={[
-                                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors duration-200",
+                                    "flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors duration-200",
                                     isCompleted
-                                        ? "bg-cobalt-500 border-cobalt-500 text-white"
+                                        ? "border-cobalt-500 bg-cobalt-500 text-white"
                                         : isActive
-                                        ? "bg-surface border-cobalt-500 text-cobalt-600"
-                                        : "bg-surface border-ink-200 text-ink-400",
+                                        ? "border-cobalt-500 bg-surface text-cobalt-600"
+                                        : "border-ink-200 bg-surface text-ink-400",
                                 ].join(" ")}
                             >
                                 {isCompleted ? (
@@ -40,19 +50,18 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
                             </div>
                             <span
                                 className={[
-                                    "text-xs font-medium whitespace-nowrap",
-                                    isActive
-                                        ? "text-ink-900"
-                                        : "text-ink-400",
+                                    "absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap text-xs font-medium",
+                                    isActive ? "text-ink-900" : "text-ink-400",
                                 ].join(" ")}
                             >
                                 {step.label}
                             </span>
                         </div>
 
-                        {/* Connector line */}
+                        {/* Connector line, vertically centered on the circle */}
                         {!isLast && (
-                            <div className="flex-1 h-0.5 mt-4 mx-2 transition-colors duration-200 rounded-full"
+                            <div
+                                className="mx-2 h-0.5 flex-1 rounded-full transition-colors duration-200"
                                 style={{
                                     backgroundColor: isCompleted
                                         ? "var(--color-cobalt-500)"

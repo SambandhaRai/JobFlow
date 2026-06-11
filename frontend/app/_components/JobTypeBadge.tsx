@@ -1,3 +1,5 @@
+import Badge, { type BadgeTone } from "./Badge";
+
 export type JobBadgeVariant =
     | "internship"
     | "full-time"
@@ -8,44 +10,15 @@ export type JobBadgeVariant =
     | "beginner-friendly"
     | "entry-level";
 
-interface BadgeConfig {
-    label: string;
-    className: string;
-}
-
-const BADGE_CONFIG: Record<JobBadgeVariant, BadgeConfig> = {
-    "internship": {
-        label: "Internship",
-        className: "bg-cobalt-50 text-cobalt-700 border border-cobalt-200",
-    },
-    "full-time": {
-        label: "Full-time",
-        className: "bg-cobalt-100 text-cobalt-800 border border-cobalt-200",
-    },
-    "part-time": {
-        label: "Part-time",
-        className: "bg-warning-50 text-warning-700 border border-warning-500/30",
-    },
-    "hybrid": {
-        label: "Hybrid",
-        className: "bg-ink-50 text-ink-600 border border-ink-200",
-    },
-    "on-site": {
-        label: "On-site",
-        className: "bg-ink-50 text-ink-600 border border-ink-200",
-    },
-    "remote": {
-        label: "Remote",
-        className: "bg-success-50 text-success-700 border border-success-500/30",
-    },
-    "beginner-friendly": {
-        label: "Beginner-friendly",
-        className: "bg-success-50 text-success-700 border border-success-500/30",
-    },
-    "entry-level": {
-        label: "Entry-level",
-        className: "bg-warning-50 text-warning-700 border border-warning-500/30",
-    },
+const BADGE_CONFIG: Record<JobBadgeVariant, { label: string; tone: BadgeTone }> = {
+    "internship": { label: "Internship", tone: "cobalt" },
+    "full-time": { label: "Full-time", tone: "cobalt" },
+    "part-time": { label: "Part-time", tone: "warning" },
+    "hybrid": { label: "Hybrid", tone: "neutral" },
+    "on-site": { label: "On-site", tone: "neutral" },
+    "remote": { label: "Remote", tone: "success" },
+    "beginner-friendly": { label: "Beginner-friendly", tone: "success" },
+    "entry-level": { label: "Entry-level", tone: "warning" },
 };
 
 interface JobTypeBadgeProps {
@@ -54,17 +27,11 @@ interface JobTypeBadgeProps {
 }
 
 export default function JobTypeBadge({ variant, className = "" }: JobTypeBadgeProps) {
-    const config = BADGE_CONFIG[variant];
+    const { label, tone } = BADGE_CONFIG[variant];
 
     return (
-        <span
-            className={[
-                "inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium",
-                config.className,
-                className,
-            ].join(" ")}
-        >
-            {config.label}
-        </span>
+        <Badge tone={tone} className={className}>
+            {label}
+        </Badge>
     );
 }
