@@ -65,9 +65,11 @@
   --shadow-modal:   0 12px 32px rgba(14, 17, 22, 0.12), 0 4px 8px rgba(14, 17, 22, 0.06);
 
   /* ---------- Layout ---------- */
-  /* Exposing the sidebar width as a spacing token lets you use
-     w-sidebar, ml-sidebar, min-w-sidebar, etc. */
+  /* Exposing rail widths as spacing tokens keeps fixed navigation
+     and page grids in sync when desktop panels are collapsed. */
   --spacing-sidebar: 232px;
+  --app-sidebar-width: 232px;
+  --discover-filter-width: 260px;
 }
 
 /* ============================================================

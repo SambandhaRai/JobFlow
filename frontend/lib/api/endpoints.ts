@@ -1,5 +1,5 @@
 type QueryValue = string | number | boolean | null | undefined;
-type QueryParams = Record<string, QueryValue>;
+type QueryParams = Record<string, QueryValue | QueryValue[]>;
 
 export type UserRole = "user" | "employer" | "admin";
 
@@ -120,11 +120,11 @@ export type JobListQuery = {
     page?: number;
     size?: number;
     search?: string;
-    jobType?: JobType;
-    workMode?: WorkMode;
-    experienceLevel?: ExperienceLevel;
-    category?: JobCategory;
-    location?: string;
+    jobType?: JobType | JobType[];
+    workMode?: WorkMode | WorkMode[];
+    experienceLevel?: ExperienceLevel | ExperienceLevel[];
+    category?: JobCategory | JobCategory[];
+    location?: string | string[];
     postedByUserId?: string;
     companyId?: string;
     hiringType?: HiringType;
@@ -166,6 +166,12 @@ const withQuery = (path: string, params?: QueryParams) => {
 
     Object.entries(params ?? {}).forEach(([key, value]) => {
         if (value === undefined || value === null || value === "") return;
+        if (Array.isArray(value)) {
+            value.forEach((item) => {
+                if (item !== undefined && item !== null && item !== "") query.append(key, String(item));
+            });
+            return;
+        }
         query.set(key, String(value));
     });
 
