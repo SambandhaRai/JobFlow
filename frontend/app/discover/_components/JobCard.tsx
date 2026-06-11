@@ -23,30 +23,39 @@ export default function JobCard({ job }: JobCardProps) {
 
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                        <div className="min-w-0">
-                            <h2 className="text-lg font-semibold leading-snug tracking-tight text-ink-900">
-                                {job.title}
-                            </h2>
-                            <div className="mt-2 flex flex-wrap items-center gap-2">
-                                {job.isVerified && <VerifiedBadge />}
-                                {job.isHiringVerified && (
-                                    <span className="inline-flex items-center rounded-md border border-cobalt-100 bg-cobalt-50 px-2 py-0.5 text-xs font-medium text-cobalt-600">
-                                        Verified hiring profile
-                                    </span>
-                                )}
-                                {job.isBeginnerFriendly && (
-                                    <span className="inline-flex items-center gap-1 rounded-md border border-success-500/20 bg-success-50 px-2 py-0.5 text-xs font-medium text-success-700">
-                                        <Sparkles size={12} />
-                                        Beginner-friendly
-                                    </span>
+                        <div className="min-w-0 space-y-2">
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
+                                <h2 className="min-w-0 text-lg font-semibold leading-snug tracking-tight text-ink-900">
+                                    {job.title}
+                                </h2>
+
+                                {(job.isVerified || job.isBeginnerFriendly) && (
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {job.isVerified && <VerifiedBadge />}
+                                        {job.isBeginnerFriendly && (
+                                            <span className="inline-flex items-center gap-1 rounded-md border border-success-500/20 bg-success-50 px-2 py-0.5 text-xs font-medium text-success-700">
+                                                <Sparkles size={12} />
+                                                Beginner-friendly
+                                            </span>
+                                        )}
+                                    </div>
                                 )}
                             </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-500">
+
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-500">
                                 <span>{job.company}</span>
                                 <span aria-hidden="true">·</span>
                                 <span>{hiringTypeLabel}</span>
                                 <span aria-hidden="true">·</span>
                                 <span>{job.category}</span>
+                                {job.isHiringVerified && (
+                                    <>
+                                        <span aria-hidden="true">·</span>
+                                        <span className="inline-flex items-center rounded-md border border-cobalt-100 bg-cobalt-50 px-2 py-0.5 text-xs font-medium text-cobalt-600">
+                                            Verified hiring profile
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         </div>
 
@@ -64,15 +73,15 @@ export default function JobCard({ job }: JobCardProps) {
 
                     <div className="mt-4 grid gap-2 rounded-md bg-ink-50 p-3 text-sm text-ink-600 sm:grid-cols-3">
                         <span className="inline-flex min-w-0 items-center gap-1.5">
-                            <MapPin size={14} className="text-ink-300" />
+                            <MapPin size={14} className="shrink-0 text-ink-300" />
                             <span className="truncate">{job.location} · {job.workMode}</span>
                         </span>
                         <span className="inline-flex min-w-0 items-center gap-1.5">
-                            <BriefcaseBusiness size={14} className="text-ink-300" />
+                            <BriefcaseBusiness size={14} className="shrink-0 text-ink-300" />
                             <span className="truncate">{job.type}{job.duration ? ` · ${job.duration}` : ""}</span>
                         </span>
                         <span className="inline-flex min-w-0 items-center gap-1.5">
-                            <CreditCard size={14} className="text-ink-300" />
+                            <CreditCard size={14} className="shrink-0 text-ink-300" />
                             <span className="truncate">{job.compensation}</span>
                         </span>
                     </div>

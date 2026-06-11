@@ -85,6 +85,8 @@ export type TrendingSearch = {
 
 export type ActiveFilter = {
     key: string;
+    paramKey?: string;
+    value?: string;
     keys?: string[];
     label: string;
 };
@@ -167,10 +169,21 @@ const getFirstParam = (value: string | string[] | undefined) => (
     Array.isArray(value) ? value[0] : value
 );
 
+const getParamValues = (value: string | string[] | undefined) => (
+    (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean)
+);
+
 const isOneOf = <TValue extends string>(
     value: string | undefined,
     options: Array<FilterOption<TValue>>,
 ): value is TValue => Boolean(value && options.some((option) => option.value === value));
+
+const getValidValues = <TValue extends string>(
+    value: string | string[] | undefined,
+    options: Array<FilterOption<TValue>>,
+): TValue[] => (
+    getParamValues(value).filter((item): item is TValue => isOneOf(item, options))
+);
 
 const parseNumberParam = (value: string | undefined) => {
     if (!value) return undefined;
@@ -249,11 +262,11 @@ export const getFilterLabel = (key: keyof JobListQuery, value?: string) => {
 
 export const getActiveFilters = (searchParams: SearchParams) => {
     const search = getFirstParam(searchParams.search);
-    const location = getFirstParam(searchParams.location);
-    const jobType = getFirstParam(searchParams.jobType);
-    const experienceLevel = getFirstParam(searchParams.experienceLevel);
-    const workMode = getFirstParam(searchParams.workMode);
-    const category = getFirstParam(searchParams.category);
+    const locations = getParamValues(searchParams.location);
+    const jobTypes = getValidValues(searchParams.jobType, jobTypeOptions);
+    const experienceLevels = getValidValues(searchParams.experienceLevel, experienceOptions);
+    const workModes = getValidValues(searchParams.workMode, workModeOptions);
+    const categories = getValidValues(searchParams.category, categoryOptions);
     const minSalary = getFirstParam(searchParams.minSalary);
     const maxSalary = getFirstParam(searchParams.maxSalary);
     const isBeginnerFriendly = getFirstParam(searchParams.isBeginnerFriendly);
@@ -264,14 +277,36 @@ export const getActiveFilters = (searchParams: SearchParams) => {
 
     return [
         search ? { key: "search", label: search } : null,
-        location ? { key: "location", label: location } : null,
-        jobType ? { key: "jobType", label: getFilterLabel("jobType", jobType) ?? jobType } : null,
-        experienceLevel ? {
-            key: "experienceLevel",
+        ...locations.map((location) => ({
+            key: `location:${location}`,
+            paramKey: "location",
+            value: location,
+            label: location,
+        })),
+        ...jobTypes.map((jobType) => ({
+            key: `jobType:${jobType}`,
+            paramKey: "jobType",
+            value: jobType,
+            label: getFilterLabel("jobType", jobType) ?? jobType,
+        })),
+        ...experienceLevels.map((experienceLevel) => ({
+            key: `experienceLevel:${experienceLevel}`,
+            paramKey: "experienceLevel",
+            value: experienceLevel,
             label: getFilterLabel("experienceLevel", experienceLevel) ?? experienceLevel,
-        } : null,
-        workMode ? { key: "workMode", label: getFilterLabel("workMode", workMode) ?? workMode } : null,
-        category ? { key: "category", label: getFilterLabel("category", category) ?? category } : null,
+        })),
+        ...workModes.map((workMode) => ({
+            key: `workMode:${workMode}`,
+            paramKey: "workMode",
+            value: workMode,
+            label: getFilterLabel("workMode", workMode) ?? workMode,
+        })),
+        ...categories.map((category) => ({
+            key: `category:${category}`,
+            paramKey: "category",
+            value: category,
+            label: getFilterLabel("category", category) ?? category,
+        })),
         minSalary || maxSalary ? {
             key: "salary",
             keys: ["minSalary", "maxSalary"],
@@ -284,11 +319,11 @@ export const getActiveFilters = (searchParams: SearchParams) => {
 export const getJobQueryFromSearchParams = (searchParams: SearchParams): JobListQuery => {
     const page = parsePositiveIntegerParam(searchParams.page);
     const search = getFirstParam(searchParams.search);
-    const location = getFirstParam(searchParams.location);
-    const jobType = getFirstParam(searchParams.jobType);
-    const experienceLevel = getFirstParam(searchParams.experienceLevel);
-    const workMode = getFirstParam(searchParams.workMode);
-    const category = getFirstParam(searchParams.category);
+    const locations = getParamValues(searchParams.location);
+    const jobTypes = getValidValues(searchParams.jobType, jobTypeOptions);
+    const experienceLevels = getValidValues(searchParams.experienceLevel, experienceOptions);
+    const workModes = getValidValues(searchParams.workMode, workModeOptions);
+    const categories = getValidValues(searchParams.category, categoryOptions);
     const minSalary = getFirstParam(searchParams.minSalary);
     const maxSalary = getFirstParam(searchParams.maxSalary);
     const isBeginnerFriendly = getFirstParam(searchParams.isBeginnerFriendly);
@@ -298,22 +333,31 @@ export const getJobQueryFromSearchParams = (searchParams: SearchParams): JobList
         size: JOBS_PER_DISCOVER_PAGE,
         isVerified: true,
         search,
-        location,
-        jobType: isOneOf(jobType, jobTypeOptions) ? jobType : undefined,
-        experienceLevel: isOneOf(experienceLevel, experienceOptions) ? experienceLevel : undefined,
-        workMode: isOneOf(workMode, workModeOptions) ? workMode : undefined,
-        category: isOneOf(category, categoryOptions) ? category : undefined,
+        location: locations.length > 0 ? locations : undefined,
+        jobType: jobTypes.length > 0 ? jobTypes : undefined,
+        experienceLevel: experienceLevels.length > 0 ? experienceLevels : undefined,
+        workMode: workModes.length > 0 ? workModes : undefined,
+        category: categories.length > 0 ? categories : undefined,
         minSalary: parseNumberParam(minSalary),
         maxSalary: parseNumberParam(maxSalary),
         isBeginnerFriendly: isBeginnerFriendly === "true" ? true : undefined,
     };
 };
 
-const withQuery = (path: string, params?: Record<string, string | number | boolean | undefined>) => {
+const withQuery = (
+    path: string,
+    params?: Record<string, string | number | boolean | Array<string | number | boolean> | undefined>,
+) => {
     const query = new URLSearchParams();
 
     Object.entries(params ?? {}).forEach(([key, value]) => {
         if (value === undefined || value === "") return;
+        if (Array.isArray(value)) {
+            value.forEach((item) => {
+                if (item !== "") query.append(key, String(item));
+            });
+            return;
+        }
         query.set(key, String(value));
     });
 

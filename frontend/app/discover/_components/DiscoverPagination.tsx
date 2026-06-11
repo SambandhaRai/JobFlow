@@ -9,16 +9,16 @@ interface DiscoverPaginationProps {
     searchParams: SearchParams;
 }
 
-const getFirstParam = (value: string | string[] | undefined) => (
-    Array.isArray(value) ? value[0] : value
+const getParamValues = (value: string | string[] | undefined) => (
+    (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean)
 );
 
 const getPageHref = (searchParams: SearchParams, page: number) => {
     const params = new URLSearchParams();
 
     Object.entries(searchParams).forEach(([key, value]) => {
-        const firstValue = getFirstParam(value);
-        if (firstValue && key !== "page") params.set(key, firstValue);
+        if (key === "page") return;
+        getParamValues(value).forEach((item) => params.append(key, item));
     });
 
     if (page > 1) params.set("page", String(page));

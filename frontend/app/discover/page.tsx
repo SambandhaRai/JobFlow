@@ -44,16 +44,16 @@ const getFirstName = (fullName?: string) => {
     return firstName || "there";
 };
 
-const getFirstParam = (value: string | string[] | undefined) => (
-    Array.isArray(value) ? value[0] : value
+const getParamValues = (value: string | string[] | undefined) => (
+    (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean)
 );
 
 const getDiscoverPageHref = (searchParams: SearchParams, page: number) => {
     const params = new URLSearchParams();
 
     Object.entries(searchParams).forEach(([key, value]) => {
-        const firstValue = getFirstParam(value);
-        if (firstValue && key !== "page") params.set(key, firstValue);
+        if (key === "page") return;
+        getParamValues(value).forEach((item) => params.append(key, item));
     });
 
     if (page > 1) params.set("page", String(page));
@@ -114,7 +114,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
                 profileCompletion={getProfileCompletion(user)}
             />
 
-            <div className="min-h-screen lg:pl-sidebar">
+            <div className="min-h-screen transition-[padding] duration-200 lg:pl-[var(--app-sidebar-width,232px)]">
                 <TopBar
                     userName={fullName}
                     notificationCount={1}
@@ -125,9 +125,9 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
                     }
                 />
 
-                <main className="grid gap-5 px-4 py-5 sm:px-6 sm:py-6 xl:grid-cols-[260px_minmax(0,1fr)]">
+                <main className="grid gap-5 px-4 py-5 transition-[grid-template-columns] duration-200 sm:px-6 sm:py-6 xl:grid-cols-[var(--discover-filter-width,260px)_minmax(0,1fr)]">
                     <div className="hidden xl:block">
-                        <DiscoverFilters searchParams={resolvedSearchParams} />
+                        <DiscoverFilters searchParams={resolvedSearchParams} variant="rail" />
                     </div>
 
                     <section className="min-w-0 space-y-5">

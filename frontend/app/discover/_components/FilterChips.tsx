@@ -12,16 +12,34 @@ const getFirstParam = (value: string | string[] | undefined) => (
     Array.isArray(value) ? value[0] : value
 );
 
+const getParamValues = (value: string | string[] | undefined) => (
+    (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean)
+);
+
 const getRemoveHref = (
     searchParams: Record<string, string | string[] | undefined>,
     filter: ActiveFilter,
 ) => {
     const params = new URLSearchParams();
-    const keysToRemove = new Set(filter.keys ?? [filter.key]);
+    const keysToRemove = new Set(filter.keys ?? [filter.paramKey ?? filter.key]);
 
     Object.entries(searchParams).forEach(([key, value]) => {
+        if (key === "page") return;
+
+        if (filter.value && key === filter.paramKey) {
+            getParamValues(value)
+                .filter((item) => item !== filter.value)
+                .forEach((item) => params.append(key, item));
+            return;
+        }
+
         const firstValue = getFirstParam(value);
-        if (firstValue && key !== "page" && !keysToRemove.has(key)) params.set(key, firstValue);
+        if (Array.isArray(value) && !keysToRemove.has(key)) {
+            getParamValues(value).forEach((item) => params.append(key, item));
+            return;
+        }
+
+        if (firstValue && !keysToRemove.has(key)) params.set(key, firstValue);
     });
 
     const query = params.toString();
