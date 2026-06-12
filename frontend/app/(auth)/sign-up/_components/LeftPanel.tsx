@@ -39,7 +39,7 @@ export default function LeftPanel() {
 
             <div className="relative z-10 px-12 pb-10">
                 <Link
-                    href="/employer/sign-up"
+                    href="/employer-signup"
                     className="flex w-full flex-col rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/15"
                 >
                     <span className="text-xs font-mono text-white/65 mb-1">
