@@ -1,23 +1,25 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     AlignLeft,
-    Star,
     Bookmark,
     FileText,
     Bell,
     File,
-    Settings,
+    LogOut,
     ChevronRight,
     PanelLeftClose,
     PanelLeftOpen,
+    UserRound,
 } from "lucide-react";
 import CompanyAvatar from "./CompanyAvatar";
 import { getSavedJobs } from "../../lib/api/user/user";
 import { getMyApplications } from "../../lib/api/application/application";
+import { navCountsStore, type NavCounts } from "../../lib/stores/navCounts";
+import { useAuth } from "../../context/AuthContext";
 
 const SIDEBAR_STORAGE_KEY = "jobflow-sidebar-collapsed";
 const SIDEBAR_EXPANDED_WIDTH = "232px";
@@ -31,13 +33,13 @@ interface NavItem {
 
 const JOB_SEARCH_NAV: NavItem[] = [
     { label: "Discover", href: "/discover", icon: <AlignLeft size={16} /> },
-    { label: "For you", href: "/for-you", icon: <Star size={16} /> },
     { label: "Saved", href: "/saved", icon: <Bookmark size={16} /> },
     { label: "Applications", href: "/applications", icon: <FileText size={16} /> },
     { label: "Notifications", href: "/notifications", icon: <Bell size={16} /> },
 ];
 
 const PROFILE_NAV: NavItem[] = [
+    { label: "Profile", href: "/profile", icon: <UserRound size={16} /> },
     { label: "Resume", href: "/profile/resume", icon: <File size={16} /> },
 ];
 
@@ -104,15 +106,17 @@ function NavLink({
     );
 }
 
-type NavCounts = {
-    saved?: number;
-    applications?: number;
-};
-
 export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const pathname = usePathname();
+    const { logout } = useAuth();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [counts, setCounts] = useState<NavCounts>({});
+    // Counts live in a shared store so save/apply actions elsewhere on the page
+    // update these badges instantly — no page reload needed.
+    const counts = useSyncExternalStore(
+        navCountsStore.subscribe,
+        navCountsStore.getSnapshot,
+        navCountsStore.getServerSnapshot,
+    );
 
     useEffect(() => {
         let cancelled = false;
@@ -137,7 +141,7 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                     ?? (Array.isArray(value?.data) ? value.data.length : undefined);
             }
 
-            setCounts(next);
+            navCountsStore.set(next);
         };
 
         void loadCounts();
@@ -284,30 +288,27 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
             )}
 
             {/* User footer */}
-            <div
-                className={[
-                    "flex items-center pb-5 pt-1",
-                    isCollapsed ? "justify-center px-2" : "gap-2.5 px-4",
-                ].join(" ")}
-            >
-                <CompanyAvatar name={user.name} size="sm" className="rounded-full bg-cobalt-500 text-white" />
-                {!isCollapsed && (
-                    <>
+            <div className={["pb-5 pt-1", isCollapsed ? "px-2" : "px-4"].join(" ")}>
+                <div className={["flex items-center", isCollapsed ? "flex-col gap-2" : "gap-2.5"].join(" ")}>
+                    <CompanyAvatar name={user.name} size="sm" className="rounded-full bg-cobalt-500 text-white" />
+                    {!isCollapsed && (
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-ink-900 truncate leading-tight">
                                 {user.name}
                             </p>
                             <p className="text-xs text-ink-500 truncate">{user.subtitle}</p>
                         </div>
-                        <button
-                            type="button"
-                            className="text-ink-400 hover:text-ink-600 transition-colors"
-                            aria-label="Settings"
-                        >
-                            <Settings size={15} />
-                        </button>
-                    </>
-                )}
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => void logout()}
+                        title="Log out"
+                        aria-label="Log out"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-surface/70 hover:text-danger-700"
+                    >
+                        <LogOut size={16} />
+                    </button>
+                </div>
             </div>
         </aside>
     );

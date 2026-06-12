@@ -52,7 +52,7 @@ export default function TopBar({
     };
 
     return (
-        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-ink-100 bg-surface px-6">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-ink-100 bg-surface px-6">
             {/* Search */}
             <form action="/discover" className="w-full max-w-xl">
                 <div className="relative">
