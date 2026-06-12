@@ -232,10 +232,15 @@ export const API = {
         USER: {
             GET_ALL: (params?: UserListQuery) => withQuery("/api/users", params),
             GET_BY_ID: (id: string) => `/api/users/${id}`,
+            UPDATE: (id: string) => `/api/users/${id}`,
             DELETE: (id: string) => `/api/users/${id}`,
         },
         JOB: {
             VERIFY: (id: string) => `/api/jobs/${id}/verify`,
+        },
+        COMPANY: {
+            VERIFY: (id: string) => `/api/companies/${id}/verify`,
+            DELETE: (id: string) => `/api/companies/${id}`,
         },
         APPLICATION: {
             GET_ALL: (params?: ApplicationListQuery) => withQuery("/api/applications", params),

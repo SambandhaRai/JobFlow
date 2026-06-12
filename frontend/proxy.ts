@@ -4,8 +4,9 @@ type CookieUser = {
     role?: "user" | "employer" | "admin";
 };
 
-const publicRoutes = ["/login", "/sign-up"];
+const publicRoutes = ["/login", "/sign-up", "/employer-login", "/employer-signup"];
 const adminRoutes = ["/admin"];
+const employerRoutes = ["/employer"];
 const userRoutes = [
     "/discover",
     "/profile",
@@ -40,21 +41,28 @@ export function proxy(request: NextRequest) {
 
     const isPublicRoute = startsWithRoute(pathname, publicRoutes);
     const isAdminRoute = startsWithRoute(pathname, adminRoutes);
+    const isEmployerRoute = startsWithRoute(pathname, employerRoutes);
     const isUserRoute = startsWithRoute(pathname, userRoutes);
     const isHomeRoute = pathname === "/";
 
-    if (!token && (isAdminRoute || isUserRoute)) {
+    if (!token && (isAdminRoute || isEmployerRoute || isUserRoute)) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
     if (token && user?.role === "admin") {
-        if (isHomeRoute || isPublicRoute || isUserRoute) {
+        if (isHomeRoute || isPublicRoute || isUserRoute || isEmployerRoute) {
             return NextResponse.redirect(new URL("/admin", request.url));
         }
     }
 
+    if (token && user?.role === "employer") {
+        if (isHomeRoute || isPublicRoute || isUserRoute || isAdminRoute) {
+            return NextResponse.redirect(new URL("/employer", request.url));
+        }
+    }
+
     if (token && user?.role === "user") {
-        if (isAdminRoute || isPublicRoute || isHomeRoute) {
+        if (isAdminRoute || isEmployerRoute || isPublicRoute || isHomeRoute) {
             return NextResponse.redirect(new URL("/discover", request.url));
         }
     }
@@ -70,6 +78,7 @@ export const config = {
     matcher: [
         "/",
         "/admin/:path*",
+        "/employer/:path*",
         "/discover/:path*",
         "/profile/:path*",
         "/for-you/:path*",
@@ -78,5 +87,7 @@ export const config = {
         "/notifications/:path*",
         "/login",
         "/sign-up",
+        "/employer-login",
+        "/employer-signup",
     ],
 };

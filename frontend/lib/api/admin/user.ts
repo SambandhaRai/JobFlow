@@ -30,6 +30,21 @@ export const getUserById = async (id: string) => {
     }
 };
 
+export type AdminUpdateUserPayload = {
+    fullName?: string;
+    phone?: string;
+    isVerified?: boolean;
+};
+
+export const updateUser = async (id: string, data: AdminUpdateUserPayload) => {
+    try {
+        const response = await axios.put(API.ADMIN.USER.UPDATE(id), data);
+        return response.data;
+    } catch (err) {
+        throw new Error(getAdminUserErrorMessage(err, "Failed to update user"));
+    }
+};
+
 export const deleteUser = async (id: string) => {
     try {
         const response = await axios.delete(API.ADMIN.USER.DELETE(id));

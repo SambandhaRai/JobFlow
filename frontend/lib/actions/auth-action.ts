@@ -1,7 +1,7 @@
 "use server";
 
 import { loginUser, registerUser } from "../api/auth";
-import type { LoginPayload, RegisterPayload } from "../api/endpoints";
+import type { LoginPayload, RegisterPayload, UserRole } from "../api/endpoints";
 import { setAuthToken, setUserData } from "../cookie";
 
 type AuthUser = {
@@ -11,6 +11,11 @@ type AuthUser = {
     email?: string;
     role?: "user" | "employer" | "admin";
     [key: string]: unknown;
+};
+
+type LoginActionPayload = LoginPayload & {
+    acceptedRoles?: UserRole[];
+    roleMismatchMessage?: string;
 };
 
 type AuthApiResult<TData = unknown> = {
@@ -74,12 +79,22 @@ export const handleRegister = async (
 };
 
 export const handleLogin = async (
-    formData: LoginPayload,
+    formData: LoginActionPayload,
 ): Promise<AuthActionResult<AuthUser>> => {
     try {
-        const result = await loginUser(formData) as AuthApiResult<AuthUser>;
+        const { acceptedRoles, roleMismatchMessage, ...loginData } = formData;
+        const result = await loginUser(loginData) as AuthApiResult<AuthUser>;
 
         if (result.success) {
+            const role = result.data?.role;
+
+            if (acceptedRoles?.length && (!role || !acceptedRoles.includes(role))) {
+                return {
+                    success: false,
+                    message: roleMismatchMessage || "This account cannot log in from here.",
+                };
+            }
+
             if (result.token) {
                 await setAuthToken(result.token);
             }
