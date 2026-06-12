@@ -27,6 +27,7 @@ router.delete("/me/saved-jobs/:jobId", authorizedMiddleware, userOnlyMiddleware,
 // Admin
 router.get("/", authorizedMiddleware, adminOnlyMiddleware, userController.getAllUsers);
 router.get("/:id", authorizedMiddleware, adminOnlyMiddleware, userController.getUserById);
+router.put("/:id", authorizedMiddleware, adminOnlyMiddleware, userController.updateUserById);
 router.delete("/:id", authorizedMiddleware, adminOnlyMiddleware, userController.deleteUser);
 
 export default router;

@@ -56,6 +56,14 @@ export const UpdateUserDto = BaseUserSchema.pick({
 }).partial();
 export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
 
+// Admin editing another user's profile (and verifying employers).
+export const AdminUpdateUserDto = z.object({
+    fullName: z.string().trim().min(2, "Full name must be at least 2 characters").optional(),
+    phone: z.string().trim().min(10).max(15).optional(),
+    isVerified: z.boolean().optional(),
+});
+export type AdminUpdateUserDto = z.infer<typeof AdminUpdateUserDto>;
+
 export const CreateResumeDto = ResumeSchema.pick({
     fileName: true,
     fileUrl: true,

@@ -13,6 +13,7 @@ import jobRoutes from "./routes/job.routes";
 import applicationRoutes from "./routes/application.routes";
 import institutionRoutes from "./routes/institution.routes";
 import companyRoutes from "./routes/company.routes";
+import reportRoutes from "./routes/report.routes";
 
 const app: Application = express();
 
@@ -23,6 +24,7 @@ const allowedOrigins = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "http://192.168.101.8:3000",
+    "http://10.1.19.83:3000"
 ].filter(Boolean);
 
 const corsOptions: CorsOptions = {
@@ -56,5 +58,6 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/institutions", institutionRoutes);
 app.use("/api/companies", companyRoutes);
+app.use("/api/reports", reportRoutes);
 
 export default app;

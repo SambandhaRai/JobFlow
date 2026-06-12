@@ -12,6 +12,7 @@ type CreateUserData = Partial<UserType> & {
 type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone">> & {
     educations?: JobSeekerType["educations"];
     skills?: string[];
+    isVerified?: boolean;
 };
 
 export interface IUserRepository {

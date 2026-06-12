@@ -47,6 +47,12 @@ export class CompanyService {
         return await companyRepository.getCompaniesForUser(userId);
     }
 
+    async getAllCompanies(params: { page?: number; size?: number; search?: string }) {
+        const page = params.page ?? 1;
+        const size = params.size ?? 50;
+        return await companyRepository.getAllCompanies({ page, size, search: params.search });
+    }
+
     async getCompanyById(companyId: string) {
         if (!mongoose.Types.ObjectId.isValid(companyId)) {
             throw new HttpError(400, "Invalid company ID");
@@ -71,6 +77,32 @@ export class CompanyService {
         }
 
         return await companyRepository.updateCompany(companyId, data);
+    }
+
+    async verifyCompany(companyId: string) {
+        if (!mongoose.Types.ObjectId.isValid(companyId)) {
+            throw new HttpError(400, "Invalid company ID");
+        }
+
+        const company = await companyRepository.getCompanyById(companyId);
+        if (!company) {
+            throw new HttpError(404, "Company not found");
+        }
+
+        return await companyRepository.updateCompany(companyId, { isVerified: true });
+    }
+
+    async deleteCompany(companyId: string) {
+        if (!mongoose.Types.ObjectId.isValid(companyId)) {
+            throw new HttpError(400, "Invalid company ID");
+        }
+
+        const company = await companyRepository.getCompanyById(companyId);
+        if (!company) {
+            throw new HttpError(404, "Company not found");
+        }
+
+        return await companyRepository.deleteCompany(companyId);
     }
 
     async isCompanyMember(companyId: string, userId: string) {

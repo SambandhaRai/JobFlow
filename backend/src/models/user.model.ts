@@ -31,6 +31,7 @@ const UserSchema: Schema = new Schema({
     phone: { type: String, trim: true, minLength: 10, maxLength: 15 },
     password: { type: String, required: true, minLength: 6 },
     role: { type: String, enum: ["user", "employer", "admin"], default: "user" },
+    isVerified: { type: Boolean, default: false },
     seedTag: { type: String, trim: true },
 }, {
     discriminatorKey: "role",

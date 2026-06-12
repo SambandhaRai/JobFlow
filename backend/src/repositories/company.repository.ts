@@ -19,6 +19,31 @@ export class CompanyRepository {
         return await CompanyModel.findOne({ slug });
     }
 
+    async getAllCompanies({
+        page,
+        size,
+        search,
+    }: { page: number; size: number; search?: string }): Promise<{ companies: ICompany[]; totalCompanies: number }> {
+        const filter: Record<string, unknown> = {};
+        if (search) {
+            filter.$or = [
+                { name: { $regex: search, $options: "i" } },
+                { industry: { $regex: search, $options: "i" } },
+                { location: { $regex: search, $options: "i" } },
+            ];
+        }
+
+        const [companies, totalCompanies] = await Promise.all([
+            CompanyModel.find(filter)
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * size)
+                .limit(size),
+            CompanyModel.countDocuments(filter),
+        ]);
+
+        return { companies, totalCompanies };
+    }
+
     async getCompaniesForUser(userId: string): Promise<ICompany[]> {
         const objectId = new mongoose.Types.ObjectId(userId);
         return await CompanyModel.find({
@@ -31,6 +56,11 @@ export class CompanyRepository {
 
     async updateCompany(id: string, data: Partial<ICompany>): Promise<ICompany | null> {
         return await CompanyModel.findByIdAndUpdate(id, data, { returnDocument: "after" });
+    }
+
+    async deleteCompany(id: string): Promise<boolean | null> {
+        const result = await CompanyModel.findByIdAndDelete(id);
+        return result ? true : null;
     }
 
     async isCompanyMember(companyId: string, userId: string): Promise<boolean> {

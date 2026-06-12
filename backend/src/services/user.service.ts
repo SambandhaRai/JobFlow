@@ -1,4 +1,4 @@
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from "../dtos/user.dto";
+import { AdminUpdateUserDto, CreateUserDto, LoginUserDto, UpdateUserDto } from "../dtos/user.dto";
 import { UserRepository } from "../repositories/user.repository";
 import { IJobSeeker, IUser } from "../models/user.model";
 import { HttpError } from "../errors/http-error";
@@ -111,6 +111,14 @@ export class UserService {
             throw new HttpError(404, "User not found");
         }
         return await userRepository.deleteOneUser(userId);
+    }
+
+    async adminUpdateUser(userId: string, data: AdminUpdateUserDto) {
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
+        return await userRepository.updateOneUser(userId, data);
     }
 
     // -------- Resume management --------

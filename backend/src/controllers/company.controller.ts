@@ -56,6 +56,27 @@ export class CompanyController {
         }
     }
 
+    async getAllCompanies(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const size = parseInt(req.query.size as string) || 50;
+            const search = req.query.search as string | undefined;
+
+            const result = await companyService.getAllCompanies({ page, size, search });
+            return res.status(200).json({
+                success: true,
+                data: result.companies,
+                totalCompanies: result.totalCompanies,
+                message: "Companies fetched successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
     async getCompanyById(req: Request, res: Response) {
         try {
             const company = await companyService.getCompanyById(req.params.id as string);
@@ -92,6 +113,37 @@ export class CompanyController {
                 success: true,
                 data: company,
                 message: "Company updated successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
+    async verifyCompany(req: Request, res: Response) {
+        try {
+            const company = await companyService.verifyCompany(req.params.id as string);
+            return res.status(200).json({
+                success: true,
+                data: company,
+                message: "Company verified successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
+    async deleteCompany(req: Request, res: Response) {
+        try {
+            await companyService.deleteCompany(req.params.id as string);
+            return res.status(200).json({
+                success: true,
+                message: "Company deleted successfully",
             });
         } catch (error: Error | any) {
             return res.status(error.statusCode || 500).json({

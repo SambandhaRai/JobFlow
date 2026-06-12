@@ -1,4 +1,4 @@
-import { UpdateUserDto, CreateResumeDto } from "../dtos/user.dto";
+import { AdminUpdateUserDto, UpdateUserDto, CreateResumeDto } from "../dtos/user.dto";
 import { UserService } from "../services/user.service";
 import { UserRoleEnum, UserRoleType } from "../types/user.type";
 import { Request, Response } from "express";
@@ -110,6 +110,30 @@ export class UserController {
             return res.status(200).json({
                 success: true,
                 message: "User deleted successfully"
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error"
+            });
+        }
+    }
+
+    async updateUserById(req: Request, res: Response) {
+        try {
+            const userId = req.params.id as string;
+            const parsedData = AdminUpdateUserDto.safeParse(req.body);
+            if (!parsedData.success) {
+                return res.status(400).json({
+                    success: false,
+                    errors: z.prettifyError(parsedData.error)
+                });
+            }
+            const updatedUser = await userService.adminUpdateUser(userId, parsedData.data);
+            return res.status(200).json({
+                success: true,
+                data: updatedUser,
+                message: "User updated successfully"
             });
         } catch (error: Error | any) {
             return res.status(error.statusCode || 500).json({
