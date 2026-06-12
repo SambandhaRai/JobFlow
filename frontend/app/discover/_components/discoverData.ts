@@ -382,7 +382,7 @@ const fetchJson = async <TData>(url: string, token: string | null) => {
     return response.json() as Promise<ApiListResponse<TData>>;
 };
 
-const mapJob = (job: BackendJob): Job => ({
+export const mapJob = (job: BackendJob): Job => ({
     id: job._id ?? job.id ?? `${job.title}-${job.company}`,
     title: job.title ?? "Untitled role",
     company: job.hiringName ?? job.company ?? "Unknown hiring profile",

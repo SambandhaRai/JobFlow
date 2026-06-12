@@ -23,6 +23,13 @@ import StepIndicator from "../../../_components/StepIndicator";
 import VerifiedBadge from "../../../_components/VerifiedBadge";
 import { addResume } from "../../../../lib/api/user/user";
 import { applyToJob } from "../../../../lib/api/application/application";
+import { navCountsStore } from "../../../../lib/stores/navCounts";
+import {
+    PHONE_ERROR_MESSAGE,
+    PHONE_MAX_LENGTH,
+    isValidPhone,
+    sanitizePhoneInput,
+} from "../../../../lib/validation/phone";
 import {
     mapApplicantResume,
     type ApplicantDefaults,
@@ -187,9 +194,8 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
         if (fullName.trim().length < 2) nextErrors.fullName = "Enter your full name.";
         if (!isValidEmail(email.trim())) nextErrors.email = "Enter a valid email.";
 
-        const trimmedPhone = phone.trim();
-        if (trimmedPhone.length < 10 || trimmedPhone.length > 15) {
-            nextErrors.phone = "Phone must be 10–15 characters.";
+        if (!isValidPhone(phone)) {
+            nextErrors.phone = PHONE_ERROR_MESSAGE;
         }
 
         setErrors(nextErrors);
@@ -218,6 +224,7 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
 
             const created = response?.data as { _id?: string; id?: string } | undefined;
             setApplicationId(created?._id ?? created?.id ?? null);
+            navCountsStore.adjustApplications(1);
             setStep(3);
         } catch (error) {
             const message = error instanceof Error ? error.message : "Could not submit your application";
@@ -661,9 +668,11 @@ function StepReview({
                     <FieldLabel>Phone</FieldLabel>
                     <input
                         value={phone}
-                        onChange={(event) => onPhoneChange(event.target.value)}
+                        inputMode="numeric"
+                        maxLength={PHONE_MAX_LENGTH}
+                        onChange={(event) => onPhoneChange(sanitizePhoneInput(event.target.value))}
                         className={fieldClass(errors.phone)}
-                        placeholder="+977 98 XXXX XXXX"
+                        placeholder="98XXXXXXXX"
                     />
                     {errors.phone && <p className="text-xs text-danger-700">{errors.phone}</p>}
                 </div>

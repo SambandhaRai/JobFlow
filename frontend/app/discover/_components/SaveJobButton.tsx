@@ -5,12 +5,16 @@ import { Bookmark, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { saveJob, unsaveJob } from "../../../lib/api/user/user";
+import { navCountsStore } from "../../../lib/stores/navCounts";
 
 interface SaveJobButtonProps {
     jobId: string;
     title: string;
     initialSaved?: boolean;
     className?: string;
+    // Optional: notified after a successful toggle. Lets the Saved page drop a
+    // row when it is unsaved. Discover leaves this unset and is unaffected.
+    onToggleSaved?: (saved: boolean) => void;
 }
 
 export default function SaveJobButton({
@@ -18,6 +22,7 @@ export default function SaveJobButton({
     title,
     initialSaved = false,
     className = "",
+    onToggleSaved,
 }: SaveJobButtonProps) {
     const [isSaved, setIsSaved] = useState(initialSaved);
     const [isSaving, setIsSaving] = useState(false);
@@ -28,10 +33,14 @@ export default function SaveJobButton({
             if (isSaved) {
                 await unsaveJob(jobId);
                 setIsSaved(false);
+                onToggleSaved?.(false);
+                navCountsStore.adjustSaved(-1);
                 toast.success("Removed from saved jobs");
             } else {
                 await saveJob(jobId);
                 setIsSaved(true);
+                onToggleSaved?.(true);
+                navCountsStore.adjustSaved(1);
                 toast.success("Saved for later");
             }
         } catch (error) {

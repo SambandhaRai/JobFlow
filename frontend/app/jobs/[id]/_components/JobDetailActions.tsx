@@ -5,6 +5,8 @@ import { Bookmark, Flag, Loader2, Send, Share2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { saveJob, unsaveJob } from "../../../../lib/api/user/user";
+import { navCountsStore } from "../../../../lib/stores/navCounts";
+import { createReport } from "../../../../lib/api/report/report";
 import AppliedButton from "./AppliedButton";
 import ApplyButton from "./ApplyButton";
 import type { ApplicantDefaults, ApplicantResume, ApplyJob } from "./jobDetailsData";
@@ -30,6 +32,7 @@ export default function JobDetailActions({
 }: JobDetailActionsProps) {
     const [isSaved, setIsSaved] = useState(isInitiallySaved);
     const [isSaving, setIsSaving] = useState(false);
+    const [isReporting, setIsReporting] = useState(false);
 
     const handleSave = async () => {
         setIsSaving(true);
@@ -38,10 +41,12 @@ export default function JobDetailActions({
             if (isSaved) {
                 await unsaveJob(applyJob.id);
                 setIsSaved(false);
+                navCountsStore.adjustSaved(-1);
                 toast.success("Removed from saved jobs");
             } else {
                 await saveJob(applyJob.id);
                 setIsSaved(true);
+                navCountsStore.adjustSaved(1);
                 toast.success("Saved for later");
             }
         } catch (error) {
@@ -68,8 +73,24 @@ export default function JobDetailActions({
         }
     };
 
-    const handleReport = () => {
-        toast.info("Thanks. Reporting tools will be available soon.");
+    const handleReport = async () => {
+        const message = window.prompt("Why are you reporting this listing? (optional)");
+        // Cancelled the prompt — don't submit anything.
+        if (message === null) return;
+
+        setIsReporting(true);
+        try {
+            await createReport({
+                jobId: applyJob.id,
+                reason: "other",
+                message: message.trim() || undefined,
+            });
+            toast.success("Listing reported — our team will review it.");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Could not submit report");
+        } finally {
+            setIsReporting(false);
+        }
     };
 
     return (
@@ -110,10 +131,11 @@ export default function JobDetailActions({
             <button
                 type="button"
                 onClick={handleReport}
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50 sm:self-center"
+                disabled={isReporting}
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50 disabled:opacity-50 sm:self-center"
             >
                 <Flag size={14} />
-                Report listing
+                {isReporting ? "Reporting…" : "Report listing"}
             </button>
         </div>
     );

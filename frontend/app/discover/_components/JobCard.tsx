@@ -10,9 +10,12 @@ import type { Job } from "./discoverData";
 interface JobCardProps {
     job: Job;
     isSaved?: boolean;
+    // Optional: forwarded to the bookmark so a parent (e.g. the Saved page) can
+    // react when this job is saved/unsaved. Discover omits it.
+    onToggleSaved?: (saved: boolean) => void;
 }
 
-export default function JobCard({ job, isSaved = false }: JobCardProps) {
+export default function JobCard({ job, isSaved = false, onToggleSaved }: JobCardProps) {
     const hiringTypeLabel = {
         company: "Company",
         "small-business": "Small business",
@@ -71,6 +74,7 @@ export default function JobCard({ job, isSaved = false }: JobCardProps) {
                                 jobId={job.id}
                                 title={job.title}
                                 initialSaved={isSaved}
+                                onToggleSaved={onToggleSaved}
                                 className="relative z-10"
                             />
                         </div>

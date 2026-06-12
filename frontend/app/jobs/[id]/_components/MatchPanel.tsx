@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle2, ExternalLink, Mail, MapPin, Phone, ShieldChe
 
 import CompanyAvatar from "../../../_components/CompanyAvatar";
 import AppliedButton from "./AppliedButton";
-import ApplyButton from "./ApplyButton";
+import QuickApplyButton from "./QuickApplyButton";
 import {
     toApplyJob,
     type ApplicantDefaults,
@@ -90,7 +90,7 @@ export default function MatchPanel({
                 {hasApplied ? (
                     <AppliedButton className="mt-5 h-10 w-full px-4" />
                 ) : (
-                    <ApplyButton
+                    <QuickApplyButton
                         job={toApplyJob(job)}
                         defaults={applicantDefaults}
                         resumes={resumes}
@@ -98,7 +98,7 @@ export default function MatchPanel({
                     >
                         <Zap size={15} />
                         Quick apply
-                    </ApplyButton>
+                    </QuickApplyButton>
                 )}
             </section>
 
