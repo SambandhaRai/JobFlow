@@ -57,7 +57,7 @@ export default async function SavedJobsPage() {
                 profileCompletion={getProfileCompletion(user)}
             />
 
-            <div className="min-h-screen transition-[padding] duration-200 lg:pl-[var(--app-sidebar-width,232px)]">
+            <div className="min-h-screen transition-[padding] duration-200 lg:pl-(--app-sidebar-width,232px)">
                 <TopBar userName={fullName} />
 
                 <main className="px-4 py-5 sm:px-6 sm:py-6">
