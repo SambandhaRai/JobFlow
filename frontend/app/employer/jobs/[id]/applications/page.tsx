@@ -29,6 +29,9 @@ export default async function JobApplicationsPage({ params }: PageProps) {
                 Applications · {job?.title ?? "Job"}{" "}
                 <span className="font-normal text-ink-400">({applications.length})</span>
             </h1>
+            <p className="mt-1 text-sm text-ink-500">
+                Review applicants and set a status — the applicant is notified the moment it changes.
+            </p>
 
             {error && (
                 <div className="mt-3 flex gap-2 rounded-md border border-danger-500/30 bg-danger-50 px-3 py-2 text-sm text-danger-700">

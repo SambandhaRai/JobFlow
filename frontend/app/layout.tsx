@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "../context/AuthContext";
+import { NotificationProvider } from "../context/NotificationContext";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -40,8 +41,10 @@ export default function RootLayout({
     >
       <body>
         <AuthProvider>
-          {children}
-          <ToastContainer position="top-right" autoClose={2500} />
+          <NotificationProvider>
+            {children}
+            <ToastContainer position="top-right" autoClose={2500} />
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

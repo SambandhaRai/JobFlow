@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BriefcaseBusiness, CalendarDays, Clock3, CreditCard, MapPin, Sparkles } from "lucide-react";
 
 import Badge from "../../../_components/Badge";
@@ -22,10 +23,18 @@ export default function JobHero({
     applicantDefaults,
     resumes,
 }: JobHeroProps) {
+    const companyHref = job.companyId ? `/companies/${job.companyId}` : null;
+
     return (
         <section className="rounded-lg border border-ink-100 bg-surface p-5 shadow-card sm:p-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
-                <CompanyAvatar name={job.company} size="xl" className="rounded-lg" />
+                {companyHref ? (
+                    <Link href={companyHref} className="shrink-0 transition-opacity hover:opacity-80">
+                        <CompanyAvatar name={job.company} size="xl" className="rounded-lg" />
+                    </Link>
+                ) : (
+                    <CompanyAvatar name={job.company} size="xl" className="rounded-lg" />
+                )}
 
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -45,7 +54,16 @@ export default function JobHero({
                             </h1>
 
                             <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-500">
-                                <span className="font-medium text-ink-700">{job.company}</span>
+                                {companyHref ? (
+                                    <Link
+                                        href={companyHref}
+                                        className="font-medium text-cobalt-600 transition-colors hover:text-cobalt-700 hover:underline"
+                                    >
+                                        {job.company}
+                                    </Link>
+                                ) : (
+                                    <span className="font-medium text-ink-700">{job.company}</span>
+                                )}
                                 {job.isHiringVerified && (
                                     <>
                                         <span aria-hidden="true">/</span>

@@ -34,7 +34,7 @@ export default function SavedLoading() {
             <div className="min-h-screen lg:pl-[var(--app-sidebar-width,232px)]">
                 <TopBar userName="Job seeker" />
 
-                <main className="px-4 py-5 sm:px-6 sm:py-6">
+                <main className="animate-pulse px-4 py-5 sm:px-6 sm:py-6">
                     <div className="h-7 w-44 rounded bg-ink-100" />
                     <div className="mt-2 h-4 w-80 rounded bg-ink-50" />
 

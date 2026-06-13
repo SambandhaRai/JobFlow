@@ -4,6 +4,7 @@ import { AlertCircle, CheckCircle2, Clock3, Eye, Send, Sparkles } from "lucide-r
 
 import Sidebar from "../_components/Sidebar";
 import TopBar from "../_components/TopBar";
+import ApplicationsRealtimeSync from "./_components/ApplicationsRealtimeSync";
 import ApplicationsTable from "./_components/ApplicationsTable";
 import StatCard from "./_components/StatCard";
 import {
@@ -64,6 +65,7 @@ export default async function ApplicationsPage() {
 
             <div className="min-h-screen transition-[padding] duration-200 lg:pl-[var(--app-sidebar-width,232px)]">
                 <TopBar userName={fullName} />
+                <ApplicationsRealtimeSync />
 
                 <main className="px-4 py-5 sm:px-6 sm:py-6">
                     {/* Header */}

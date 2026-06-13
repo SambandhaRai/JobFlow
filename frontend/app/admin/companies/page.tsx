@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import AdminSection from "../_components/AdminSection";
 import AdminTable from "../_components/AdminTable";
 import CompanyActions from "../_components/CompanyActions";
+import VerifiedTag from "../_components/VerifiedTag";
 import { fetchAdminCompanies, formatDate } from "../_components/adminData";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function AdminCompaniesPage() {
                     company.industry ?? "—",
                     company.location ?? "—",
                     company.email ?? "—",
-                    company.isVerified ? "Yes" : "No",
+                    <VerifiedTag key="v" verified={Boolean(company.isVerified)} />,
                     formatDate(company.createdAt),
                     <CompanyActions key="a" companyId={company._id ?? ""} isVerified={Boolean(company.isVerified)} />,
                 ])}

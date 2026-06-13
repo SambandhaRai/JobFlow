@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertCircle, CheckCircle2, ExternalLink, Mail, MapPin, Phone, ShieldCheck, Zap } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle2, ExternalLink, Mail, MapPin, Phone, ShieldCheck, Zap } from "lucide-react";
 
 import CompanyAvatar from "../../../_components/CompanyAvatar";
 import AppliedButton from "./AppliedButton";
@@ -33,6 +33,7 @@ export default function MatchPanel({
 }: MatchPanelProps) {
     const topMatchedSkills = match.matchedSkills.slice(0, 3);
     const topMissingSkills = match.missingSkills.slice(0, 2);
+    const companyHref = job.companyId ? `/companies/${job.companyId}` : null;
 
     return (
         <aside className="space-y-4">
@@ -104,11 +105,26 @@ export default function MatchPanel({
 
             <section className="rounded-lg border border-ink-100 bg-surface p-5 shadow-card">
                 <div className="flex items-start gap-3">
-                    <CompanyAvatar name={job.company} size="md" />
+                    {companyHref ? (
+                        <Link href={companyHref} className="shrink-0 transition-opacity hover:opacity-80">
+                            <CompanyAvatar name={job.company} size="md" />
+                        </Link>
+                    ) : (
+                        <CompanyAvatar name={job.company} size="md" />
+                    )}
                     <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                                <h2 className="truncate text-base font-semibold text-ink-900">{job.company}</h2>
+                                {companyHref ? (
+                                    <Link
+                                        href={companyHref}
+                                        className="block truncate text-base font-semibold text-ink-900 transition-colors hover:text-cobalt-700"
+                                    >
+                                        {job.company}
+                                    </Link>
+                                ) : (
+                                    <h2 className="truncate text-base font-semibold text-ink-900">{job.company}</h2>
+                                )}
                                 <p className="mt-1 text-xs text-ink-500">{job.hiringTypeLabel}</p>
                             </div>
                             {job.isHiringVerified && (
@@ -150,13 +166,23 @@ export default function MatchPanel({
                     </div>
                 </div>
 
-                <Link
-                    href={`/discover?search=${encodeURIComponent(job.company)}`}
-                    className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-cobalt-600 hover:text-cobalt-700"
-                >
-                    See more from this hiring profile
-                    <ExternalLink size={14} />
-                </Link>
+                {companyHref ? (
+                    <Link
+                        href={companyHref}
+                        className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-cobalt-600 hover:text-cobalt-700"
+                    >
+                        View company profile
+                        <ArrowRight size={14} />
+                    </Link>
+                ) : (
+                    <Link
+                        href={`/discover?search=${encodeURIComponent(job.company)}`}
+                        className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-cobalt-600 hover:text-cobalt-700"
+                    >
+                        See more from this hiring profile
+                        <ExternalLink size={14} />
+                    </Link>
+                )}
             </section>
         </aside>
     );

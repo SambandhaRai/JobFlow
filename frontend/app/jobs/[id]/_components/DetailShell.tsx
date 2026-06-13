@@ -22,7 +22,7 @@ export default function DetailShell({ user, children }: DetailShellProps) {
             />
 
             <div className="min-h-screen transition-[padding] duration-200 lg:pl-[var(--app-sidebar-width,232px)]">
-                <TopBar userName={fullName} notificationCount={1} />
+                <TopBar userName={fullName} />
                 {children}
             </div>
         </div>

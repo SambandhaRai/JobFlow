@@ -19,6 +19,7 @@ export type BackendJobDetails = {
     id?: string;
     title?: string;
     company?: string;
+    companyId?: string | { _id?: string; id?: string };
     hiringType?: HiringType;
     hiringName?: string;
     hiringEmail?: string;
@@ -89,6 +90,7 @@ export type JobDetails = {
     id: string;
     title: string;
     company: string;
+    companyId?: string;
     hiringType: HiringType;
     hiringTypeLabel: string;
     isHiringVerified: boolean;
@@ -251,6 +253,15 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
 
 const getJobId = (job: BackendJobDetails) => job._id ?? job.id ?? "";
 
+// companyId may arrive as a raw ObjectId string or a populated sub-document.
+const getCompanyId = (companyId: BackendJobDetails["companyId"]) => {
+    if (typeof companyId === "string") return companyId || undefined;
+    if (companyId && typeof companyId === "object") {
+        return companyId._id ?? companyId.id ?? undefined;
+    }
+    return undefined;
+};
+
 const mapJobDetails = (job: BackendJobDetails): JobDetails => {
     const jobType = job.jobType ?? "internship";
     const workMode = job.workMode ?? "hybrid";
@@ -263,6 +274,7 @@ const mapJobDetails = (job: BackendJobDetails): JobDetails => {
         id: getJobId(job),
         title: job.title ?? "Untitled role",
         company: job.hiringName ?? job.company ?? "Hiring profile",
+        companyId: getCompanyId(job.companyId),
         hiringType,
         hiringTypeLabel: {
             company: "Company",

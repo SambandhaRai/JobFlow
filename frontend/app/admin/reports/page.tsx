@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 
 import AdminSection from "../_components/AdminSection";
 import AdminTable from "../_components/AdminTable";
+import ReportStatusTag from "../_components/ReportStatusTag";
 import { fetchAdminReports, formatDate, reportField } from "../_components/adminData";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export default async function AdminReportsPage() {
                     reportField(report.reporterId, "fullName"),
                     report.reason ?? "—",
                     report.message ? report.message : "—",
-                    report.status ?? "—",
+                    <ReportStatusTag key="s" status={report.status} />,
                     formatDate(report.createdAt),
                 ])}
             />

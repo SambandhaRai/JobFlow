@@ -119,7 +119,6 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
             <div className="min-h-screen transition-[padding] duration-200 lg:pl-[var(--app-sidebar-width,232px)]">
                 <TopBar
                     userName={fullName}
-                    notificationCount={1}
                     defaultSearchValue={
                         Array.isArray(resolvedSearchParams.search)
                             ? resolvedSearchParams.search[0]

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { AlertCircle, ShieldCheck } from "lucide-react";
 
 import Button from "../../_components/Button";
 import Input from "../../_components/Input";
@@ -51,6 +52,26 @@ const categoryOptions = [
     "Media & Communication",
     "Other",
 ].map((value) => ({ value, label: value }));
+
+// Groups related fields into a scannable section with a clear heading, so the
+// form reads as a few small chunks instead of one long list.
+function FormSection({
+    title,
+    description,
+    children,
+}: {
+    title: string;
+    description: string;
+    children: ReactNode;
+}) {
+    return (
+        <section className="py-5 first:pt-0 last:pb-0">
+            <h2 className="text-sm font-semibold text-ink-900">{title}</h2>
+            <p className="mt-0.5 text-xs text-ink-500">{description}</p>
+            <div className="mt-4 space-y-5">{children}</div>
+        </section>
+    );
+}
 
 export default function CreateJobForm() {
     const router = useRouter();
@@ -128,51 +149,60 @@ export default function CreateJobForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-2xl space-y-5 rounded-lg border border-ink-200 bg-surface p-5 sm:p-6">
+        <form onSubmit={handleSubmit} className="max-w-2xl rounded-lg border border-ink-200 bg-surface p-5 sm:p-6">
             {error && (
-                <div className="rounded-md border border-danger-500/30 bg-danger-50 px-3 py-2 text-sm text-danger-700">
-                    {error}
+                <div className="mb-5 flex gap-2 rounded-md border border-danger-500/30 bg-danger-50 px-3 py-2 text-sm text-danger-700">
+                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                    <span>{error}</span>
                 </div>
             )}
 
-            <Input label="Job title" value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Frontend Developer Intern" />
+            <div className="divide-y divide-ink-100">
+                <FormSection title="Role basics" description="What the role is and who it's for.">
+                    <Input label="Job title" value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Frontend Developer Intern" />
+                    <div className="grid gap-5 sm:grid-cols-2">
+                        <Select label="Job type" options={jobTypeOptions} value={form.jobType} onChange={(e) => set("jobType", e.target.value)} />
+                        <Select label="Work mode" options={workModeOptions} value={form.workMode} onChange={(e) => set("workMode", e.target.value)} />
+                        <Select label="Experience level" options={experienceOptions} value={form.experienceLevel} onChange={(e) => set("experienceLevel", e.target.value)} />
+                        <Select label="Category" options={categoryOptions} value={form.category} onChange={(e) => set("category", e.target.value)} />
+                    </div>
+                </FormSection>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-                <Input label="Hiring / company name" value={form.hiringName} onChange={(e) => set("hiringName", e.target.value)} placeholder="Your business name" />
-                <Input label="Location" value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="e.g. Kathmandu" />
-                <Input label="Contact email" type="email" value={form.hiringEmail} onChange={(e) => set("hiringEmail", e.target.value)} placeholder="hiring@example.com" />
-                <Input label="Contact phone" value={form.hiringPhone} onChange={(e) => set("hiringPhone", e.target.value)} placeholder="98XXXXXXXX" />
+                <FormSection title="Hiring contact" description="How applicants and admins can reach you. Add at least one contact.">
+                    <div className="grid gap-5 sm:grid-cols-2">
+                        <Input label="Hiring / company name" value={form.hiringName} onChange={(e) => set("hiringName", e.target.value)} placeholder="Your business name" />
+                        <Input label="Location" value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="e.g. Kathmandu" />
+                        <Input label="Contact email" type="email" value={form.hiringEmail} onChange={(e) => set("hiringEmail", e.target.value)} placeholder="hiring@example.com" />
+                        <Input label="Contact phone" value={form.hiringPhone} onChange={(e) => set("hiringPhone", e.target.value)} placeholder="98XXXXXXXX" />
+                    </div>
+                </FormSection>
+
+                <FormSection title="Details & requirements" description="Pay, skills, deadline, and a clear description of the role.">
+                    <div className="grid gap-5 sm:grid-cols-2">
+                        <Input label="Salary min (optional)" inputMode="numeric" value={form.salaryMin} onChange={(e) => set("salaryMin", e.target.value.replace(/\D/g, ""))} placeholder="20000" />
+                        <Input label="Salary max (optional)" inputMode="numeric" value={form.salaryMax} onChange={(e) => set("salaryMax", e.target.value.replace(/\D/g, ""))} placeholder="35000" />
+                    </div>
+                    <Input label="Skills (comma separated)" value={form.skills} onChange={(e) => set("skills", e.target.value)} placeholder="React, TypeScript, CSS" />
+                    <Input label="Application deadline (optional)" type="date" value={form.deadline} onChange={(e) => set("deadline", e.target.value)} />
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-ink-700">Description</label>
+                        <textarea
+                            value={form.description}
+                            onChange={(e) => set("description", e.target.value)}
+                            rows={6}
+                            placeholder="Describe the role, responsibilities, and what you're looking for…"
+                            className="w-full resize-y rounded-md border border-ink-200 bg-surface px-3 py-2.5 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100"
+                        />
+                    </div>
+                </FormSection>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-                <Select label="Job type" options={jobTypeOptions} value={form.jobType} onChange={(e) => set("jobType", e.target.value)} />
-                <Select label="Work mode" options={workModeOptions} value={form.workMode} onChange={(e) => set("workMode", e.target.value)} />
-                <Select label="Experience level" options={experienceOptions} value={form.experienceLevel} onChange={(e) => set("experienceLevel", e.target.value)} />
-                <Select label="Category" options={categoryOptions} value={form.category} onChange={(e) => set("category", e.target.value)} />
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2">
-                <Input label="Salary min (optional)" inputMode="numeric" value={form.salaryMin} onChange={(e) => set("salaryMin", e.target.value.replace(/\D/g, ""))} placeholder="20000" />
-                <Input label="Salary max (optional)" inputMode="numeric" value={form.salaryMax} onChange={(e) => set("salaryMax", e.target.value.replace(/\D/g, ""))} placeholder="35000" />
-            </div>
-
-            <Input label="Skills (comma separated)" value={form.skills} onChange={(e) => set("skills", e.target.value)} placeholder="React, TypeScript, CSS" />
-
-            <Input label="Application deadline (optional)" type="date" value={form.deadline} onChange={(e) => set("deadline", e.target.value)} />
-
-            <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-ink-700">Description</label>
-                <textarea
-                    value={form.description}
-                    onChange={(e) => set("description", e.target.value)}
-                    rows={6}
-                    placeholder="Describe the role, responsibilities, and what you're looking for…"
-                    className="w-full resize-y rounded-md border border-ink-200 bg-surface px-3 py-2.5 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100"
-                />
-            </div>
-
-            <div className="flex justify-end">
-                <Button type="submit" loading={saving}>Post job</Button>
+            <div className="mt-5 flex flex-col gap-3 border-t border-ink-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="inline-flex items-start gap-1.5 text-xs text-ink-500">
+                    <ShieldCheck size={14} className="mt-0.5 shrink-0 text-ink-400" />
+                    Listings are reviewed by an admin before going live — usually within a day.
+                </p>
+                <Button type="submit" loading={saving} fullWidth className="sm:w-auto">Post job</Button>
             </div>
         </form>
     );

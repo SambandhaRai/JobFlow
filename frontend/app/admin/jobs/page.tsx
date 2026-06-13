@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import AdminSection from "../_components/AdminSection";
 import AdminTable from "../_components/AdminTable";
 import JobActions from "../_components/JobActions";
+import VerifiedTag from "../_components/VerifiedTag";
 import { fetchAdminJobs, formatDate } from "../_components/adminData";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function AdminJobsPage() {
                     job.hiringName ?? job.company ?? "—",
                     job.location ?? "—",
                     job.jobType ?? "—",
-                    job.isVerified ? "Yes" : "No",
+                    <VerifiedTag key="v" verified={Boolean(job.isVerified)} />,
                     formatDate(job.createdAt),
                     <JobActions key="a" jobId={job._id ?? ""} isVerified={Boolean(job.isVerified)} />,
                 ])}
