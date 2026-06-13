@@ -2,27 +2,71 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Bell, Globe, LogOut, Search, Settings } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Globe, LogOut, Search, Settings, X } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import CompanyAvatar from "./CompanyAvatar";
+import NotificationBell from "./NotificationBell";
 
 interface TopBarProps {
     userName: string;
-    notificationCount?: number;
-    onSearch?: (query: string) => void;
     defaultSearchValue?: string;
 }
 
 export default function TopBar({
     userName,
-    notificationCount = 0,
-    onSearch,
     defaultSearchValue = "",
 }: TopBarProps) {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     const { logout } = useAuth();
+
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const [searchValue, setSearchValue] = useState(defaultSearchValue);
+    const [lastDefaultSearch, setLastDefaultSearch] = useState(defaultSearchValue);
+
+    // Keep the field in sync when the URL's search term changes (e.g. navigating
+    // to /discover?search=… or having the term cleared server-side). Adjusting
+    // state during render is React's recommended alternative to a sync effect.
+    if (defaultSearchValue !== lastDefaultSearch) {
+        setLastDefaultSearch(defaultSearchValue);
+        setSearchValue(defaultSearchValue);
+    }
+
+    // Build a /discover URL that preserves any active filters already in the URL,
+    // sets (or removes) the search term, and resets pagination to the first page.
+    const buildDiscoverHref = (term: string) => {
+        const params = new URLSearchParams(pathname === "/discover" ? searchParams.toString() : "");
+        const trimmed = term.trim();
+
+        if (trimmed) {
+            params.set("search", trimmed);
+        } else {
+            params.delete("search");
+        }
+        params.delete("page");
+
+        const query = params.toString();
+        return query ? `/discover?${query}` : "/discover";
+    };
+
+    const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        router.push(buildDiscoverHref(searchValue));
+    };
+
+    const handleSearchClear = () => {
+        setSearchValue("");
+        // Only reset results when a search term is actually applied to the page.
+        if (pathname === "/discover" && searchParams.has("search")) {
+            router.push(buildDiscoverHref(""));
+        }
+        searchInputRef.current?.focus();
+    };
 
     useEffect(() => {
         if (!isProfileMenuOpen) return;
@@ -54,20 +98,31 @@ export default function TopBar({
     return (
         <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-ink-100 bg-surface px-6">
             {/* Search */}
-            <form action="/discover" className="w-full max-w-xl">
+            <form onSubmit={handleSearchSubmit} role="search" className="w-full max-w-xl">
                 <div className="relative">
                     <Search
                         size={15}
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400"
                     />
                     <input
+                        ref={searchInputRef}
                         name="search"
                         type="search"
-                        defaultValue={defaultSearchValue}
-                        onChange={(e) => onSearch?.(e.target.value)}
+                        value={searchValue}
+                        onChange={(event) => setSearchValue(event.target.value)}
                         placeholder="Search by role, skill, or company..."
-                        className="w-full h-9 pl-9 pr-12 text-sm text-ink-900 bg-ink-50 border border-ink-200 rounded-md outline-none placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100 transition-colors"
+                        className="h-9 w-full rounded-md border border-ink-200 bg-ink-50 pl-9 pr-9 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100 [&::-webkit-search-cancel-button]:appearance-none"
                     />
+                    {searchValue && (
+                        <button
+                            type="button"
+                            onClick={handleSearchClear}
+                            aria-label="Clear search"
+                            className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-ink-400 transition-colors hover:bg-ink-200 hover:text-ink-700"
+                        >
+                            <X size={13} />
+                        </button>
+                    )}
                 </div>
             </form>
 
@@ -82,16 +137,7 @@ export default function TopBar({
                     <span className="text-xs font-medium">EN</span>
                 </button>
 
-                <button
-                    type="button"
-                    className="relative text-ink-500 hover:text-ink-800 transition-colors"
-                    aria-label={`${notificationCount} notifications`}
-                >
-                    <Bell size={18} />
-                    {notificationCount > 0 && (
-                        <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-danger-500 ring-2 ring-surface" />
-                    )}
-                </button>
+                <NotificationBell />
 
                 <div ref={profileMenuRef} className="relative">
                     <button

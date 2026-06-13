@@ -1,6 +1,8 @@
 type QueryValue = string | number | boolean | null | undefined;
 type QueryParams = Record<string, QueryValue | QueryValue[]>;
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+
 export type UserRole = "user" | "employer" | "admin";
 
 export type RegisterPayload =
@@ -161,6 +163,11 @@ export type ApplicationListQuery = {
     status?: ApplicationStatus;
 };
 
+export type NotificationListQuery = {
+    page?: number;
+    size?: number;
+};
+
 const withQuery = (path: string, params?: QueryParams) => {
     const query = new URLSearchParams();
 
@@ -226,6 +233,18 @@ export const API = {
 
     INSTITUTION: {
         GET_ALL: (params?: InstitutionListQuery) => withQuery("/api/institutions", params),
+    },
+
+    NOTIFICATION: {
+        GET_ALL: (params?: NotificationListQuery) => withQuery("/api/notifications", params),
+        UNREAD_COUNT: "/api/notifications/unread-count",
+        MARK_READ: (id: string) => `/api/notifications/${id}/read`,
+        MARK_ALL_READ: "/api/notifications/read-all",
+        // Absolute URL because EventSource ignores the axios baseURL; token goes in
+        // the query string since EventSource can't set an Authorization header.
+        STREAM: (token: string) => (
+            `${API_BASE_URL}/api/notifications/stream?token=${encodeURIComponent(token)}`
+        ),
     },
 
     ADMIN: {

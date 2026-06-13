@@ -20,6 +20,7 @@ import { getSavedJobs } from "../../lib/api/user/user";
 import { getMyApplications } from "../../lib/api/application/application";
 import { navCountsStore, type NavCounts } from "../../lib/stores/navCounts";
 import { useAuth } from "../../context/AuthContext";
+import { useNotifications } from "../../context/NotificationContext";
 
 const SIDEBAR_STORAGE_KEY = "jobflow-sidebar-collapsed";
 const SIDEBAR_EXPANDED_WIDTH = "232px";
@@ -109,6 +110,7 @@ function NavLink({
 export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const pathname = usePathname();
     const { logout } = useAuth();
+    const { unreadCount } = useNotifications();
     const [isCollapsed, setIsCollapsed] = useState(false);
     // Counts live in a shared store so save/apply actions elsewhere on the page
     // update these badges instantly — no page reload needed.
@@ -154,6 +156,8 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const navCountFor = (href: string) => {
         if (href === "/saved") return counts.saved;
         if (href === "/applications") return counts.applications;
+        // Unread (not total) so the badge clears once everything's been read.
+        if (href === "/notifications") return unreadCount;
         return undefined;
     };
 
