@@ -2,6 +2,7 @@ import { CreateApplicationDto, UpdateApplicationStatusDto } from "../dtos/applic
 import { ApplicationRepository } from "../repositories/application.repository";
 import { JobRepository } from "../repositories/job.repository";
 import { CompanyRepository } from "../repositories/company.repository";
+import { NotificationService } from "./notification.service";
 import { HttpError } from "../errors/http-error";
 import { ApplicationStatusType } from "../types/application.type";
 import { UserRoleType } from "../types/user.type";
@@ -10,6 +11,7 @@ import mongoose from "mongoose";
 let applicationRepository = new ApplicationRepository();
 let jobRepository = new JobRepository();
 let companyRepository = new CompanyRepository();
+let notificationService = new NotificationService();
 
 interface ListApplicationsParams {
     page?: number;
@@ -92,6 +94,13 @@ export class ApplicationService {
             throw new HttpError(403, "Not authorized to view applications for this job");
         }
 
+        // An employer opening this job's applicant list counts as viewing those
+        // applications: flip any still-"submitted" ones to "viewed_by_employer" and
+        // notify each applicant. Admins browsing don't trigger a view.
+        if (requesterRole !== "admin") {
+            await this.markJobApplicationsViewed(jobId, job.title);
+        }
+
         const page = params.page ?? 1;
         const size = params.size ?? 20;
         return await applicationRepository.getAllApplications({
@@ -167,7 +176,30 @@ export class ApplicationService {
             throw new HttpError(403, "Not authorized to update this application");
         }
 
-        return await applicationRepository.updateApplicationStatus(applicationId, data.status);
+        const updated = await applicationRepository.updateApplicationStatus(applicationId, data.status);
+
+        // Notify the applicant when the status actually changes to a meaningful one.
+        if (updated && data.status !== application.status) {
+            const job = await jobRepository.getJobById(application.jobId.toString());
+            await notificationService.notifyApplicationStatus(updated, data.status, job?.title);
+        }
+
+        return updated;
+    }
+
+    // Marks every still-"submitted" application for a job as viewed and notifies
+    // each applicant. Idempotent: once marked, repeat calls find nothing to do.
+    private async markJobApplicationsViewed(jobId: string, jobTitle?: string): Promise<void> {
+        const submitted = await applicationRepository.getSubmittedApplicationsForJob(jobId);
+        if (submitted.length === 0) return;
+
+        await applicationRepository.markApplicationsViewed(submitted.map((application) => application._id));
+
+        await Promise.all(
+            submitted.map((application) =>
+                notificationService.notifyApplicationStatus(application, "viewed_by_employer", jobTitle)
+            )
+        );
     }
 
     async withdrawApplication(applicationId: string, requesterId: string, requesterRole: UserRoleType) {

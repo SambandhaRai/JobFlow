@@ -20,6 +20,8 @@ export interface IApplicationRepository {
     deleteOneApplication(id: string): Promise<boolean | null>;
     hasUserAppliedToJob(userId: string, jobId: string): Promise<boolean>;
     deleteByJob(jobId: string): Promise<number>;
+    getSubmittedApplicationsForJob(jobId: string): Promise<IApplication[]>;
+    markApplicationsViewed(applicationIds: mongoose.Types.ObjectId[]): Promise<void>;
 }
 
 export class ApplicationRepository implements IApplicationRepository {
@@ -91,6 +93,22 @@ export class ApplicationRepository implements IApplicationRepository {
             jobId: new mongoose.Types.ObjectId(jobId),
         });
         return result.deletedCount;
+    }
+
+    // Applications for a job still awaiting a first employer view.
+    async getSubmittedApplicationsForJob(jobId: string): Promise<IApplication[]> {
+        return await ApplicationModel.find({
+            jobId: new mongoose.Types.ObjectId(jobId),
+            status: "submitted",
+        });
+    }
+
+    async markApplicationsViewed(applicationIds: mongoose.Types.ObjectId[]): Promise<void> {
+        if (applicationIds.length === 0) return;
+        await ApplicationModel.updateMany(
+            { _id: { $in: applicationIds } },
+            { $set: { status: "viewed_by_employer" } }
+        );
     }
 
 }
