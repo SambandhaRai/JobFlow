@@ -31,6 +31,7 @@ export type LoginPayload = {
 export type UpdateProfilePayload = {
     fullName?: string;
     phone?: string;
+    profilePicture?: string;
     educations?: Array<{
         level: "see" | "+2" | "diploma" | "bachelor" | "master" | "phd" | "other";
         institutionName: string;
@@ -53,6 +54,21 @@ export type CreateResumePayload = {
     fileUrl: string;
     fileSize: number;
 };
+
+export type UpdateCompanyPayload = {
+    name?: string;
+    website?: string;
+    logoUrl?: string;
+    description?: string;
+    industry?: string;
+    location?: string;
+    email?: string;
+    phone?: string;
+};
+
+export type CreateCompanyPayload = {
+    name: string;
+} & UpdateCompanyPayload;
 
 export type UserListQuery = {
     page?: number;
@@ -195,6 +211,7 @@ export const API = {
     USER: {
         GET_PROFILE: "/api/users/me",
         UPDATE_PROFILE: "/api/users/me",
+        UPLOAD_PROFILE_PICTURE: "/api/users/me/profile-picture",
 
         RESUME: {
             ADD: "/api/users/me/resumes",
@@ -207,6 +224,14 @@ export const API = {
             SAVE: (jobId: string) => `/api/users/me/saved-jobs/${jobId}`,
             UNSAVE: (jobId: string) => `/api/users/me/saved-jobs/${jobId}`,
         },
+    },
+
+    COMPANY: {
+        GET_MINE: "/api/companies/me",
+        GET_BY_ID: (id: string) => `/api/companies/${id}`,
+        CREATE: "/api/companies",
+        UPDATE: (id: string) => `/api/companies/${id}`,
+        UPLOAD_LOGO: (id: string) => `/api/companies/${id}/logo`,
     },
 
     JOB: {
@@ -240,8 +265,6 @@ export const API = {
         UNREAD_COUNT: "/api/notifications/unread-count",
         MARK_READ: (id: string) => `/api/notifications/${id}/read`,
         MARK_ALL_READ: "/api/notifications/read-all",
-        // Absolute URL because EventSource ignores the axios baseURL; token goes in
-        // the query string since EventSource can't set an Authorization header.
         STREAM: (token: string) => (
             `${API_BASE_URL}/api/notifications/stream?token=${encodeURIComponent(token)}`
         ),

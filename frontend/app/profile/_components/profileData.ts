@@ -6,6 +6,9 @@ import type {
     EducationLevel,
     EducationStatus,
 } from "../setup/_components/profileSetupOptions";
+import { resolveAvatarUrl } from "../../../lib/avatar";
+
+export { resolveAvatarUrl };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
 
@@ -22,6 +25,7 @@ export type RawProfileUser = {
     email?: string;
     phone?: string;
     role?: string;
+    profilePicture?: string;
     createdAt?: string;
     skills?: string[];
     educations?: unknown[];
@@ -42,6 +46,7 @@ export type ProfileData = {
     email: string;
     phone: string;
     role: string;
+    profilePicture: string | null;
     memberSince: string | null;
     skills: string[];
     educations: ProfileEducation[];
@@ -65,9 +70,7 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse<TData>;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
         throw new Error(message);
     }
 
@@ -104,6 +107,7 @@ export const mapProfile = (user: RawProfileUser): ProfileData => ({
     email: user.email ?? "",
     phone: user.phone ?? "",
     role: user.role ?? "user",
+    profilePicture: resolveAvatarUrl(user.profilePicture),
     memberSince: formatMemberSince(user.createdAt),
     skills: Array.isArray(user.skills) ? user.skills.filter((skill): skill is string => typeof skill === "string") : [],
     educations: (Array.isArray(user.educations) ? user.educations : [])
@@ -115,9 +119,6 @@ export const mapProfile = (user: RawProfileUser): ProfileData => ({
         .sort((a, b) => Number(b.isDefault) - Number(a.isDefault)),
 });
 
-// Mirrors the 4-factor completion used across Discover/Applications so the
-// sidebar shows the same number everywhere, and surfaces the per-item checklist
-// for the profile header.
 export const getProfileCompletion = (profile: ProfileData | null): ProfileCompletion => {
     const items = [
         { label: "Name", done: (profile?.fullName.trim().length ?? 0) >= 2 },

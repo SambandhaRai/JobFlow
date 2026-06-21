@@ -5,6 +5,7 @@ import { AlertCircle, CalendarDays, CheckCircle2, Circle, FileText, GraduationCa
 import Sidebar from "../_components/Sidebar";
 import ScrollToTop from "../_components/ScrollToTop";
 import TopBar from "../_components/TopBar";
+import AvatarUploader from "./_components/AvatarUploader";
 import BasicInfoCard from "./_components/BasicInfoCard";
 import EducationCard from "./_components/EducationCard";
 import ResumesCard from "./_components/ResumesCard";
@@ -40,8 +41,6 @@ const roleLabel = (role: string) => (
     }[role] ?? "Job seeker"
 );
 
-// Circular completion gauge. pathLength=100 lets the dash array read as a raw
-// percentage; the -rotate-90 starts the arc at 12 o'clock.
 function ProgressRing({ percent }: { percent: number }) {
     const value = Math.max(0, Math.min(100, percent));
 
@@ -128,11 +127,8 @@ export default async function ProfilePage() {
                         </div>
                     ) : (
                         <div className="mt-6 space-y-5">
-                            {/* Header */}
                             <section className="overflow-hidden rounded-xl border border-ink-100 bg-surface shadow-card">
-                                {/* Gradient cover */}
                                 <div className="relative h-24 overflow-hidden bg-gradient-to-br from-cobalt-700 via-cobalt-500 to-cobalt-400 sm:h-28">
-                                    {/* Dot texture so the cover reads as a surface, not a flat slab */}
                                     <div
                                         className="absolute inset-0 opacity-20"
                                         style={{
@@ -146,11 +142,12 @@ export default async function ProfilePage() {
 
                                 <div className="relative z-10 px-5 pb-5 sm:px-6 sm:pb-6">
                                     <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-                                        {/* Identity */}
                                         <div className="flex min-w-0 items-end gap-4">
-                                            <div className="-mt-12 flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cobalt-500 to-cobalt-700 font-display text-2xl font-bold text-white shadow-popover ring-4 ring-surface sm:-mt-14">
-                                                {initials}
-                                            </div>
+                                            <AvatarUploader
+                                                initials={initials}
+                                                name={displayName}
+                                                profilePicture={profile?.profilePicture ?? null}
+                                            />
                                             <div className="min-w-0 pb-0.5">
                                                 <h2 className="truncate text-xl font-semibold text-ink-900">{displayName}</h2>
                                                 <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-ink-500">
@@ -173,7 +170,6 @@ export default async function ProfilePage() {
                                             </div>
                                         </div>
 
-                                        {/* Completion */}
                                         <div className="flex shrink-0 items-center gap-3 rounded-xl border border-ink-100 bg-ink-50/70 px-4 py-3">
                                             <ProgressRing percent={completion.percent} />
                                             <div>
@@ -190,14 +186,12 @@ export default async function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    {/* Stats */}
                                     <div className="mt-5 grid grid-cols-3 gap-3">
                                         <StatTile icon={<Sparkles size={15} />} value={profile?.skills.length ?? 0} label="Skills" />
                                         <StatTile icon={<GraduationCap size={15} />} value={profile?.educations.length ?? 0} label="Education" />
                                         <StatTile icon={<FileText size={15} />} value={profile?.resumes.length ?? 0} label="Résumés" />
                                     </div>
 
-                                    {/* Completion checklist — only while there's something left to do */}
                                     {completion.percent < 100 && (
                                         <div className="mt-4 flex flex-wrap gap-2">
                                             {completion.items.map((item) => (

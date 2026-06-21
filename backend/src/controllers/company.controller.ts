@@ -122,6 +122,37 @@ export class CompanyController {
         }
     }
 
+    async uploadCompanyLogo(req: Request, res: Response) {
+        try {
+            const requesterId = req.user?.id;
+            if (!requesterId) {
+                return res.status(401).json({ success: false, message: "Unauthorized" });
+            }
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please upload a file",
+                });
+            }
+
+            const company = await companyService.uploadCompanyLogo(
+                req.params.id as string,
+                requesterId,
+                req.file,
+            );
+            return res.status(200).json({
+                success: true,
+                data: company,
+                message: "Company logo uploaded successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
     async verifyCompany(req: Request, res: Response) {
         try {
             const company = await companyService.verifyCompany(req.params.id as string);

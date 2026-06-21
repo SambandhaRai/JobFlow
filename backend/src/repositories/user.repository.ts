@@ -9,7 +9,7 @@ type CreateUserData = Partial<UserType> & {
     savedJobs?: mongoose.Types.ObjectId[];
 };
 
-type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone">> & {
+type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone" | "profilePicture">> & {
     educations?: JobSeekerType["educations"];
     skills?: string[];
     isVerified?: boolean;
@@ -21,6 +21,7 @@ export interface IUserRepository {
     getUserById(id: string): Promise<IUser | null>;
     getEmployerById(id: string): Promise<IEmployer | null>;
     updateOneUser(id: string, data: UpdateUserData): Promise<IUser | null>;
+    uploadProfilePicture(id: string, profilePicture: string): Promise<IUser | null>;
     deleteOneUser(id: string): Promise<boolean | null>;
 
     getUserByEmail(email: string): Promise<IUser | null>;
@@ -90,6 +91,11 @@ export class UserRepository implements IUserRepository {
         return updatedUser;
     }
 
+    async uploadProfilePicture(id: string, profilePicture: string): Promise<IUser | null> {
+        const updatedUser = await UserModel.findByIdAndUpdate(id, { profilePicture }, { returnDocument: "after" });
+        return updatedUser;
+    }
+
     async deleteOneUser(id: string): Promise<boolean | null> {
         const result = await UserModel.findByIdAndDelete(id);
         return result ? true : null;
@@ -122,12 +128,10 @@ export class UserRepository implements IUserRepository {
     }
 
     async setDefaultResume(userId: string, resumeId: string): Promise<IJobSeeker | null> {
-        // Unset isDefault on all resumes for this user
         await JobSeekerModel.updateOne(
             { _id: userId },
             { $set: { "resumes.$[].isDefault": false } }
         );
-        // Set the chosen resume as default
         return await JobSeekerModel.findOneAndUpdate(
             { _id: userId, "resumes._id": new mongoose.Types.ObjectId(resumeId) },
             { $set: { "resumes.$.isDefault": true } },
@@ -152,7 +156,10 @@ export class UserRepository implements IUserRepository {
     }
 
     async getSavedJobs(userId: string): Promise<IJobSeeker | null> {
-        return await JobSeekerModel.findById(userId).populate("savedJobs");
+        return await JobSeekerModel.findById(userId).populate({
+            path: "savedJobs",
+            populate: { path: "companyId", select: "name slug logoUrl isVerified" },
+        });
     }
 
 }

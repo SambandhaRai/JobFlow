@@ -39,12 +39,22 @@ export default async function EmployerLayout({ children }: { children: ReactNode
         <div className="min-h-screen bg-background">
             <header className="border-b border-ink-200 bg-surface">
                 <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-                    <Link href="/employer/jobs" className="flex items-center gap-2 font-semibold text-ink-900">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cobalt-500 text-xs font-bold text-white">
-                            JF
-                        </span>
-                        JobFlow Employer
-                    </Link>
+                    <div className="flex items-center gap-6">
+                        <Link href="/employer/jobs" className="flex items-center gap-2 font-semibold text-ink-900">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cobalt-500 text-xs font-bold text-white">
+                                JF
+                            </span>
+                            JobFlow Employer
+                        </Link>
+                        <nav className="hidden items-center gap-4 text-sm sm:flex">
+                            <Link href="/employer/jobs" className="text-ink-600 transition-colors hover:text-ink-900">
+                                Jobs
+                            </Link>
+                            <Link href="/employer/company" className="text-ink-600 transition-colors hover:text-ink-900">
+                                Company
+                            </Link>
+                        </nav>
+                    </div>
                     <div className="flex items-center gap-3">
                         <span className="hidden truncate text-sm text-ink-500 sm:inline">{user?.email ?? "Employer"}</span>
                         <LogoutButton />

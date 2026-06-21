@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
 import { CreateCompanyDto, UpdateCompanyDto } from "../dtos/company.dto";
 import { HttpError } from "../errors/http-error";
 import { CompanyRepository } from "../repositories/company.repository";
+import { uploadDir } from "../middlewares/upload.middleware";
 
 const companyRepository = new CompanyRepository();
 
@@ -77,6 +80,40 @@ export class CompanyService {
         }
 
         return await companyRepository.updateCompany(companyId, data);
+    }
+
+    async uploadCompanyLogo(companyId: string, requesterId: string, file?: Express.Multer.File) {
+        if (!file) {
+            throw new HttpError(400, "Please upload a file");
+        }
+        if (!mongoose.Types.ObjectId.isValid(companyId)) {
+            throw new HttpError(400, "Invalid company ID");
+        }
+
+        const isMember = await companyRepository.isCompanyMember(companyId, requesterId);
+        if (!isMember) {
+            throw new HttpError(403, "Not authorized to update this company");
+        }
+
+        const company = await companyRepository.getCompanyById(companyId);
+        if (!company) {
+            throw new HttpError(404, "Company not found");
+        }
+
+        const oldLogo = company.logoUrl;
+        if (oldLogo && !/^https?:\/\//i.test(oldLogo)) {
+            const oldFilePath = path.join(uploadDir, oldLogo);
+            if (fs.existsSync(oldFilePath)) {
+                await fs.promises.unlink(oldFilePath);
+            }
+        }
+
+        const updated = await companyRepository.updateCompany(companyId, { logoUrl: file.filename });
+        if (!updated) {
+            throw new HttpError(404, "Company not found");
+        }
+
+        return updated;
     }
 
     async verifyCompany(companyId: string) {

@@ -55,6 +55,32 @@ export class UserController {
         }
     }
 
+    async uploadProfilePicture(req: Request, res: Response) {
+        try {
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ success: false, message: "Unauthorized" });
+            }
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please upload a file",
+                });
+            }
+            const updatedUser = await userService.uploadProfilePicture(userId, req.file);
+            return res.status(200).json({
+                success: true,
+                data: { profilePicture: updatedUser.profilePicture },
+                message: "Profile picture uploaded successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
     async getAllUsers(req: Request, res: Response) {
         try {
             const page = parseInt(req.query.page as string) || 1;
@@ -143,7 +169,6 @@ export class UserController {
         }
     }
 
-    // ---- Resume management ----
 
     async addResume(req: Request, res: Response) {
         try {
@@ -222,7 +247,6 @@ export class UserController {
         }
     }
 
-    // ---- Saved jobs ----
 
     async saveJob(req: Request, res: Response) {
         try {
