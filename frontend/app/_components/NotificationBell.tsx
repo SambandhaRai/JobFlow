@@ -41,7 +41,7 @@ export default function NotificationBell() {
     };
 
     const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
-    const visible = notifications.slice(0, PANEL_LIMIT);
+    const visible = notifications.filter((notification) => !notification.isRead).slice(0, PANEL_LIMIT);
 
     return (
         <div ref={panelRef} className="relative">
