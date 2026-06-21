@@ -1,18 +1,18 @@
 import mongoose, { QueryFilter } from "mongoose";
 import { AdminModel, EmployerModel, IEmployer, IJobSeeker, IUser, JobSeekerModel, UserModel } from "../models/user.model";
-import { ResumeType, UserRoleType, UserType } from "../types/user.type";
+import { JobSeekerType, ResumeType, UserRoleType, UserType } from "../types/user.type";
 
 type CreateUserData = Partial<UserType> & {
     role?: UserRoleType;
     skills?: string[];
     resumes?: Partial<ResumeType>[];
     savedJobs?: mongoose.Types.ObjectId[];
-    companyName?: string;
-    companyWebsite?: string;
 };
 
 type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone">> & {
+    educations?: JobSeekerType["educations"];
     skills?: string[];
+    isVerified?: boolean;
 };
 
 export interface IUserRepository {
@@ -56,6 +56,7 @@ export class UserRepository implements IUserRepository {
             filter.$or = [
                 { fullName: { $regex: search, $options: "i" } },
                 { email: { $regex: search, $options: "i" } },
+                { "educations.institutionName": { $regex: search, $options: "i" } },
                 { skills: { $regex: search, $options: "i" } },
             ];
         }
@@ -79,7 +80,10 @@ export class UserRepository implements IUserRepository {
     }
 
     async updateOneUser(id: string, data: UpdateUserData): Promise<IUser | null> {
-        if (data.skills !== undefined) {
+        if (
+            data.skills !== undefined ||
+            data.educations !== undefined
+        ) {
             return await JobSeekerModel.findByIdAndUpdate(id, data, { returnDocument: "after" });
         }
         const updatedUser = await UserModel.findByIdAndUpdate(id, data, { returnDocument: "after" });

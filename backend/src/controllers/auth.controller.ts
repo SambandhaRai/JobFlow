@@ -15,10 +15,11 @@ export class AuthController {
                     errors: z.prettifyError(parsedData.error)
                 });
             }
-            const newUser = await userService.registerUser(parsedData.data);
+            const { token, user } = await userService.registerUser(parsedData.data);
             return res.status(201).json({
                 success: true,
-                data: newUser,
+                data: user,
+                token,
                 message: "User registered successfully"
             });
         } catch (error: Error | any) {

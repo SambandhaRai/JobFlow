@@ -1,4 +1,4 @@
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from "../dtos/user.dto";
+import { AdminUpdateUserDto, CreateUserDto, LoginUserDto, UpdateUserDto } from "../dtos/user.dto";
 import { UserRepository } from "../repositories/user.repository";
 import { IJobSeeker, IUser } from "../models/user.model";
 import { HttpError } from "../errors/http-error";
@@ -16,6 +16,16 @@ export class UserService {
         if (user.role !== "user") {
             throw new HttpError(403, `Only job seekers can ${action}`);
         }
+    }
+
+    private createAuthToken(user: IUser) {
+        const payload = {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+        };
+
+        return jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
     }
 
     async registerUser(data: CreateUserDto) {
@@ -46,7 +56,9 @@ export class UserService {
             password: hashedPassword,
         });
 
-        return newUser;
+        const token = this.createAuthToken(newUser);
+
+        return { token, user: newUser };
     }
 
     async loginUser(data: LoginUserDto) {
@@ -60,12 +72,7 @@ export class UserService {
             throw new HttpError(401, "Invalid credentials");
         }
 
-        const payload = {
-            id: existingUser._id,
-            email: existingUser.email,
-            role: existingUser.role,
-        };
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
+        const token = this.createAuthToken(existingUser);
 
         return { token, user: existingUser };
     }
@@ -83,8 +90,11 @@ export class UserService {
         if (!user) {
             throw new HttpError(404, "User not found");
         }
-        if (data.skills !== undefined) {
-            this.ensureJobSeeker(user, "update skills");
+        if (
+            data.skills !== undefined ||
+            data.educations !== undefined
+        ) {
+            this.ensureJobSeeker(user, "update job seeker profile details");
         }
 
         const updatedUser = await userRepository.updateOneUser(userId, data);
@@ -101,6 +111,14 @@ export class UserService {
             throw new HttpError(404, "User not found");
         }
         return await userRepository.deleteOneUser(userId);
+    }
+
+    async adminUpdateUser(userId: string, data: AdminUpdateUserDto) {
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
+        return await userRepository.updateOneUser(userId, data);
     }
 
     // -------- Resume management --------

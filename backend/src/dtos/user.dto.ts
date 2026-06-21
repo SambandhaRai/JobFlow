@@ -1,5 +1,5 @@
 import z from "zod";
-import { BaseUserSchema, ResumeSchema } from "../types/user.type";
+import { BaseUserSchema, JobSeekerSchema, ResumeSchema } from "../types/user.type";
 
 const CreateUserBaseDto = BaseUserSchema.pick({
     fullName: true,
@@ -16,8 +16,6 @@ const CreateJobSeekerDto = CreateUserBaseDto.extend({
 
 const CreateEmployerDto = CreateUserBaseDto.extend({
     role: z.literal("employer"),
-    companyName: z.string().trim().min(1, "Company name is required"),
-    companyWebsite: z.string().trim().optional(),
 });
 
 const CreateAdminDto = CreateUserBaseDto.extend({
@@ -53,9 +51,18 @@ export const UpdateUserDto = BaseUserSchema.pick({
     fullName: true,
     phone: true,
 }).extend({
-    skills: z.array(z.string()).optional(),
+    educations: JobSeekerSchema.shape.educations,
+    skills: z.array(z.string().trim()).optional(),
 }).partial();
 export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
+
+// Admin editing another user's profile (and verifying employers).
+export const AdminUpdateUserDto = z.object({
+    fullName: z.string().trim().min(2, "Full name must be at least 2 characters").optional(),
+    phone: z.string().trim().min(10).max(15).optional(),
+    isVerified: z.boolean().optional(),
+});
+export type AdminUpdateUserDto = z.infer<typeof AdminUpdateUserDto>;
 
 export const CreateResumeDto = ResumeSchema.pick({
     fileName: true,

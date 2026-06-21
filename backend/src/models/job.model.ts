@@ -9,8 +9,20 @@ const SalarySchema: Schema = new Schema({
 
 const JobSchema: Schema = new Schema({
     title: { type: String, required: true, trim: true, minLength: 2 },
-    company: { type: String, required: true, trim: true, minLength: 2 },
-    employerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    postedByUserId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    hiringType: {
+        type: String,
+        enum: ["company", "small-business", "individual"],
+        default: "small-business",
+    },
+    companyId: { type: Schema.Types.ObjectId, ref: "Company" },
+    company: { type: String, trim: true },
+    hiringName: { type: String, required: true, trim: true, minLength: 2 },
+    hiringEmail: { type: String, trim: true, lowercase: true },
+    hiringPhone: { type: String, trim: true },
+    hiringWebsite: { type: String, trim: true },
+    hiringLocation: { type: String, trim: true },
+    isHiringVerified: { type: Boolean, default: false },
     location: { type: String, required: true, trim: true, minLength: 2 },
     jobType: {
         type: String,
@@ -27,6 +39,25 @@ const JobSchema: Schema = new Schema({
         enum: ["no-experience", "entry-level", "junior", "mid-level", "senior-level"],
         required: true,
     },
+    category: {
+        type: String,
+        enum: [
+            "IT & Software",
+            "Design & Creative",
+            "Marketing & Social Media",
+            "Writing & Content",
+            "Sales & Customer Service",
+            "Business & Administration",
+            "Finance & Accounting",
+            "Education & Tutoring",
+            "Hospitality & Tourism",
+            "Retail & Store Jobs",
+            "Data & Research",
+            "Media & Communication",
+            "Other",
+        ],
+        default: "Other",
+    },
     salary: { type: SalarySchema, required: false },
     duration: { type: String, trim: true },
     skills: { type: [String], default: [] },
@@ -37,13 +68,15 @@ const JobSchema: Schema = new Schema({
     isBeginnerFriendly: { type: Boolean, default: false },
     deadline: { type: Date },
     postedAt: { type: Date, default: () => new Date() },
+    seedTag: { type: String, trim: true },
 }, {
     timestamps: true,
 });
 
-export interface IJob extends Omit<JobType, "employerId">, Document {
+export interface IJob extends Omit<JobType, "postedByUserId" | "companyId">, Document {
     _id: mongoose.Types.ObjectId;
-    employerId: mongoose.Types.ObjectId;
+    postedByUserId: mongoose.Types.ObjectId;
+    companyId?: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

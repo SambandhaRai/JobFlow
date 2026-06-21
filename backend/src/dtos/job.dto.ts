@@ -1,12 +1,20 @@
 import z from "zod";
-import { JobSchema } from "../types/job.type";
+import { JobBaseSchema, validateJobHiringDetails } from "../types/job.type";
 
-export const CreateJobDto = JobSchema.pick({
+const JobMutationDto = JobBaseSchema.pick({
     title: true,
+    hiringType: true,
+    companyId: true,
+    hiringName: true,
+    hiringEmail: true,
+    hiringPhone: true,
+    hiringWebsite: true,
+    hiringLocation: true,
     location: true,
     jobType: true,
     workMode: true,
     experienceLevel: true,
+    category: true,
     salary: true,
     duration: true,
     skills: true,
@@ -16,7 +24,9 @@ export const CreateJobDto = JobSchema.pick({
     isBeginnerFriendly: true,
     deadline: true,
 });
+
+export const CreateJobDto = JobMutationDto.superRefine(validateJobHiringDetails);
 export type CreateJobDto = z.infer<typeof CreateJobDto>;
 
-export const UpdateJobDto = CreateJobDto.partial();
+export const UpdateJobDto = JobMutationDto.partial();
 export type UpdateJobDto = z.infer<typeof UpdateJobDto>;

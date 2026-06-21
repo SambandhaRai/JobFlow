@@ -1,0 +1,183 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Globe, LogOut, Search, Settings, X } from "lucide-react";
+
+import { useAuth } from "../../context/AuthContext";
+import CompanyAvatar from "./CompanyAvatar";
+import NotificationBell from "./NotificationBell";
+
+interface TopBarProps {
+    userName: string;
+    defaultSearchValue?: string;
+}
+
+export default function TopBar({
+    userName,
+    defaultSearchValue = "",
+}: TopBarProps) {
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const profileMenuRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const { logout } = useAuth();
+
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const [searchValue, setSearchValue] = useState(defaultSearchValue);
+    const [lastDefaultSearch, setLastDefaultSearch] = useState(defaultSearchValue);
+
+    // Keep the field in sync when the URL's search term changes (e.g. navigating
+    // to /discover?search=… or having the term cleared server-side). Adjusting
+    // state during render is React's recommended alternative to a sync effect.
+    if (defaultSearchValue !== lastDefaultSearch) {
+        setLastDefaultSearch(defaultSearchValue);
+        setSearchValue(defaultSearchValue);
+    }
+
+    // Build a /discover URL that preserves any active filters already in the URL,
+    // sets (or removes) the search term, and resets pagination to the first page.
+    const buildDiscoverHref = (term: string) => {
+        const params = new URLSearchParams(pathname === "/discover" ? searchParams.toString() : "");
+        const trimmed = term.trim();
+
+        if (trimmed) {
+            params.set("search", trimmed);
+        } else {
+            params.delete("search");
+        }
+        params.delete("page");
+
+        const query = params.toString();
+        return query ? `/discover?${query}` : "/discover";
+    };
+
+    const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        router.push(buildDiscoverHref(searchValue));
+    };
+
+    const handleSearchClear = () => {
+        setSearchValue("");
+        // Only reset results when a search term is actually applied to the page.
+        if (pathname === "/discover" && searchParams.has("search")) {
+            router.push(buildDiscoverHref(""));
+        }
+        searchInputRef.current?.focus();
+    };
+
+    useEffect(() => {
+        if (!isProfileMenuOpen) return;
+
+        const handlePointerDown = (event: PointerEvent) => {
+            if (!profileMenuRef.current?.contains(event.target as Node)) {
+                setIsProfileMenuOpen(false);
+            }
+        };
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setIsProfileMenuOpen(false);
+        };
+
+        document.addEventListener("pointerdown", handlePointerDown);
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("pointerdown", handlePointerDown);
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isProfileMenuOpen]);
+
+    const handleLogout = async () => {
+        setIsProfileMenuOpen(false);
+        await logout();
+    };
+
+    return (
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-ink-100 bg-surface px-6">
+            {/* Search */}
+            <form onSubmit={handleSearchSubmit} role="search" className="w-full max-w-xl">
+                <div className="relative">
+                    <Search
+                        size={15}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400"
+                    />
+                    <input
+                        ref={searchInputRef}
+                        name="search"
+                        type="search"
+                        value={searchValue}
+                        onChange={(event) => setSearchValue(event.target.value)}
+                        placeholder="Search by role, skill, or company..."
+                        className="h-9 w-full rounded-md border border-ink-200 bg-ink-50 pl-9 pr-9 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-cobalt-500 focus:ring-2 focus:ring-cobalt-100 [&::-webkit-search-cancel-button]:appearance-none"
+                    />
+                    {searchValue && (
+                        <button
+                            type="button"
+                            onClick={handleSearchClear}
+                            aria-label="Clear search"
+                            className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-ink-400 transition-colors hover:bg-ink-200 hover:text-ink-700"
+                        >
+                            <X size={13} />
+                        </button>
+                    )}
+                </div>
+            </form>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-3 ml-auto">
+                <button
+                    type="button"
+                    className="flex items-center gap-1.5 text-sm text-ink-600 hover:text-ink-900 transition-colors"
+                    aria-label="Language"
+                >
+                    <Globe size={16} />
+                    <span className="text-xs font-medium">EN</span>
+                </button>
+
+                <NotificationBell />
+
+                <div ref={profileMenuRef} className="relative">
+                    <button
+                        type="button"
+                        onClick={() => setIsProfileMenuOpen((current) => !current)}
+                        className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt-500"
+                        aria-label="Profile menu"
+                        aria-expanded={isProfileMenuOpen}
+                        aria-haspopup="menu"
+                    >
+                        <CompanyAvatar name={userName} size="sm" className="rounded-full bg-cobalt-500 text-white" />
+                    </button>
+
+                    {isProfileMenuOpen && (
+                        <div
+                            role="menu"
+                            className="absolute right-0 top-11 z-30 w-48 overflow-hidden rounded-lg border border-ink-100 bg-surface py-1 shadow-popover"
+                        >
+                            <Link
+                                href="/profile/setup"
+                                role="menuitem"
+                                onClick={() => setIsProfileMenuOpen(false)}
+                                className="flex min-h-10 items-center gap-2 px-3 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 hover:text-ink-900"
+                            >
+                                <Settings size={15} className="text-ink-400" />
+                                Settings
+                            </Link>
+                            <button
+                                type="button"
+                                role="menuitem"
+                                onClick={handleLogout}
+                                className="flex min-h-10 w-full items-center gap-2 px-3 text-left text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50"
+                            >
+                                <LogOut size={15} />
+                                Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </header>
+    );
+}

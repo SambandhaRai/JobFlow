@@ -7,7 +7,7 @@ export const CreateApplicationDto = ApplicationSchema.pick({
     fullName: true,
     email: true,
     phone: true,
-    coverLetter: true,
+    applicationNote: true,
 });
 export type CreateApplicationDto = z.infer<typeof CreateApplicationDto>;
 

@@ -13,7 +13,7 @@ const jobController = new JobController();
 router.get("/", jobController.getAllJobs);
 router.get("/:id", jobController.getJobById);
 
-// Employer creates job (employerId derived from req.user)
+// Employer creates job (postedByUserId derived from req.user)
 router.post("/", authorizedMiddleware, employerOnlyMiddleware, jobController.createJob);
 
 // Owner employer or admin (ownership check lives in service)

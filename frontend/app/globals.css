@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* ============================================================
+   THEME TOKENS
+   These define every utility class Tailwind generates.
+   Edit values here, not in components.
+   ============================================================ */
+@theme {
+  /* ---------- Brand: Cobalt blue ---------- */
+  --color-cobalt-50:  #EEF2FF;
+  --color-cobalt-100: #DDE5FF;
+  --color-cobalt-200: #B8C7FF;
+  --color-cobalt-300: #8AA1FF;
+  --color-cobalt-400: #5C7AFF;
+  --color-cobalt-500: #2E5BFF;  /* primary brand */
+  --color-cobalt-600: #1D45E5;
+  --color-cobalt-700: #1535B8;
+  --color-cobalt-800: #0F258A;
+  --color-cobalt-900: #0A1A60;
+
+  /* ---------- Ink: neutral text/border scale ---------- */
+  --color-ink-50:  #F5F7FA;
+  --color-ink-100: #E5E8EC;
+  --color-ink-200: #C8CDD6;     /* lightest border value from spec */
+  --color-ink-300: #A8AEB8;
+  --color-ink-400: #8A92A0;
+  --color-ink-500: #6B7280;
+  --color-ink-600: #4A5160;
+  --color-ink-700: #2A3038;
+  --color-ink-800: #1A1F26;
+  --color-ink-900: #0E1116;     /* darkest text value from spec */
+
+  /* ---------- Semantic ---------- */
+  --color-success-50:  #ECFDF5;
+  --color-success-500: #10B981;
+  --color-success-700: #047857;
+
+  --color-warning-50:  #FFFBEB;
+  --color-warning-500: #F59E0B;
+  --color-warning-700: #B45309;
+
+  --color-danger-50:  #FEF2F2;
+  --color-danger-500: #EF4444;
+  --color-danger-700: #B91C1C;
+
+  /* ---------- Surface shortcuts ---------- */
+  --color-surface:    #FFFFFF;
+  --color-background: #F5F7FA;
+
+  /* ---------- Typography ---------- */
+  /* These reference the CSS variables set up by next/font in layout.tsx. */
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-sans:    var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:    var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---------- Radii (from spec: 6/10/14/18px) ---------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-card:    0 1px 2px rgba(14, 17, 22, 0.04), 0 1px 1px rgba(14, 17, 22, 0.03);
+  --shadow-popover: 0 4px 12px rgba(14, 17, 22, 0.08), 0 2px 4px rgba(14, 17, 22, 0.04);
+  --shadow-modal:   0 12px 32px rgba(14, 17, 22, 0.12), 0 4px 8px rgba(14, 17, 22, 0.06);
+
+  /* ---------- Layout ---------- */
+  /* Exposing rail widths as spacing tokens keeps fixed navigation
+     and page grids in sync when desktop panels are collapsed. */
+  --spacing-sidebar: 232px;
+  --app-sidebar-width: 232px;
+  --discover-filter-width: 260px;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Accessible focus ring in brand color */
+  *:focus-visible {
+    outline: 2px solid var(--color-cobalt-500);
+    outline-offset: 2px;
+  }
+
+  /* Mono font for inline code and skill chips */
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
+  }
+}
