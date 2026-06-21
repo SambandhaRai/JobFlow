@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
-  allowedDevOrigins: ["192.168.1.*", "localhost", "10.1.19.*"],
+  allowedDevOrigins: ["192.168.1.*", "localhost", "10.1.19.*", "10.1.20.*"],
   images: {
     dangerouslyAllowLocalIP: true,
     remotePatterns: [

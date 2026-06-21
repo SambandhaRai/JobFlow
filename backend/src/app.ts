@@ -25,7 +25,9 @@ const allowedOrigins = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "http://192.168.101.8:3000",
-    "http://10.1.19.83:3000"
+    "http://192.168.1.2:3001",
+    "http://10.1.19.83:3000",
+    "http://10.1.20.249:3000"
 ].filter(Boolean);
 
 const corsOptions: CorsOptions = {
