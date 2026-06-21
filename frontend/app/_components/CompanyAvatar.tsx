@@ -1,4 +1,3 @@
-// Deterministic color from initials so the same company always gets the same color
 const AVATAR_COLORS = [
     { bg: "bg-cobalt-50", text: "text-cobalt-700" },
     { bg: "bg-success-50", text: "text-success-700" },
@@ -40,11 +39,28 @@ interface CompanyAvatarProps {
     name: string;
     size?: AvatarSize;
     className?: string;
+    imageUrl?: string | null;
 }
 
-export default function CompanyAvatar({ name, size = "md", className = "" }: CompanyAvatarProps) {
+export default function CompanyAvatar({ name, size = "md", className = "", imageUrl }: CompanyAvatarProps) {
     const initials = getInitials(name);
     const { bg, text } = AVATAR_COLORS[getColorIndex(initials)];
+
+    if (imageUrl) {
+        return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+                src={imageUrl}
+                alt={name}
+                aria-label={name}
+                className={[
+                    "object-cover shrink-0",
+                    sizeStyles[size],
+                    className,
+                ].join(" ")}
+            />
+        );
+    }
 
     return (
         <div

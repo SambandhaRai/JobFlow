@@ -17,7 +17,6 @@ export default function JobDetailsLoading() {
 
                     <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
                         <div className="min-w-0 space-y-5">
-                            {/* Hero */}
                             <div className="rounded-lg border border-ink-100 bg-surface p-5 shadow-card sm:p-6">
                                 <div className="flex gap-5">
                                     <div className="h-16 w-16 shrink-0 rounded-lg bg-ink-100" />
@@ -34,14 +33,12 @@ export default function JobDetailsLoading() {
                                 </div>
                             </div>
 
-                            {/* At a glance */}
                             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                                 {Array.from({ length: 4 }).map((_, index) => (
                                     <div key={index} className="h-20 rounded-lg border border-ink-100 bg-surface" />
                                 ))}
                             </div>
 
-                            {/* Sections */}
                             {Array.from({ length: 2 }).map((_, index) => (
                                 <div key={index} className="rounded-lg border border-ink-100 bg-surface p-5 shadow-card sm:p-6">
                                     <div className="h-5 w-40 rounded bg-ink-100" />

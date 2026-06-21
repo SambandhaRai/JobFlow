@@ -12,8 +12,6 @@ interface SaveJobButtonProps {
     title: string;
     initialSaved?: boolean;
     className?: string;
-    // Optional: notified after a successful toggle. Lets the Saved page drop a
-    // row when it is unsaved. Discover leaves this unset and is unaffected.
     onToggleSaved?: (saved: boolean) => void;
 }
 

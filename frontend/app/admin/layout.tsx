@@ -33,8 +33,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     const token = cookieStore.get("auth_token")?.value ?? null;
     const user = parseUserCookie(cookieStore.get("user_data")?.value);
 
-    // The proxy already keeps job seekers out; this also blocks employers who
-    // would otherwise slip through, and anyone without a token.
     if (!token || user?.role !== "admin") {
         redirect("/login");
     }

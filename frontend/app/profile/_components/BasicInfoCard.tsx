@@ -29,7 +29,6 @@ export default function BasicInfoCard({ fullName, email, phone }: BasicInfoCardP
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // Committed values shown when not editing; drafts hold in-progress edits.
     const [committedName, setCommittedName] = useState(fullName);
     const [committedPhone, setCommittedPhone] = useState(phone);
     const [nameDraft, setNameDraft] = useState(fullName);
@@ -71,9 +70,6 @@ export default function BasicInfoCard({ fullName, email, phone }: BasicInfoCardP
         try {
             await updateUserProfile({
                 fullName: trimmedName,
-                // Phone is optional; omit it when empty rather than send ""
-                // (which the API would reject). When present it's already a
-                // valid 10-digit 98/97 number per validate().
                 ...(trimmedPhone ? { phone: trimmedPhone } : {}),
             });
             setCommittedName(trimmedName);

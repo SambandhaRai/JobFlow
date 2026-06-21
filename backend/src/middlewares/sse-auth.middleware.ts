@@ -9,9 +9,6 @@ interface JwtPayload {
     role: UserRoleType;
 }
 
-// EventSource cannot send an Authorization header, so the SSE endpoint accepts the
-// JWT as a `token` query parameter (falling back to the header for non-browser
-// clients). Otherwise this mirrors authorizedMiddleware.
 export const sseAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
         const headerToken = req.headers.authorization?.startsWith("Bearer ")

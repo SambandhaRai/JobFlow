@@ -36,7 +36,6 @@ const resumePreviewUrl = (fileUrl: string) => (
     /^https?:\/\//i.test(fileUrl) ? fileUrl : `${API_BASE_URL}/uploads/${fileUrl}`
 );
 
-// "a resume" · "a resume and your phone" · "a resume, your name, and your phone"
 const formatList = (items: string[]) => {
     if (items.length <= 1) return items[0] ?? "";
     if (items.length === 2) return `${items[0]} and ${items[1]}`;
@@ -45,8 +44,8 @@ const formatList = (items: string[]) => {
 
 export default function QuickApplyButton({ job, defaults, resumes, className, children }: QuickApplyButtonProps) {
     const router = useRouter();
-    const [open, setOpen] = useState(false);            // confirm dialog
-    const [showFullFlow, setShowFullFlow] = useState(false); // full 3-step fallback
+    const [open, setOpen] = useState(false);
+    const [showFullFlow, setShowFullFlow] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
     const defaultResume = resumes.find((resume) => resume.isDefault) ?? resumes[0] ?? null;
@@ -58,8 +57,6 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
     const emailOk = isValidEmail(email);
     const phoneOk = isValidPhone(phone);
 
-    // What's missing for a one-click submit. If anything is, we send the user
-    // into the full form instead of letting the backend reject the request.
     const missing: string[] = [];
     if (!defaultResume) missing.push("a resume");
     if (!nameOk) missing.push("your full name");
@@ -109,7 +106,6 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
             navCountsStore.adjustApplications(1);
             toast.success("Application sent 🎉");
             setOpen(false);
-            // Re-fetch so the page swaps Quick apply → "Already applied".
             router.refresh();
         } catch (error) {
             const message = error instanceof Error ? error.message : "Could not submit your application";
@@ -138,10 +134,9 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
                     }}
                 >
                     <div className="my-auto flex w-full max-w-128 flex-col overflow-hidden rounded-xl bg-surface shadow-modal">
-                        {/* Header */}
                         <div className="flex items-start justify-between gap-4 px-6 pt-6">
                             <div className="flex min-w-0 items-center gap-3">
-                                <CompanyAvatar name={job.company} size="lg" className="rounded-lg" />
+                                <CompanyAvatar name={job.company} size="lg" imageUrl={job.companyLogo} className="rounded-lg" />
                                 <div className="min-w-0">
                                     <div className="flex flex-wrap items-center gap-2">
                                         <h2 className="truncate text-lg font-semibold text-ink-900">{job.title}</h2>
@@ -161,7 +156,6 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
                             </button>
                         </div>
 
-                        {/* Body */}
                         <div className="px-6 py-5">
                             <h3 className="text-base font-semibold text-ink-900">
                                 {canQuickApply ? "Review and send" : "Almost there"}
@@ -227,7 +221,6 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
                             </div>
                         </div>
 
-                        {/* Footer */}
                         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-100 px-6 py-4">
                             <button
                                 type="button"

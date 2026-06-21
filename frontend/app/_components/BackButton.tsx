@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 interface BackButtonProps {
-    /** Where to go when there's no browser history to go back to. */
     fallbackHref?: string;
     label?: string;
     className?: string;

@@ -17,10 +17,6 @@ interface BadgeProps {
     className?: string;
 }
 
-/**
- * Single source of truth for small status/trust pills across the app.
- * Keeps shape (rounded-md), padding, and tonal colors consistent.
- */
 export default function Badge({ tone = "neutral", icon, children, className = "" }: BadgeProps) {
     return (
         <span

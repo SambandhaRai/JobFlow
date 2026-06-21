@@ -24,6 +24,7 @@ export interface IJobRepository {
     createJob(data: Partial<IJob>): Promise<IJob>;
     getAllJobs(params: GetAllJobsParams): Promise<{ jobs: IJob[], totalJobs: number }>;
     getJobById(id: string): Promise<IJob | null>;
+    getJobByIdWithRelations(id: string): Promise<IJob | null>;
     updateOneJob(id: string, data: Partial<IJob>): Promise<IJob | null>;
     deleteOneJob(id: string): Promise<boolean | null>;
 
@@ -94,6 +95,13 @@ export class JobRepository implements IJobRepository {
 
     async getJobById(id: string): Promise<IJob | null> {
         const job = await JobModel.findById(id);
+        return job;
+    }
+
+    async getJobByIdWithRelations(id: string): Promise<IJob | null> {
+        const job = await JobModel.findById(id)
+            .populate("postedByUserId", "fullName email")
+            .populate("companyId", "name slug logoUrl isVerified");
         return job;
     }
 

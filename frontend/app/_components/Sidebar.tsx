@@ -21,6 +21,7 @@ import { getMyApplications } from "../../lib/api/application/application";
 import { navCountsStore, type NavCounts } from "../../lib/stores/navCounts";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
+import { resolveAvatarUrl } from "../../lib/avatar";
 
 const SIDEBAR_STORAGE_KEY = "jobflow-sidebar-collapsed";
 const SIDEBAR_EXPANDED_WIDTH = "232px";
@@ -99,7 +100,6 @@ function NavLink({
                     {count}
                 </span>
             )}
-            {/* Collapsed rail: show a dot instead of the number */}
             {compact && hasCount && (
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-cobalt-500 ring-2 ring-cobalt-50" />
             )}
@@ -109,11 +109,10 @@ function NavLink({
 
 export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const pathname = usePathname();
-    const { logout } = useAuth();
+    const { user: authUser, logout } = useAuth();
     const { unreadCount } = useNotifications();
+    const avatarUrl = resolveAvatarUrl(authUser?.profilePicture as string | undefined);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    // Counts live in a shared store so save/apply actions elsewhere on the page
-    // update these badges instantly — no page reload needed.
     const counts = useSyncExternalStore(
         navCountsStore.subscribe,
         navCountsStore.getSnapshot,
@@ -156,7 +155,6 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
     const navCountFor = (href: string) => {
         if (href === "/saved") return counts.saved;
         if (href === "/applications") return counts.applications;
-        // Unread (not total) so the badge clears once everything's been read.
         if (href === "/notifications") return unreadCount;
         return undefined;
     };
@@ -199,7 +197,6 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                 isCollapsed ? "w-[76px]" : "w-sidebar",
             ].join(" ")}
         >
-            {/* Logo */}
             <div className={["px-4 pt-5 pb-4", isCollapsed ? "space-y-3" : ""].join(" ")}>
                 <div className={["flex items-center", isCollapsed ? "justify-center" : "justify-between gap-3"].join(" ")}>
                     <Link href="/" className="flex min-w-0 items-center gap-2" title="JobFlow">
@@ -238,7 +235,6 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                 )}
             </div>
 
-            {/* Nav sections */}
             <nav className="flex-1 overflow-y-auto px-2">
                 {!isCollapsed && (
                     <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-ink-400">
@@ -272,7 +268,6 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                 </ul>
             </nav>
 
-            {/* Profile completion card */}
             {profileCompletion && !isCollapsed && (
                 <div className="mx-4 mb-4 rounded-md bg-surface p-3 shadow-card">
                     <div className="flex items-center justify-between mb-2">
@@ -291,10 +286,9 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                 </div>
             )}
 
-            {/* User footer */}
             <div className={["pb-5 pt-1", isCollapsed ? "px-2" : "px-4"].join(" ")}>
                 <div className={["flex items-center", isCollapsed ? "flex-col gap-2" : "gap-2.5"].join(" ")}>
-                    <CompanyAvatar name={user.name} size="sm" className="rounded-full bg-cobalt-500 text-white" />
+                    <CompanyAvatar name={user.name} size="sm" imageUrl={avatarUrl} className="rounded-full bg-cobalt-500 text-white" />
                     {!isCollapsed && (
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-ink-900 truncate leading-tight">

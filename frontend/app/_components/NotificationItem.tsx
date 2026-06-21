@@ -52,8 +52,6 @@ export default function NotificationItem({ notification, onSelect }: Notificatio
                 <p className="mt-0.5 text-sm text-ink-500">{notification.message}</p>
             </div>
 
-            {/* Right meta column: pushes the timestamp to the row's edge so the
-                full width is used, and pairs it with the unread indicator. */}
             <div className="flex shrink-0 flex-col items-end gap-1.5 pl-3 text-right">
                 <time className="whitespace-nowrap text-xs text-ink-400">
                     {formatRelativeTime(notification.createdAt)}

@@ -6,7 +6,6 @@ import { sseAuthMiddleware } from "../middlewares/sse-auth.middleware";
 const router = Router();
 const notificationController = new NotificationController();
 
-// Real-time stream (auth via ?token= since EventSource can't set headers).
 router.get("/stream", sseAuthMiddleware, notificationController.stream);
 
 router.get("/", authorizedMiddleware, notificationController.getMyNotifications);

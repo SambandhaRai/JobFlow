@@ -1,4 +1,5 @@
 import type { ExperienceLevel, HiringType, JobCategory, JobListQuery, JobType, WorkMode } from "../../../lib/api/endpoints";
+import { resolveCompanyLogo } from "../../../lib/avatar";
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 export const JOBS_PER_DISCOVER_PAGE = 7;
@@ -22,6 +23,7 @@ export type BackendJob = {
     id?: string;
     title?: string;
     company?: string;
+    companyId?: string | { _id?: string; id?: string; name?: string; slug?: string; logoUrl?: string };
     hiringType?: HiringType;
     hiringName?: string;
     hiringEmail?: string;
@@ -54,6 +56,7 @@ export type Job = {
     id: string;
     title: string;
     company: string;
+    companyLogo?: string;
     hiringType: HiringType;
     isHiringVerified: boolean;
     category: string;
@@ -386,6 +389,7 @@ export const mapJob = (job: BackendJob): Job => ({
     id: job._id ?? job.id ?? `${job.title}-${job.company}`,
     title: job.title ?? "Untitled role",
     company: job.hiringName ?? job.company ?? "Unknown hiring profile",
+    companyLogo: resolveCompanyLogo(job.companyId),
     hiringType: job.hiringType ?? "small-business",
     isHiringVerified: Boolean(job.isHiringVerified),
     category: job.category ?? "Other",
@@ -487,9 +491,7 @@ export const fetchDiscoverData = async ({
         try {
             const savedResponse = await fetchJson<DiscoverUser>(withQuery("/api/users/me/saved-jobs"), token);
             user = savedResponse.data ? { ...user, ...savedResponse.data } : user;
-        } catch {
-            // Saved jobs are helpful, not critical for the page.
-        }
+        } catch {}
     }
 
     return {

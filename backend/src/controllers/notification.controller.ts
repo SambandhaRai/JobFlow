@@ -94,7 +94,6 @@ export class NotificationController {
         }
     }
 
-    // Long-lived Server-Sent Events stream. Authenticated via sseAuthMiddleware.
     async stream(req: Request, res: Response) {
         const userId = req.user?.id;
         if (!userId) {
@@ -105,7 +104,6 @@ export class NotificationController {
             "Content-Type": "text/event-stream",
             "Cache-Control": "no-cache, no-transform",
             Connection: "keep-alive",
-            // Disable proxy buffering (e.g. nginx) so events flush immediately.
             "X-Accel-Buffering": "no",
         });
         res.write("retry: 5000\n\n");
@@ -113,15 +111,11 @@ export class NotificationController {
 
         addClient(userId, res);
 
-        // Send the current unread count so a freshly opened tab is accurate.
         try {
             const unreadCount = await notificationService.getUnreadCount(userId);
             res.write(`event: unread\ndata: ${JSON.stringify({ unreadCount })}\n\n`);
-        } catch {
-            // Non-fatal: the client can still fall back to the REST unread-count endpoint.
-        }
+        } catch {}
 
-        // Comment-only heartbeat keeps idle connections from being dropped.
         const heartbeat = setInterval(() => {
             res.write(": ping\n\n");
         }, 25000);

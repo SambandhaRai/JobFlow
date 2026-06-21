@@ -53,7 +53,11 @@ export class ApplicationRepository implements IApplicationRepository {
                 .sort({ appliedAt: -1 })
                 .skip((page - 1) * size)
                 .limit(size)
-                .populate("jobId", "title company hiringName hiringType location jobType workMode")
+                .populate({
+                    path: "jobId",
+                    select: "title company hiringName hiringType location jobType workMode companyId",
+                    populate: { path: "companyId", select: "name slug logoUrl isVerified" },
+                })
                 .populate("userId", "fullName email phone"),
             ApplicationModel.countDocuments(filter)
         ]);
@@ -95,7 +99,6 @@ export class ApplicationRepository implements IApplicationRepository {
         return result.deletedCount;
     }
 
-    // Applications for a job still awaiting a first employer view.
     async getSubmittedApplicationsForJob(jobId: string): Promise<IApplication[]> {
         return await ApplicationModel.find({
             jobId: new mongoose.Types.ObjectId(jobId),

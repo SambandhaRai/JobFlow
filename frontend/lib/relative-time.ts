@@ -1,4 +1,3 @@
-// Compact "time ago" formatter for notification timestamps.
 export const formatRelativeTime = (isoDate: string): string => {
     const date = new Date(isoDate);
     if (Number.isNaN(date.getTime())) return "";

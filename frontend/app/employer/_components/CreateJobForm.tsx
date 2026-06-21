@@ -53,8 +53,6 @@ const categoryOptions = [
     "Other",
 ].map((value) => ({ value, label: value }));
 
-// Groups related fields into a scannable section with a clear heading, so the
-// form reads as a few small chunks instead of one long list.
 function FormSection({
     title,
     description,

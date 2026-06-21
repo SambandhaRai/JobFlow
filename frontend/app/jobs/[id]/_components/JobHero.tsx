@@ -30,10 +30,10 @@ export default function JobHero({
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
                 {companyHref ? (
                     <Link href={companyHref} className="shrink-0 transition-opacity hover:opacity-80">
-                        <CompanyAvatar name={job.company} size="xl" className="rounded-lg" />
+                        <CompanyAvatar name={job.company} size="xl" imageUrl={job.companyLogo} className="rounded-lg" />
                     </Link>
                 ) : (
-                    <CompanyAvatar name={job.company} size="xl" className="rounded-lg" />
+                    <CompanyAvatar name={job.company} size="xl" imageUrl={job.companyLogo} className="rounded-lg" />
                 )}
 
                 <div className="min-w-0 flex-1">

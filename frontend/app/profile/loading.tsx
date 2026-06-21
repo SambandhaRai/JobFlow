@@ -16,7 +16,6 @@ export default function ProfileLoading() {
                     <div className="h-7 w-40 rounded bg-ink-100" />
                     <div className="mt-2 h-4 w-72 rounded bg-ink-50" />
 
-                    {/* Header hero */}
                     <div className="mt-6 overflow-hidden rounded-xl border border-ink-100 bg-surface shadow-card">
                         <div className="h-28 bg-ink-100 sm:h-32" />
                         <div className="px-5 pb-5 sm:px-6 sm:pb-6">
@@ -35,7 +34,6 @@ export default function ProfileLoading() {
                         </div>
                     </div>
 
-                    {/* Section cards */}
                     <div className="mt-5 space-y-5">
                         {Array.from({ length: 4 }).map((_, index) => (
                             <div key={index} className="rounded-xl border border-ink-100 bg-surface p-5 shadow-card sm:p-6">

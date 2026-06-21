@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Globe, LogOut, Search, Settings, X } from "lucide-react";
+import { LogOut, Search, Settings, X } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
+import { resolveAvatarUrl } from "../../lib/avatar";
 import CompanyAvatar from "./CompanyAvatar";
 import NotificationBell from "./NotificationBell";
 
@@ -14,14 +15,15 @@ interface TopBarProps {
     defaultSearchValue?: string;
 }
 
-export default function TopBar({
+function TopBarContent({
     userName,
     defaultSearchValue = "",
 }: TopBarProps) {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
-    const { logout } = useAuth();
+    const { user: authUser, logout } = useAuth();
+    const avatarUrl = resolveAvatarUrl(authUser?.profilePicture as string | undefined);
 
     const router = useRouter();
     const pathname = usePathname();
@@ -29,16 +31,11 @@ export default function TopBar({
     const [searchValue, setSearchValue] = useState(defaultSearchValue);
     const [lastDefaultSearch, setLastDefaultSearch] = useState(defaultSearchValue);
 
-    // Keep the field in sync when the URL's search term changes (e.g. navigating
-    // to /discover?search=… or having the term cleared server-side). Adjusting
-    // state during render is React's recommended alternative to a sync effect.
     if (defaultSearchValue !== lastDefaultSearch) {
         setLastDefaultSearch(defaultSearchValue);
         setSearchValue(defaultSearchValue);
     }
 
-    // Build a /discover URL that preserves any active filters already in the URL,
-    // sets (or removes) the search term, and resets pagination to the first page.
     const buildDiscoverHref = (term: string) => {
         const params = new URLSearchParams(pathname === "/discover" ? searchParams.toString() : "");
         const trimmed = term.trim();
@@ -61,7 +58,6 @@ export default function TopBar({
 
     const handleSearchClear = () => {
         setSearchValue("");
-        // Only reset results when a search term is actually applied to the page.
         if (pathname === "/discover" && searchParams.has("search")) {
             router.push(buildDiscoverHref(""));
         }
@@ -97,7 +93,6 @@ export default function TopBar({
 
     return (
         <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-ink-100 bg-surface px-6">
-            {/* Search */}
             <form onSubmit={handleSearchSubmit} role="search" className="w-full max-w-xl">
                 <div className="relative">
                     <Search
@@ -126,16 +121,7 @@ export default function TopBar({
                 </div>
             </form>
 
-            {/* Right actions */}
-            <div className="flex items-center gap-3 ml-auto">
-                <button
-                    type="button"
-                    className="flex items-center gap-1.5 text-sm text-ink-600 hover:text-ink-900 transition-colors"
-                    aria-label="Language"
-                >
-                    <Globe size={16} />
-                    <span className="text-xs font-medium">EN</span>
-                </button>
+            <div className="flex items-center justify-center gap-5 ml-auto">
 
                 <NotificationBell />
 
@@ -148,7 +134,7 @@ export default function TopBar({
                         aria-expanded={isProfileMenuOpen}
                         aria-haspopup="menu"
                     >
-                        <CompanyAvatar name={userName} size="sm" className="rounded-full bg-cobalt-500 text-white" />
+                        <CompanyAvatar name={userName} size="sm" imageUrl={avatarUrl} className="rounded-full bg-cobalt-500 text-white" />
                     </button>
 
                     {isProfileMenuOpen && (
@@ -179,5 +165,13 @@ export default function TopBar({
                 </div>
             </div>
         </header>
+    );
+}
+
+export default function TopBar(props: TopBarProps) {
+    return (
+        <Suspense fallback={<header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-ink-100 bg-surface px-6" />}>
+            <TopBarContent {...props} />
+        </Suspense>
     );
 }

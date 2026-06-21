@@ -24,7 +24,6 @@ export default function LeftPanel() {
             <div className="absolute inset-0 bg-linear-to-br from-cobalt-900/80 via-cobalt-700/35 to-ink-900/70 pointer-events-none" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink-900/85 to-transparent pointer-events-none" />
 
-            {/* Logo */}
             <div className="relative z-10 p-10">
                 <AuthLogo inverted />
             </div>
@@ -44,7 +43,6 @@ export default function LeftPanel() {
                 </div>
             </div>
 
-            {/* Stats */}
             <div className="relative z-10 border-t border-white/20 px-12 py-8 grid grid-cols-3 gap-6">
                 {stats.map((stat) => (
                     <div key={stat.label}>
@@ -56,7 +54,6 @@ export default function LeftPanel() {
                 ))}
             </div>
 
-            {/* Verified badge */}
             <div className="absolute top-8 right-8 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
                 <div className="w-4 h-4 rounded-full bg-white/30 flex items-center justify-center">
                     <Check size={10} strokeWidth={2.5} className="text-white" />

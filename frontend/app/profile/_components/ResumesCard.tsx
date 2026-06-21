@@ -37,7 +37,6 @@ const resumePreviewUrl = (fileUrl: string) => (
     /^https?:\/\//i.test(fileUrl) ? fileUrl : `${API_BASE_URL}/uploads/${fileUrl}`
 );
 
-// Resume mutations return the updated user; pull the fresh, default-first list.
 const extractResumes = (response: unknown): ApplicantResume[] | null => {
     const data = (response as { data?: { resumes?: unknown[] } })?.data;
     if (!data || !Array.isArray(data.resumes)) return null;
@@ -204,7 +203,6 @@ export default function ResumesCard({ resumes: initialResumes }: ResumesCardProp
                     <p className="text-sm text-ink-400">No résumés yet. Upload one to apply faster.</p>
                 )}
 
-                {/* Upload */}
                 <div className="rounded-lg border border-dashed border-ink-200 bg-ink-50/50 px-6 py-7 text-center">
                     <input
                         ref={fileInputRef}

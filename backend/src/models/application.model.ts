@@ -21,7 +21,6 @@ const ApplicationSchema: Schema = new Schema({
     timestamps: true,
 });
 
-// One application per user-job pair
 ApplicationSchema.index({ userId: 1, jobId: 1 }, { unique: true });
 
 export interface IApplication extends Omit<ApplicationType, "userId" | "jobId" | "postedByUserId" | "companyId">, Document {

@@ -71,9 +71,7 @@ const fetchJson = async (path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
         throw new Error(message);
     }
 
@@ -117,7 +115,6 @@ export const formatDate = (value?: string) => {
     return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(date);
 };
 
-// Reports come back with reporterId/jobId either populated (object) or as a raw id string.
 export const reportField = (ref: AdminReportRef, key: "fullName" | "email" | "title") => (
     ref && typeof ref === "object" ? (ref[key] ?? "—") : "—"
 );

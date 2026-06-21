@@ -75,7 +75,6 @@ export default function JobDetailActions({
 
     const handleReport = async () => {
         const message = window.prompt("Why are you reporting this listing? (optional)");
-        // Cancelled the prompt — don't submit anything.
         if (message === null) return;
 
         setIsReporting(true);

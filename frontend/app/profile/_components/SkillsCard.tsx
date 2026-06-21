@@ -82,7 +82,6 @@ export default function SkillsCard({ skills }: SkillsCardProps) {
     };
 
     const handleSave = async () => {
-        // Fold any half-typed skill in before saving.
         const nextSkills = mergeSkills(draft, input.split(","));
 
         setSaving(true);

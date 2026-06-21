@@ -33,7 +33,6 @@ async function seedInstitutions(): Promise<void> {
 
     console.log(`📦 Starting institution seed — ${summary.total} input rows\n`);
 
-    // ── Deduplicate input rows case-insensitively ─────────────────
     const seen = new Set<string>();
     const uniqueEntries = institutionsSeedData.filter((entry) => {
         const key = normalizeName(entry.name).toLowerCase();
@@ -51,7 +50,6 @@ async function seedInstitutions(): Promise<void> {
     for (const entry of uniqueEntries) {
         const name = normalizeName(entry.name);
 
-        // ── Validate entry ────────────────────────────────────────
         if (!name) {
             summary.skipped++;
             console.log(`  ⏭  Skipped: empty name`);
@@ -65,7 +63,6 @@ async function seedInstitutions(): Promise<void> {
         }
 
         try {
-            // ── Type-safe upsert: check existence first ───────────
             const existing = await InstitutionModel.findOne({ name });
 
             await InstitutionModel.findOneAndUpdate(
@@ -94,7 +91,6 @@ async function seedInstitutions(): Promise<void> {
         }
     }
 
-    // ── Summary ───────────────────────────────────────────────────
     console.log("\n─────────────────────────────────────");
     console.log("  Seed Summary");
     console.log("─────────────────────────────────────");

@@ -5,6 +5,7 @@ import type {
     JobType,
     WorkMode,
 } from "../../../../lib/api/endpoints";
+import { resolveCompanyLogo } from "../../../../lib/avatar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
 
@@ -19,7 +20,7 @@ export type BackendJobDetails = {
     id?: string;
     title?: string;
     company?: string;
-    companyId?: string | { _id?: string; id?: string };
+    companyId?: string | { _id?: string; id?: string; name?: string; slug?: string; logoUrl?: string };
     hiringType?: HiringType;
     hiringName?: string;
     hiringEmail?: string;
@@ -81,6 +82,7 @@ export type ApplyJob = {
     id: string;
     title: string;
     company: string;
+    companyLogo?: string;
     location: string;
     salary: string;
     isVerified: boolean;
@@ -91,6 +93,7 @@ export type JobDetails = {
     title: string;
     company: string;
     companyId?: string;
+    companyLogo?: string;
     hiringType: HiringType;
     hiringTypeLabel: string;
     isHiringVerified: boolean;
@@ -140,6 +143,7 @@ export const toApplyJob = (job: JobDetails): ApplyJob => ({
     id: job.id,
     title: job.title,
     company: job.company,
+    companyLogo: job.companyLogo,
     location: job.location,
     salary: job.salary,
     isVerified: job.isVerified,
@@ -239,9 +243,7 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse<TData>;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
 
         const error = new Error(message) as HttpError;
         error.status = response.status;
@@ -253,7 +255,6 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
 
 const getJobId = (job: BackendJobDetails) => job._id ?? job.id ?? "";
 
-// companyId may arrive as a raw ObjectId string or a populated sub-document.
 const getCompanyId = (companyId: BackendJobDetails["companyId"]) => {
     if (typeof companyId === "string") return companyId || undefined;
     if (companyId && typeof companyId === "object") {
@@ -275,6 +276,7 @@ const mapJobDetails = (job: BackendJobDetails): JobDetails => {
         title: job.title ?? "Untitled role",
         company: job.hiringName ?? job.company ?? "Hiring profile",
         companyId: getCompanyId(job.companyId),
+        companyLogo: resolveCompanyLogo(job.companyId),
         hiringType,
         hiringTypeLabel: {
             company: "Company",
@@ -390,7 +392,6 @@ export const getApplicantResumes = (user: JobDetailsUser | null): ApplicantResum
     return resumes
         .map(mapApplicantResume)
         .filter((resume): resume is ApplicantResume => resume !== null)
-        // Surface the default resume first so it is the natural pre-selection.
         .sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
 };
 
