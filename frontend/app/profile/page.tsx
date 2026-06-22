@@ -109,7 +109,7 @@ export default async function ProfilePage() {
                 profileCompletion={{ percent: completion.percent, hint: completion.hint }}
             />
 
-            <div className="min-h-screen transition-[padding] duration-200 lg:pl-[var(--app-sidebar-width,232px)]">
+            <div className="min-h-screen transition-[padding] duration-200 lg:pl-(--app-sidebar-width,232px)">
                 <TopBar userName={displayName} />
 
                 <main className="px-4 py-5 sm:px-6 sm:py-6">
@@ -129,7 +129,7 @@ export default async function ProfilePage() {
                     ) : (
                         <div className="mt-6 space-y-5">
                             <section className="overflow-hidden rounded-xl border border-ink-100 bg-surface shadow-card">
-                                <div className="relative h-24 overflow-hidden bg-gradient-to-br from-cobalt-700 via-cobalt-500 to-cobalt-400 sm:h-28">
+                                <div className="relative h-24 overflow-hidden bg-linear-to-br from-cobalt-700 via-cobalt-500 to-cobalt-400 sm:h-28">
                                     <div
                                         className="absolute inset-0 opacity-20"
                                         style={{
