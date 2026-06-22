@@ -25,6 +25,29 @@ const EducationSchema: Schema = new Schema({
     completionYear: { type: String, trim: true },
 }, { _id: true });
 
+const ExperienceSchema: Schema = new Schema({
+    title: { type: String, required: true, trim: true },
+    organization: { type: String, required: true, trim: true },
+    employmentType: {
+        type: String,
+        enum: ["internship", "part-time", "full-time", "freelance", "volunteer"],
+        required: true,
+    },
+    startMonth: {
+        type: String,
+        enum: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+        required: true,
+    },
+    startYear: { type: String, required: true, trim: true },
+    isCurrent: { type: Boolean, default: false },
+    endMonth: {
+        type: String,
+        enum: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+    },
+    endYear: { type: String, trim: true },
+    description: { type: String, trim: true },
+}, { _id: true });
+
 const UserSchema: Schema = new Schema({
     fullName: { type: String, required: true, trim: true, minLength: 2 },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
@@ -50,6 +73,7 @@ UserSchema.set("toJSON", {
 
 const JobSeekerSchema: Schema = new Schema({
     educations: { type: [EducationSchema], default: [] },
+    experiences: { type: [ExperienceSchema], default: [] },
     skills: { type: [String], default: [] },
     resumes: { type: [ResumeSchema], default: [] },
     savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],
@@ -71,6 +95,19 @@ export interface IEducation {
     completionYear?: string;
 }
 
+export interface IExperience {
+    _id: mongoose.Types.ObjectId;
+    title: string;
+    organization: string;
+    employmentType: "internship" | "part-time" | "full-time" | "freelance" | "volunteer";
+    startMonth: string;
+    startYear: string;
+    isCurrent: boolean;
+    endMonth?: string;
+    endYear?: string;
+    description?: string;
+}
+
 export interface IUser extends UserType, Document {
     _id: mongoose.Types.ObjectId;
     role: UserRoleType;
@@ -81,6 +118,7 @@ export interface IUser extends UserType, Document {
 export interface IJobSeeker extends IUser {
     role: "user";
     educations: IEducation[];
+    experiences: IExperience[];
     skills: string[];
     resumes: IResume[];
     savedJobs: mongoose.Types.ObjectId[];

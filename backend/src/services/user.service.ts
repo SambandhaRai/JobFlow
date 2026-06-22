@@ -93,7 +93,8 @@ export class UserService {
         }
         if (
             data.skills !== undefined ||
-            data.educations !== undefined
+            data.educations !== undefined ||
+            data.experiences !== undefined
         ) {
             this.ensureJobSeeker(user, "update job seeker profile details");
         }

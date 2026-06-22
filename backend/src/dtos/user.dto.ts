@@ -53,6 +53,7 @@ export const UpdateUserDto = BaseUserSchema.pick({
     profilePicture: true,
 }).extend({
     educations: JobSeekerSchema.shape.educations,
+    experiences: JobSeekerSchema.shape.experiences,
     skills: z.array(z.string().trim()).optional(),
 }).partial();
 export type UpdateUserDto = z.infer<typeof UpdateUserDto>;

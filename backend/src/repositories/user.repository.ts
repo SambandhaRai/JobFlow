@@ -11,6 +11,7 @@ type CreateUserData = Partial<UserType> & {
 
 type UpdateUserData = Partial<Pick<UserType, "fullName" | "phone" | "profilePicture">> & {
     educations?: JobSeekerType["educations"];
+    experiences?: JobSeekerType["experiences"];
     skills?: string[];
     isVerified?: boolean;
 };
@@ -83,7 +84,8 @@ export class UserRepository implements IUserRepository {
     async updateOneUser(id: string, data: UpdateUserData): Promise<IUser | null> {
         if (
             data.skills !== undefined ||
-            data.educations !== undefined
+            data.educations !== undefined ||
+            data.experiences !== undefined
         ) {
             return await JobSeekerModel.findByIdAndUpdate(id, data, { returnDocument: "after" });
         }
