@@ -4,7 +4,7 @@ import { GraduationCap } from "lucide-react";
 import StepIndicator from "../../../_components/StepIndicator";
 
 interface ProfileSetupShellProps {
-    currentStep: 1 | 2;
+    currentStep: 1 | 2 | 3;
     serverError: string | null;
     children: React.ReactNode;
 }
@@ -47,7 +47,7 @@ export default function ProfileSetupShell({
                                 Build your student profile
                             </h1>
                             <p className="mt-2 max-w-xl text-sm leading-6 text-ink-500">
-                                Add your education history and skills so JobFlow can tune internships and entry-level roles to you.
+                                Add your education, experience, and skills so JobFlow can tune internships and entry-level roles to you.
                             </p>
                         </div>
                     </div>
@@ -55,7 +55,7 @@ export default function ProfileSetupShell({
                     <div className="mb-8">
                         <StepIndicator
                             currentStep={currentStep}
-                            steps={[{ label: "Education" }, { label: "Skills" }]}
+                            steps={[{ label: "Education" }, { label: "Experience" }, { label: "Skills" }]}
                         />
                     </div>
 

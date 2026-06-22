@@ -38,6 +38,17 @@ export type UpdateProfilePayload = {
         status: "currently-studying" | "completed";
         completionYear?: string;
     }>;
+    experiences?: Array<{
+        title: string;
+        organization: string;
+        employmentType: "internship" | "part-time" | "full-time" | "freelance" | "volunteer";
+        startMonth: string;
+        startYear: string;
+        isCurrent: boolean;
+        endMonth?: string;
+        endYear?: string;
+        description?: string;
+    }>;
     skills?: string[];
 };
 

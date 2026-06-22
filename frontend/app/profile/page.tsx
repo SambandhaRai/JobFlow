@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { AlertCircle, CalendarDays, CheckCircle2, Circle, FileText, GraduationCap, Mail, Sparkles } from "lucide-react";
+import { AlertCircle, Briefcase, CalendarDays, CheckCircle2, Circle, FileText, GraduationCap, Mail, Sparkles } from "lucide-react";
 
 import Sidebar from "../_components/Sidebar";
 import ScrollToTop from "../_components/ScrollToTop";
@@ -8,6 +8,7 @@ import TopBar from "../_components/TopBar";
 import AvatarUploader from "./_components/AvatarUploader";
 import BasicInfoCard from "./_components/BasicInfoCard";
 import EducationCard from "./_components/EducationCard";
+import ExperienceCard from "./_components/ExperienceCard";
 import ResumesCard from "./_components/ResumesCard";
 import SkillsCard from "./_components/SkillsCard";
 import {
@@ -186,9 +187,10 @@ export default async function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-5 grid grid-cols-3 gap-3">
-                                        <StatTile icon={<Sparkles size={15} />} value={profile?.skills.length ?? 0} label="Skills" />
+                                    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                                         <StatTile icon={<GraduationCap size={15} />} value={profile?.educations.length ?? 0} label="Education" />
+                                        <StatTile icon={<Briefcase size={15} />} value={profile?.experiences.length ?? 0} label="Experience" />
+                                        <StatTile icon={<Sparkles size={15} />} value={profile?.skills.length ?? 0} label="Skills" />
                                         <StatTile icon={<FileText size={15} />} value={profile?.resumes.length ?? 0} label="Résumés" />
                                     </div>
 
@@ -221,6 +223,7 @@ export default async function ProfilePage() {
                                         phone={profile.phone}
                                     />
                                     <EducationCard educations={profile.educations} />
+                                    <ExperienceCard experiences={profile.experiences} />
                                     <SkillsCard skills={profile.skills} />
                                     <ResumesCard resumes={profile.resumes} />
                                 </>

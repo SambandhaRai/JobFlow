@@ -146,7 +146,7 @@ export default function EducationStep({
                     onClick={onContinue}
                     className="sm:w-auto"
                 >
-                    Continue to skills
+                    Continue to experience
                 </Button>
             </div>
         </div>
