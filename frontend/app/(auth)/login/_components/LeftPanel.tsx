@@ -11,7 +11,7 @@ const stats = [
 
 export default function LeftPanel() {
     return (
-        <aside className="hidden lg:flex flex-col w-1/2 bg-cobalt-500 relative overflow-hidden">
+        <aside className="hidden lg:flex flex-col w-1/2 bg-[#2E5BFF] relative overflow-hidden">
             <Image
                 src="/images/login-left.png"
                 alt=""
@@ -20,9 +20,9 @@ export default function LeftPanel() {
                 sizes="50vw"
                 className="object-cover"
             />
-            <div className="absolute inset-0 bg-cobalt-900/35 pointer-events-none" />
-            <div className="absolute inset-0 bg-linear-to-br from-cobalt-900/80 via-cobalt-700/35 to-ink-900/70 pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink-900/85 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-[#0A1A60]/35 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-br from-[#0A1A60]/80 via-[#1535B8]/35 to-[#0E1116]/70 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-[#0E1116]/85 to-transparent pointer-events-none" />
 
             <div className="relative z-10 p-10">
                 <AuthLogo inverted />

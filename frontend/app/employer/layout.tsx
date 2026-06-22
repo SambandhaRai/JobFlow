@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import LogoutButton from "../_components/LogoutButton";
+import ThemeToggle from "../_components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,7 @@ export default async function EmployerLayout({ children }: { children: ReactNode
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="hidden truncate text-sm text-ink-500 sm:inline">{user?.email ?? "Employer"}</span>
+                        <ThemeToggle />
                         <LogoutButton />
                     </div>
                 </div>

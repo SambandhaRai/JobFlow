@@ -48,17 +48,19 @@ export default function NotificationBell() {
             <button
                 type="button"
                 onClick={() => setIsOpen((current) => !current)}
-                className="relative text-ink-500 transition-colors hover:text-ink-800"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
                 aria-label={`${unreadCount} unread notifications`}
                 aria-expanded={isOpen}
                 aria-haspopup="menu"
             >
-                <Bell size={18} />
-                {unreadCount > 0 && (
-                    <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger-500 px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-surface">
-                        {badgeLabel}
-                    </span>
-                )}
+                <span className="relative inline-flex">
+                    <Bell size={18} />
+                    {unreadCount > 0 && (
+                        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger-500 px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-surface">
+                            {badgeLabel}
+                        </span>
+                    )}
+                </span>
             </button>
 
             {isOpen && (

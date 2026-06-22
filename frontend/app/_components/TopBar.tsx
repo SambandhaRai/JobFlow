@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { resolveAvatarUrl } from "../../lib/avatar";
 import CompanyAvatar from "./CompanyAvatar";
 import NotificationBell from "./NotificationBell";
+import ThemeToggle from "./ThemeToggle";
 
 interface TopBarProps {
     userName: string;
@@ -121,11 +122,13 @@ function TopBarContent({
                 </div>
             </form>
 
-            <div className="flex items-center justify-center gap-5 ml-auto">
+            <div className="flex items-center gap-1 ml-auto">
+
+                <ThemeToggle />
 
                 <NotificationBell />
 
-                <div ref={profileMenuRef} className="relative">
+                <div ref={profileMenuRef} className="relative ml-1 flex items-center">
                     <button
                         type="button"
                         onClick={() => setIsProfileMenuOpen((current) => !current)}
