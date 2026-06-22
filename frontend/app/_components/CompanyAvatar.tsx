@@ -40,11 +40,21 @@ interface CompanyAvatarProps {
     size?: AvatarSize;
     className?: string;
     imageUrl?: string | null;
+    fallbackTone?: "auto" | "brand";
 }
 
-export default function CompanyAvatar({ name, size = "md", className = "", imageUrl }: CompanyAvatarProps) {
+export default function CompanyAvatar({
+    name,
+    size = "md",
+    className = "",
+    imageUrl,
+    fallbackTone = "auto",
+}: CompanyAvatarProps) {
     const initials = getInitials(name);
     const { bg, text } = AVATAR_COLORS[getColorIndex(initials)];
+    const fallbackColors = fallbackTone === "brand"
+        ? "bg-cobalt-500 text-white"
+        : `${bg} ${text}`;
 
     if (imageUrl) {
         return (
@@ -54,7 +64,7 @@ export default function CompanyAvatar({ name, size = "md", className = "", image
                 alt={name}
                 aria-label={name}
                 className={[
-                    "object-cover shrink-0",
+                    "rounded-md object-cover shrink-0",
                     sizeStyles[size],
                     className,
                 ].join(" ")}
@@ -67,8 +77,7 @@ export default function CompanyAvatar({ name, size = "md", className = "", image
             className={[
                 "rounded-md flex items-center justify-center font-semibold shrink-0 font-mono",
                 sizeStyles[size],
-                bg,
-                text,
+                fallbackColors,
                 className,
             ].join(" ")}
             aria-label={name}

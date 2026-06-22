@@ -128,41 +128,54 @@ function TopBarContent({
 
                 <NotificationBell />
 
-                <div ref={profileMenuRef} className="relative ml-1 flex items-center">
-                    <button
-                        type="button"
-                        onClick={() => setIsProfileMenuOpen((current) => !current)}
+                <div
+                    ref={profileMenuRef}
+                    className="relative ml-1 flex items-center"
+                    onMouseEnter={() => setIsProfileMenuOpen(true)}
+                    onMouseLeave={() => setIsProfileMenuOpen(false)}
+                    onFocus={() => setIsProfileMenuOpen(true)}
+                    onBlur={(event) => {
+                        if (!event.currentTarget.contains(event.relatedTarget)) {
+                            setIsProfileMenuOpen(false);
+                        }
+                    }}
+                >
+                    <Link
+                        href="/profile"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt-500"
-                        aria-label="Profile menu"
+                        aria-label="View profile"
                         aria-expanded={isProfileMenuOpen}
                         aria-haspopup="menu"
                     >
-                        <CompanyAvatar name={userName} size="sm" imageUrl={avatarUrl} className="rounded-full bg-cobalt-500 text-white" />
-                    </button>
+                        <CompanyAvatar name={userName} size="sm" imageUrl={avatarUrl} fallbackTone="brand" className="rounded-full" />
+                    </Link>
 
                     {isProfileMenuOpen && (
-                        <div
-                            role="menu"
-                            className="absolute right-0 top-11 z-30 w-48 overflow-hidden rounded-lg border border-ink-100 bg-surface py-1 shadow-popover"
-                        >
-                            <Link
-                                href="/profile/setup"
-                                role="menuitem"
-                                onClick={() => setIsProfileMenuOpen(false)}
-                                className="flex min-h-10 items-center gap-2 px-3 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 hover:text-ink-900"
+                        <div className="absolute right-0 top-full z-30 w-48 pt-2">
+                            <div
+                                role="menu"
+                                className="overflow-hidden rounded-lg border border-ink-100 bg-surface py-1 shadow-popover"
                             >
-                                <Settings size={15} className="text-ink-400" />
-                                Settings
-                            </Link>
-                            <button
-                                type="button"
-                                role="menuitem"
-                                onClick={handleLogout}
-                                className="flex min-h-10 w-full items-center gap-2 px-3 text-left text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50"
-                            >
-                                <LogOut size={15} />
-                                Logout
-                            </button>
+                                <Link
+                                    href="/profile/setup"
+                                    role="menuitem"
+                                    onClick={() => setIsProfileMenuOpen(false)}
+                                    className="flex min-h-10 items-center gap-2 px-3 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 hover:text-ink-900"
+                                >
+                                    <Settings size={15} className="text-ink-400" />
+                                    Settings
+                                </Link>
+                                <button
+                                    type="button"
+                                    role="menuitem"
+                                    onClick={handleLogout}
+                                    className="flex min-h-10 w-full items-center gap-2 px-3 text-left text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50"
+                                >
+                                    <LogOut size={15} />
+                                    Logout
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

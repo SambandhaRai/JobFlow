@@ -288,15 +288,25 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
 
             <div className={["pb-5 pt-1", isCollapsed ? "px-2" : "px-4"].join(" ")}>
                 <div className={["flex items-center", isCollapsed ? "flex-col gap-2" : "gap-2.5"].join(" ")}>
-                    <CompanyAvatar name={user.name} size="sm" imageUrl={avatarUrl} className="rounded-full bg-cobalt-500 text-white" />
-                    {!isCollapsed && (
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-ink-900 truncate leading-tight">
-                                {user.name}
-                            </p>
-                            <p className="text-xs text-ink-500 truncate">{user.subtitle}</p>
-                        </div>
-                    )}
+                    <Link
+                        href="/profile"
+                        aria-label={`View ${user.name}'s profile`}
+                        title={isCollapsed ? "Profile" : undefined}
+                        className={[
+                            "group flex min-w-0 items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt-500",
+                            isCollapsed ? "justify-center" : "flex-1 gap-2.5",
+                        ].join(" ")}
+                    >
+                        <CompanyAvatar name={user.name} size="sm" imageUrl={avatarUrl} fallbackTone="brand" className="rounded-full" />
+                        {!isCollapsed && (
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium leading-tight text-ink-900 group-hover:text-cobalt-600">
+                                    {user.name}
+                                </p>
+                                <p className="truncate text-xs text-ink-500">{user.subtitle}</p>
+                            </div>
+                        )}
+                    </Link>
                     <button
                         type="button"
                         onClick={() => void logout()}
