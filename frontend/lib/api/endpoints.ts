@@ -28,6 +28,16 @@ export type LoginPayload = {
     password: string;
 };
 
+export type ForgotPasswordPayload = {
+    email: string;
+};
+
+export type ResetPasswordPayload = {
+    email: string;
+    password: string;
+    confirmPassword: string;
+};
+
 export type UpdateProfilePayload = {
     fullName?: string;
     phone?: string;
@@ -217,6 +227,8 @@ export const API = {
     AUTH: {
         REGISTER: "/api/auth/register",
         LOGIN: "/api/auth/login",
+        FORGOT_PASSWORD: "/api/auth/forgot-password",
+        RESET_PASSWORD: "/api/auth/reset-password",
     },
 
     USER: {

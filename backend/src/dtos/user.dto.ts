@@ -47,6 +47,24 @@ export const LoginUserDto = z.object({
 });
 export type LoginUserDto = z.infer<typeof LoginUserDto>;
 
+export const ForgotPasswordDto = z.object({
+    email: z.email("Invalid email address"),
+});
+export type ForgotPasswordDto = z.infer<typeof ForgotPasswordDto>;
+
+export const ResetPasswordDto = z.object({
+    email: z.email("Invalid email address"),
+    password: z.string().trim().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().trim().min(6, "Password must be at least 6 characters"),
+}).refine(
+    (data) => data.password === data.confirmPassword,
+    {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    }
+);
+export type ResetPasswordDto = z.infer<typeof ResetPasswordDto>;
+
 export const UpdateUserDto = BaseUserSchema.pick({
     fullName: true,
     phone: true,

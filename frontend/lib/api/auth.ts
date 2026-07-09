@@ -1,7 +1,13 @@
 import type { AxiosError } from "axios";
 
 import axios from "./axios";
-import { API, type LoginPayload, type RegisterPayload } from "./endpoints";
+import {
+    API,
+    type ForgotPasswordPayload,
+    type LoginPayload,
+    type RegisterPayload,
+    type ResetPasswordPayload,
+} from "./endpoints";
 
 type ApiErrorResponse = {
     message?: string;
@@ -28,5 +34,23 @@ export const loginUser = async (loginData: LoginPayload) => {
         return response.data;
     } catch (err) {
         throw new Error(getAuthErrorMessage(err, "Login Failed"));
+    }
+};
+
+export const requestPasswordReset = async (payload: ForgotPasswordPayload) => {
+    try {
+        const response = await axios.post(API.AUTH.FORGOT_PASSWORD, payload);
+        return response.data;
+    } catch (err) {
+        throw new Error(getAuthErrorMessage(err, "Could not send the reset link"));
+    }
+};
+
+export const resetPassword = async (payload: ResetPasswordPayload) => {
+    try {
+        const response = await axios.post(API.AUTH.RESET_PASSWORD, payload);
+        return response.data;
+    } catch (err) {
+        throw new Error(getAuthErrorMessage(err, "Password reset failed"));
     }
 };
