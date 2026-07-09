@@ -48,9 +48,7 @@ const fetchJson = async (path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
         throw new Error(message);
     }
 
@@ -63,8 +61,6 @@ export const fetchEmployerJobs = async (
     if (!token) return { jobs: [], error: null };
 
     try {
-        // Resolve the employer's own id, then list the jobs they posted
-        // (this returns pending/unverified jobs too).
         const me = await fetchJson("/api/users/me", token);
         const meData = me.data as { _id?: string; id?: string } | undefined;
         const userId = meData?._id ?? meData?.id;
@@ -100,6 +96,37 @@ export const fetchJobApplications = async (
     }
 
     return { job, applications, error };
+};
+
+export type EmployerCompany = {
+    _id?: string;
+    id?: string;
+    name?: string;
+    slug?: string;
+    website?: string;
+    logoUrl?: string;
+    description?: string;
+    industry?: string;
+    location?: string;
+    email?: string;
+    phone?: string;
+    isVerified?: boolean;
+};
+
+export const fetchMyCompanies = async (
+    token: string | null,
+): Promise<{ companies: EmployerCompany[]; error: string | null }> => {
+    if (!token) return { companies: [], error: null };
+
+    try {
+        const response = await fetchJson("/api/companies/me", token);
+        return {
+            companies: (Array.isArray(response.data) ? response.data : []) as EmployerCompany[],
+            error: null,
+        };
+    } catch (err) {
+        return { companies: [], error: err instanceof Error ? err.message : "Failed to load your company" };
+    }
 };
 
 export const formatDate = (value?: string) => {

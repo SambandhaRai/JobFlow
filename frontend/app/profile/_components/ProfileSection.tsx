@@ -8,8 +8,6 @@ interface ProfileSectionProps {
     children: ReactNode;
 }
 
-// Shared card shell for each profile section: a titled, optionally-iconed header
-// with an action slot (Edit / Save+Cancel) on the right, and the body below.
 export default function ProfileSection({ title, description, icon, action, children }: ProfileSectionProps) {
     return (
         <section className="rounded-xl border border-ink-100 bg-surface p-5 shadow-card transition-shadow hover:shadow-popover sm:p-6">

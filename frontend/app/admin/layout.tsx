@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import AdminNav from "./_components/AdminNav";
 import LogoutButton from "../_components/LogoutButton";
+import ThemeToggle from "../_components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +34,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     const token = cookieStore.get("auth_token")?.value ?? null;
     const user = parseUserCookie(cookieStore.get("user_data")?.value);
 
-    // The proxy already keeps job seekers out; this also blocks employers who
-    // would otherwise slip through, and anyone without a token.
     if (!token || user?.role !== "admin") {
         redirect("/login");
     }
@@ -51,6 +50,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
                     </Link>
                     <div className="flex items-center gap-3">
                         <span className="hidden truncate text-sm text-ink-500 sm:inline">{user?.email ?? "Admin"}</span>
+                        <ThemeToggle />
                         <LogoutButton />
                     </div>
                 </div>

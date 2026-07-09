@@ -89,7 +89,6 @@ export class JobController {
                 return res.status(400).json({ success: false, message: "Invalid maxSalary filter" });
             }
 
-            // Validate enum filters
             let jobType: JobTypeEnumType[] | undefined;
             if (req.query.jobType) {
                 const parsed = parseEnumValues(JobTypeEnum, req.query.jobType);
@@ -135,7 +134,6 @@ export class JobController {
                 hiringType = parsed.data;
             }
 
-            // Parse boolean filters (URL params always come in as strings)
             const isBeginnerFriendly =
                 req.query.isBeginnerFriendly === "true" ? true
                     : req.query.isBeginnerFriendly === "false" ? false

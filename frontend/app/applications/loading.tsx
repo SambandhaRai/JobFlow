@@ -16,7 +16,6 @@ export default function ApplicationsLoading() {
                     <div className="h-7 w-56 rounded bg-ink-100" />
                     <div className="mt-2 h-4 w-80 rounded bg-ink-50" />
 
-                    {/* Stats */}
                     <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                         {Array.from({ length: 4 }).map((_, index) => (
                             <div key={index} className="rounded-lg border border-ink-100 bg-surface p-5 shadow-card">
@@ -27,14 +26,12 @@ export default function ApplicationsLoading() {
                         ))}
                     </div>
 
-                    {/* Tabs */}
                     <div className="mt-6 flex gap-3 border-b border-ink-100 pb-3">
                         {Array.from({ length: 5 }).map((_, index) => (
                             <div key={index} className="h-6 w-20 rounded bg-ink-100" />
                         ))}
                     </div>
 
-                    {/* Table */}
                     <div className="mt-4 overflow-hidden rounded-lg border border-ink-100 bg-surface shadow-card">
                         <div className="divide-y divide-ink-100">
                             {Array.from({ length: 6 }).map((_, index) => (

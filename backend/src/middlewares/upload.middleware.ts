@@ -17,6 +17,15 @@ const allowedResumeMimeTypes = new Set([
 
 const allowedResumeExtensions = new Set([".pdf", ".doc", ".docx"]);
 
+const allowedImageMimeTypes = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+]);
+
+const allowedImageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
+
 const storage = multer.diskStorage({
     destination: (_req, _file, cb) => {
         cb(null, uploadDir);
@@ -44,9 +53,33 @@ const resumeFileFilter = (
     cb(null, true);
 };
 
+const imageFileFilter = (
+    _req: Express.Request,
+    file: Express.Multer.File,
+    cb: multer.FileFilterCallback
+) => {
+    const extension = path.extname(file.originalname).toLowerCase();
+    const isAllowedMimeType = allowedImageMimeTypes.has(file.mimetype);
+    const isAllowedExtension = allowedImageExtensions.has(extension);
+
+    if (!isAllowedMimeType || !isAllowedExtension) {
+        return cb(new Error("Only JPG, PNG, WEBP, and GIF image files are allowed"));
+    }
+
+    cb(null, true);
+};
+
 const resumeUpload = multer({
     storage,
     fileFilter: resumeFileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+    },
+});
+
+const imageUpload = multer({
+    storage,
+    fileFilter: imageFileFilter,
     limits: {
         fileSize: 5 * 1024 * 1024,
     },
@@ -58,4 +91,10 @@ export const uploads = {
     fields: (fieldsArray: { name: string; maxCount?: number }[]) => resumeUpload.fields(fieldsArray),
 };
 
-export { uploadDir, resumeUpload };
+export const imageUploads = {
+    single: (fieldName: string) => imageUpload.single(fieldName),
+    array: (fieldName: string, maxCount: number) => imageUpload.array(fieldName, maxCount),
+    fields: (fieldsArray: { name: string; maxCount?: number }[]) => imageUpload.fields(fieldsArray),
+};
+
+export { uploadDir, resumeUpload, imageUpload };

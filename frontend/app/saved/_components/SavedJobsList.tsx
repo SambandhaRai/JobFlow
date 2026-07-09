@@ -17,9 +17,6 @@ export default function SavedJobsList({ jobs }: SavedJobsListProps) {
     const [items, setItems] = useState<Job[]>(jobs);
 
     const handleToggleSaved = (jobId: string, saved: boolean) => {
-        // On a Saved page, unsaving means the job leaves the list. Drop it
-        // optimistically (SaveJobButton already toasted + hit the API), then
-        // refresh so the sidebar count and header pill re-sync with the server.
         if (saved) return;
         setItems((current) => current.filter((job) => job.id !== jobId));
         router.refresh();

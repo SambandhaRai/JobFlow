@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getInstitutions, type Institution } from "../../../lib/api/institution/institution";
 import { updateUserProfile } from "../../../lib/api/user/user";
 import EducationStep from "./_components/EducationStep";
+import ExperienceStep from "./_components/ExperienceStep";
 import ProfileSetupShell from "./_components/ProfileSetupShell";
 import SkillsStep from "./_components/SkillsStep";
 import {
@@ -18,6 +19,13 @@ import {
     type EducationEntry,
     type EducationError,
 } from "./_components/profileSetupOptions";
+import {
+    createEmptyExperience,
+    validateExperience,
+    type ExperienceDraft,
+    type ExperienceEntry,
+    type ExperienceError,
+} from "./_components/experienceOptions";
 
 const normalizeSkill = (skill: string) => skill.trim().replace(/\s+/g, " ");
 
@@ -48,13 +56,16 @@ const mergeSkills = (currentSkills: string[], newSkills: string[]) => {
 
 export default function ProfileSetupPage() {
     const router = useRouter();
-    const [currentStep, setCurrentStep] = useState<1 | 2>(1);
+    const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
     const [serverError, setServerError] = useState<string | null>(null);
     const [institutionError, setInstitutionError] = useState<string | null>(null);
     const [institutions, setInstitutions] = useState<Institution[]>([]);
     const [educations, setEducations] = useState<EducationEntry[]>([]);
     const [educationDraft, setEducationDraft] = useState<EducationDraft>(createEmptyEducation);
     const [educationError, setEducationError] = useState<EducationError>({});
+    const [experiences, setExperiences] = useState<ExperienceEntry[]>([]);
+    const [experienceDraft, setExperienceDraft] = useState<ExperienceDraft>(createEmptyExperience);
+    const [experienceError, setExperienceError] = useState<ExperienceError>({});
     const [skills, setSkills] = useState<string[]>([]);
     const [skillInput, setSkillInput] = useState("");
     const [isSaving, setIsSaving] = useState(false);
@@ -161,7 +172,7 @@ export default function ProfileSetupPage() {
         setEducations((items) => items.filter((item) => item.id !== id));
     };
 
-    const continueToSkills = () => {
+    const continueToExperience = () => {
         if (educations.length === 0) {
             const draftHasData = Boolean(
                 educationDraft.institutionName.trim() ||
@@ -189,6 +200,60 @@ export default function ProfileSetupPage() {
         }
 
         setCurrentStep(2);
+    };
+
+    const updateExperienceDraft = <TKey extends keyof ExperienceDraft>(
+        key: TKey,
+        value: ExperienceDraft[TKey],
+    ) => {
+        setExperienceDraft((draft) => ({ ...draft, [key]: value }));
+        setExperienceError((errors) => ({ ...errors, [key]: undefined, form: undefined }));
+    };
+
+    const buildExperienceEntry = (draft: ExperienceDraft): ExperienceEntry => ({
+        ...draft,
+        title: draft.title.trim(),
+        organization: draft.organization.trim(),
+        startYear: draft.startYear.trim(),
+        endYear: draft.endYear.trim(),
+        description: draft.description.trim(),
+        id: createClientId(),
+    });
+
+    const addExperience = () => {
+        const errors = validateExperience(experienceDraft);
+        if (Object.keys(errors).length > 0) {
+            setExperienceError(errors);
+            return;
+        }
+
+        setExperiences((items) => [...items, buildExperienceEntry(experienceDraft)]);
+        setExperienceDraft(createEmptyExperience());
+        setExperienceError({});
+    };
+
+    const removeExperience = (id: string) => {
+        setExperiences((items) => items.filter((item) => item.id !== id));
+    };
+
+    const continueToSkills = () => {
+        const draftHasData = Boolean(
+            experienceDraft.title.trim() || experienceDraft.organization.trim(),
+        );
+
+        if (draftHasData) {
+            const errors = validateExperience(experienceDraft);
+            if (Object.keys(errors).length > 0) {
+                setExperienceError(errors);
+                return;
+            }
+
+            setExperiences((items) => [...items, buildExperienceEntry(experienceDraft)]);
+            setExperienceDraft(createEmptyExperience());
+            setExperienceError({});
+        }
+
+        setCurrentStep(3);
     };
 
     const addSkills = (values: string[]) => {
@@ -242,6 +307,18 @@ export default function ProfileSetupPage() {
                     status: education.status,
                     completionYear: education.completionYear,
                 })),
+                experiences: experiences.map((experience) => ({
+                    title: experience.title,
+                    organization: experience.organization,
+                    employmentType: experience.employmentType,
+                    startMonth: experience.startMonth,
+                    startYear: experience.startYear,
+                    isCurrent: experience.isCurrent,
+                    ...(experience.isCurrent
+                        ? {}
+                        : { endMonth: experience.endMonth, endYear: experience.endYear }),
+                    ...(experience.description ? { description: experience.description } : {}),
+                })),
                 skills: submittedSkills,
             });
         } catch (err) {
@@ -255,7 +332,7 @@ export default function ProfileSetupPage() {
 
     return (
         <ProfileSetupShell currentStep={currentStep} serverError={serverError}>
-            {currentStep === 1 ? (
+            {currentStep === 1 && (
                 <EducationStep
                     draft={educationDraft}
                     educations={educations}
@@ -267,9 +344,24 @@ export default function ProfileSetupPage() {
                     onDraftChange={updateEducationDraft}
                     onAddEducation={addEducation}
                     onRemoveEducation={removeEducation}
+                    onContinue={continueToExperience}
+                />
+            )}
+
+            {currentStep === 2 && (
+                <ExperienceStep
+                    draft={experienceDraft}
+                    experiences={experiences}
+                    error={experienceError}
+                    onDraftChange={updateExperienceDraft}
+                    onAddExperience={addExperience}
+                    onRemoveExperience={removeExperience}
+                    onBack={() => setCurrentStep(1)}
                     onContinue={continueToSkills}
                 />
-            ) : (
+            )}
+
+            {currentStep === 3 && (
                 <SkillsStep
                     skills={skills}
                     skillInput={skillInput}
@@ -279,7 +371,7 @@ export default function ProfileSetupPage() {
                     onSkillPaste={handleSkillPaste}
                     onSkillInputBlur={commitSkillInput}
                     onRemoveSkill={removeSkill}
-                    onBack={() => setCurrentStep(1)}
+                    onBack={() => setCurrentStep(2)}
                     onFinish={finishSetup}
                 />
             )}

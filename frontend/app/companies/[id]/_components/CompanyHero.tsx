@@ -9,8 +9,6 @@ export default function CompanyHero({ company }: { company: CompanyDetails }) {
         <section className="rounded-lg border border-ink-100 bg-surface p-5 shadow-card sm:p-6">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
                 {company.logoUrl ? (
-                    // logoUrl is a free-text field that can point to any host, so a plain
-                    // <img> avoids next/image's allowed-domains restriction.
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={company.logoUrl}

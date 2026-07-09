@@ -8,7 +8,6 @@ export interface InstitutionSeedEntry {
 }
 
 export const institutionsSeedData: InstitutionSeedEntry[] = [
-    // ── Universities ──────────────────────────────────────────────
     { name: "Tribhuvan University", type: "university", isActive: true },
     { name: "Kathmandu University", type: "university", isActive: true },
     { name: "Pokhara University", type: "university", isActive: true },
@@ -23,8 +22,6 @@ export const institutionsSeedData: InstitutionSeedEntry[] = [
     { name: "Gandaki University", type: "university", isActive: true },
     { name: "National Academy of Medical Sciences", type: "university", isActive: true },
 
-    // ── Colleges ──────────────────────────────────────────────────
-    // Engineering
     { name: "Pulchowk Campus", type: "college", isActive: true },
     { name: "Thapathali Campus", type: "college", isActive: true },
     { name: "Nepal Engineering College", type: "college", isActive: true },
@@ -38,14 +35,12 @@ export const institutionsSeedData: InstitutionSeedEntry[] = [
     { name: "Lalitpur Engineering College", type: "college", isActive: true },
     { name: "Lumbini Engineering College", type: "college", isActive: true },
     { name: "Chitwan Engineering College", type: "college", isActive: true },
-    // IT / Computing
     { name: "Herald College Kathmandu", type: "college", isActive: true },
     { name: "Islington College", type: "college", isActive: true },
     { name: "Informatics College Pokhara", type: "college", isActive: true },
     { name: "NIST College", type: "college", isActive: true },
     { name: "Deerwalk Institute of Technology", type: "college", isActive: true },
     { name: "Softwarica College of IT and E-Commerce", type: "college", isActive: true },
-    // Management / Business
     { name: "Shanker Dev Campus", type: "college", isActive: true },
     { name: "Little Angels College of Management", type: "college", isActive: true },
     { name: "Ace Institute of Management", type: "college", isActive: true },
@@ -54,13 +49,11 @@ export const institutionsSeedData: InstitutionSeedEntry[] = [
     { name: "Uniglobe College", type: "college", isActive: true },
     { name: "Prime College", type: "college", isActive: true },
     { name: "Kathmandu University School of Management", type: "college", isActive: true },
-    // Medical / Health
     { name: "KIST Medical College", type: "college", isActive: true },
     { name: "Manipal College of Medical Sciences", type: "college", isActive: true },
     { name: "Nepal Medical College", type: "college", isActive: true },
     { name: "B.P. Koirala Institute of Health Sciences", type: "college", isActive: true },
     { name: "Kathmandu Model Hospital College of Nursing", type: "college", isActive: true },
-    // General / Liberal Arts
     { name: "St. Xavier's College Maitighar", type: "college", isActive: true },
     { name: "Tri-Chandra Multiple Campus", type: "college", isActive: true },
     { name: "Amrit Campus", type: "college", isActive: true },
@@ -75,7 +68,6 @@ export const institutionsSeedData: InstitutionSeedEntry[] = [
     { name: "Dhankuta Multiple Campus", type: "college", isActive: true },
     { name: "Western Region Campus Pokhara", type: "college", isActive: true },
 
-    // ── Schools ───────────────────────────────────────────────────
     { name: "Saint Xavier's School Jawalakhel", type: "school", isActive: true },
     { name: "Budhanilkantha School", type: "school", isActive: true },
     { name: "Rato Bangala School", type: "school", isActive: true },

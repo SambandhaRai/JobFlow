@@ -1,4 +1,5 @@
 import type { ApplicationStatus } from "../../_components/StatusBadge";
+import { resolveCompanyLogo } from "../../../lib/avatar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
 
@@ -17,6 +18,7 @@ type PopulatedJob = {
     title?: string;
     company?: string;
     hiringName?: string;
+    companyId?: string | { _id?: string; id?: string; name?: string; slug?: string; logoUrl?: string };
 };
 
 type BackendApplication = {
@@ -42,6 +44,7 @@ export type ApplicationItem = {
     jobId: string | null;
     role: string;
     company: string;
+    companyLogo?: string;
     status: ApplicationStatus;
     appliedAt?: string;
     appliedLabel: string;
@@ -132,6 +135,7 @@ const mapApplication = (application: BackendApplication): ApplicationItem => {
         jobId,
         role: job?.title ?? "Role",
         company: job?.hiringName ?? job?.company ?? "Company",
+        companyLogo: resolveCompanyLogo(job?.companyId),
         status: application.status ?? "submitted",
         appliedAt,
         appliedLabel: formatAppliedLabel(appliedAt),
@@ -191,9 +195,7 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse<TData>;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
         const error = new Error(message) as HttpError;
         error.status = response.status;
         throw error;

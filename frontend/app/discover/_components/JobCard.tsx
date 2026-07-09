@@ -10,8 +10,6 @@ import type { Job } from "./discoverData";
 interface JobCardProps {
     job: Job;
     isSaved?: boolean;
-    // Optional: forwarded to the bookmark so a parent (e.g. the Saved page) can
-    // react when this job is saved/unsaved. Discover omits it.
     onToggleSaved?: (saved: boolean) => void;
 }
 
@@ -25,14 +23,13 @@ export default function JobCard({ job, isSaved = false, onToggleSaved }: JobCard
     return (
         <article className="group relative rounded-lg border border-ink-100 bg-surface p-4 shadow-card transition-all hover:border-cobalt-100 hover:shadow-popover sm:p-5">
             <div className="flex flex-col gap-4 sm:flex-row">
-                <CompanyAvatar name={job.company} size="lg" className="mt-1" />
+                <CompanyAvatar name={job.company} size="lg" imageUrl={job.companyLogo} className="mt-1" />
 
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 space-y-2">
                             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
                                 <h2 className="min-w-0 text-lg font-semibold leading-snug tracking-tight text-ink-900">
-                                    {/* Stretched link: the whole card navigates to the job. */}
                                     <Link
                                         href={`/jobs/${job.id}`}
                                         className="transition-colors after:absolute after:inset-0 after:rounded-lg group-hover:text-cobalt-700"
@@ -121,7 +118,6 @@ export default function JobCard({ job, isSaved = false, onToggleSaved }: JobCard
                             <p className="text-sm text-ink-400">Skills not listed</p>
                         )}
 
-                        {/* Visual affordance only — the stretched link handles the click. */}
                         <span className="ml-auto inline-flex items-center gap-1 text-sm font-medium text-cobalt-600">
                             View details
                             <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />

@@ -118,7 +118,6 @@ export default function EducationCard({ educations }: EducationCardProps) {
         setEntry((draft) => ({
             ...draft,
             [key]: value,
-            // Clear the year when the status flips so a stale value can't sneak through.
             completionYear: key === "status" ? "" : key === "completionYear" ? (value as string) : draft.completionYear,
         }));
         setEntryError((errors) => ({ ...errors, [key]: undefined }));
@@ -149,7 +148,6 @@ export default function EducationCard({ educations }: EducationCardProps) {
     const removeEntry = (id: string) => setDraftList((list) => list.filter((item) => item.id !== id));
 
     const handleSave = async () => {
-        // If the add-entry form was started, fold it in (and block save if invalid).
         let nextList = draftList;
         if (entry.institutionName.trim() || entry.completionYear.trim()) {
             const errors = validateEducation(entry);
@@ -207,7 +205,6 @@ export default function EducationCard({ educations }: EducationCardProps) {
         >
             {editing ? (
                 <div className="space-y-5">
-                    {/* Existing entries (editable list) */}
                     {draftList.length > 0 && (
                         <div className="space-y-2">
                             {draftList.map((education) => (
@@ -232,7 +229,6 @@ export default function EducationCard({ educations }: EducationCardProps) {
                         </div>
                     )}
 
-                    {/* Add a new entry */}
                     <div className="space-y-4 rounded-md border border-dashed border-ink-200 p-4">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <Select

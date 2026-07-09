@@ -7,6 +7,9 @@ import { ResumeType, UserRoleType } from "../types/user.type";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
+import { uploadDir } from "../middlewares/upload.middleware";
 
 let userRepository = new UserRepository();
 
@@ -29,7 +32,6 @@ export class UserService {
     }
 
     async registerUser(data: CreateUserDto) {
-        // Block self-registration as admin
         const requestedRole = data.role as UserRoleType;
         if (requestedRole === "admin") {
             throw new HttpError(403, "Cannot self-register as admin");
@@ -47,7 +49,6 @@ export class UserService {
             }
         }
 
-        // Strip confirmPassword, hash password
         const { confirmPassword, ...userData } = data;
         const hashedPassword = await bcryptjs.hash(userData.password, 10);
 
@@ -92,7 +93,8 @@ export class UserService {
         }
         if (
             data.skills !== undefined ||
-            data.educations !== undefined
+            data.educations !== undefined ||
+            data.experiences !== undefined
         ) {
             this.ensureJobSeeker(user, "update job seeker profile details");
         }
@@ -121,7 +123,34 @@ export class UserService {
         return await userRepository.updateOneUser(userId, data);
     }
 
-    // -------- Resume management --------
+    async uploadProfilePicture(userId: string, file?: Express.Multer.File) {
+        if (!file) {
+            throw new HttpError(400, "Please upload a file");
+        }
+
+        const fileName = file.filename;
+
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
+
+        const oldFileName = user.profilePicture;
+        if (oldFileName) {
+            const oldFilePath = path.join(uploadDir, oldFileName);
+            if (fs.existsSync(oldFilePath)) {
+                await fs.promises.unlink(oldFilePath);
+            }
+        }
+
+        const updated = await userRepository.uploadProfilePicture(userId, fileName);
+        if (!updated) {
+            throw new HttpError(404, "User not found");
+        }
+
+        return updated;
+    }
+
 
     async addResume(userId: string, resume: Partial<ResumeType>) {
         const user = await userRepository.getUserById(userId);
@@ -130,7 +159,6 @@ export class UserService {
         }
         this.ensureJobSeeker(user, "add resumes");
 
-        // First resume becomes default automatically
         if (user.resumes.length === 0) {
             resume.isDefault = true;
         }
@@ -156,7 +184,6 @@ export class UserService {
 
         const updatedUser = await userRepository.removeResume(userId, resumeId);
 
-        // If the deleted resume was the default and others remain, promote the first one
         if (target.isDefault && updatedUser && updatedUser.resumes.length > 0) {
             const newDefaultId = updatedUser.resumes[0]._id.toString();
             return await userRepository.setDefaultResume(userId, newDefaultId);
@@ -184,7 +211,6 @@ export class UserService {
         return await userRepository.setDefaultResume(userId, resumeId);
     }
 
-    // -------- Saved jobs --------
 
     async saveJob(userId: string, jobId: string) {
         if (!mongoose.Types.ObjectId.isValid(jobId)) {

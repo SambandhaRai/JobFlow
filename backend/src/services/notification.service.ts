@@ -19,9 +19,6 @@ type StatusNotificationConfig = {
     message: (jobTitle?: string) => string;
 };
 
-// Maps the application statuses an employer can set to the notification the job
-// seeker receives. "submitted" is intentionally absent: it's the initial state
-// and never produces a notification.
 const STATUS_NOTIFICATIONS: Partial<Record<ApplicationStatusType, StatusNotificationConfig>> = {
     viewed_by_employer: {
         type: "application_viewed",
@@ -72,8 +69,6 @@ export class NotificationService {
         sendToUser(userId, "unread", { unreadCount: 0 });
     }
 
-    // Creates and delivers a status-change notification for the application's owner.
-    // Returns undefined (without persisting) for statuses that don't notify.
     async notifyApplicationStatus(
         application: IApplication,
         status: ApplicationStatusType,

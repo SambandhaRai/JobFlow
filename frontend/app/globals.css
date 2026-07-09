@@ -106,3 +106,58 @@
     font-family: var(--font-mono);
   }
 }
+
+/* ============================================================
+   DARK THEME
+   Remaps the semantic tokens so every utility flips at once.
+   Indigo-charcoal base, off-white text, desaturated brand.
+   ============================================================ */
+html.dark {
+  color-scheme: dark;
+
+  /* Brand: cobalt softened to indigo for dark surfaces */
+  --color-cobalt-50:  #1A1E32;
+  --color-cobalt-100: #232A47;
+  --color-cobalt-200: #2F3A63;
+  --color-cobalt-300: #4257A8;
+  --color-cobalt-400: #6E80FF;
+  --color-cobalt-500: #4E63F0;
+  --color-cobalt-600: #98A6FF;
+  --color-cobalt-700: #AEB8FF;
+  --color-cobalt-800: #C6CDFF;
+  --color-cobalt-900: #DDE2FF;
+
+  /* Ink: inverted so text reads light, borders/fills stay dark */
+  --color-ink-50:  #1A1C25;
+  --color-ink-100: #22242F;
+  --color-ink-200: #2E3140;
+  --color-ink-300: #3A3F50;
+  --color-ink-400: #6B7180;
+  --color-ink-500: #9097A6;
+  --color-ink-600: #B4BAC6;
+  --color-ink-700: #C7CCD6;
+  --color-ink-800: #DDE0E7;
+  --color-ink-900: #ECEEF3;
+
+  /* Semantic: dark tints + lightened text shades */
+  --color-success-50:  #11241C;
+  --color-success-500: #34D399;
+  --color-success-700: #6EE0B0;
+
+  --color-warning-50:  #2A2412;
+  --color-warning-500: #FBBF24;
+  --color-warning-700: #E8B45C;
+
+  --color-danger-50:  #2A1719;
+  --color-danger-500: #F26D6D;
+  --color-danger-700: #F29090;
+
+  /* Surfaces */
+  --color-surface:    #15171F;
+  --color-background: #0D0E14;
+
+  /* Elevation: deeper so shadows still read on dark */
+  --shadow-card:    0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 1px rgba(0, 0, 0, 0.3);
+  --shadow-popover: 0 6px 16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-modal:   0 16px 40px rgba(0, 0, 0, 0.6), 0 6px 12px rgba(0, 0, 0, 0.5);
+}

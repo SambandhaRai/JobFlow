@@ -13,7 +13,6 @@ export const ApplicationSchema = z.object({
     jobId: z.string().trim(),
     postedByUserId: z.string().trim(),
     companyId: z.string().trim().optional(),
-    // Stored as the resume's filename; the frontend resolves it to a URL.
     resumeUrl: z.string().trim().min(1, "Resume is required"),
     fullName: z.string().trim().min(2, "Full name must be at least 2 characters"),
     email: z.email("Invalid email address"),

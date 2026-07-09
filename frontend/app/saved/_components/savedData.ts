@@ -13,8 +13,6 @@ type ApiResponse<TData> = {
     message?: string;
 };
 
-// The saved-jobs endpoint returns the same populated shape Discover consumes,
-// and the profile endpoint feeds the sidebar — so we reuse Discover's user type.
 export type SavedUser = DiscoverUser;
 
 export type SavedJobsData = {
@@ -34,9 +32,7 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse<TData>;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
         throw new Error(message);
     }
 
@@ -53,7 +49,6 @@ export const fetchSavedJobsData = async (token: string | null): Promise<SavedJob
     let error: string | null = null;
 
     try {
-        // `data` is the user's saved jobs, fully populated (same shape as a job).
         const response = await fetchJson<BackendJob[]>("/api/users/me/saved-jobs", token);
         jobs = (response.data ?? []).map(mapJob);
     } catch (err) {
@@ -64,7 +59,6 @@ export const fetchSavedJobsData = async (token: string | null): Promise<SavedJob
         const userResponse = await fetchJson<SavedUser>("/api/users/me", token);
         user = userResponse.data ?? null;
     } catch {
-        // The profile only powers the sidebar — not critical for the page.
         user = null;
     }
 

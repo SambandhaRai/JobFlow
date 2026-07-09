@@ -107,10 +107,10 @@ export default function MatchPanel({
                 <div className="flex items-start gap-3">
                     {companyHref ? (
                         <Link href={companyHref} className="shrink-0 transition-opacity hover:opacity-80">
-                            <CompanyAvatar name={job.company} size="md" />
+                            <CompanyAvatar name={job.company} size="md" imageUrl={job.companyLogo} />
                         </Link>
                     ) : (
-                        <CompanyAvatar name={job.company} size="md" />
+                        <CompanyAvatar name={job.company} size="md" imageUrl={job.companyLogo} />
                     )}
                     <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">

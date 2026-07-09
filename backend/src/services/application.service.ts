@@ -94,9 +94,6 @@ export class ApplicationService {
             throw new HttpError(403, "Not authorized to view applications for this job");
         }
 
-        // An employer opening this job's applicant list counts as viewing those
-        // applications: flip any still-"submitted" ones to "viewed_by_employer" and
-        // notify each applicant. Admins browsing don't trigger a view.
         if (requesterRole !== "admin") {
             await this.markJobApplicationsViewed(jobId, job.title);
         }
@@ -138,7 +135,6 @@ export class ApplicationService {
             throw new HttpError(404, "Application not found");
         }
 
-        // Admin sees all; applicant sees their own; employer sees applications to their jobs
         if (requesterRole !== "admin") {
             const isOwner =
                 application.userId.toString() === requesterId ||
@@ -178,7 +174,6 @@ export class ApplicationService {
 
         const updated = await applicationRepository.updateApplicationStatus(applicationId, data.status);
 
-        // Notify the applicant when the status actually changes to a meaningful one.
         if (updated && data.status !== application.status) {
             const job = await jobRepository.getJobById(application.jobId.toString());
             await notificationService.notifyApplicationStatus(updated, data.status, job?.title);
@@ -187,8 +182,6 @@ export class ApplicationService {
         return updated;
     }
 
-    // Marks every still-"submitted" application for a job as viewed and notifies
-    // each applicant. Idempotent: once marked, repeat calls find nothing to do.
     private async markJobApplicationsViewed(jobId: string, jobTitle?: string): Promise<void> {
         const submitted = await applicationRepository.getSubmittedApplicationsForJob(jobId);
         if (submitted.length === 0) return;
@@ -212,7 +205,6 @@ export class ApplicationService {
             throw new HttpError(404, "Application not found");
         }
 
-        // Only the applicant or an admin can withdraw
         if (requesterRole !== "admin" && application.userId.toString() !== requesterId) {
             throw new HttpError(403, "Not authorized to withdraw this application");
         }

@@ -5,7 +5,7 @@ import AuthLogo from "../../login/_components/AuthLogo";
 
 export default function LeftPanel() {
     return (
-        <aside className="hidden lg:flex flex-col w-1/2 bg-cobalt-500 relative overflow-hidden">
+        <aside className="hidden lg:flex flex-col w-1/2 bg-[#2E5BFF] relative overflow-hidden">
             <Image
                 src="/images/signup-left.png"
                 alt=""
@@ -14,9 +14,9 @@ export default function LeftPanel() {
                 sizes="50vw"
                 className="object-cover"
             />
-            <div className="absolute inset-0 bg-cobalt-900/30 pointer-events-none" />
-            <div className="absolute inset-0 bg-linear-to-br from-cobalt-900/75 via-cobalt-700/25 to-ink-900/65 pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-ink-900/85 via-ink-900/35 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-[#0A1A60]/30 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-br from-[#0A1A60]/75 via-[#1535B8]/25 to-[#0E1116]/65 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-[#0E1116]/85 via-[#0E1116]/35 to-transparent pointer-events-none" />
 
             <div className="relative z-10 p-10">
                 <AuthLogo inverted />

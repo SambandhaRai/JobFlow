@@ -15,8 +15,6 @@ type ApiErrorResponse = {
 
 const getApplicationErrorMessage = (err: unknown, fallback: string) => {
     const error = err as AxiosError<ApiErrorResponse>;
-    // Validation failures come back under `errors` (from z.prettifyError),
-    // not `message`, so surface those instead of a generic status line.
     return error.response?.data?.message
         || error.response?.data?.errors
         || error.message

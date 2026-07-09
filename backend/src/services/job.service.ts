@@ -113,7 +113,7 @@ export class JobService {
         if (!mongoose.Types.ObjectId.isValid(jobId)) {
             throw new HttpError(400, "Invalid job ID");
         }
-        const job = await jobRepository.getJobById(jobId);
+        const job = await jobRepository.getJobByIdWithRelations(jobId);
         if (!job) {
             throw new HttpError(404, "Job not found");
         }
@@ -161,7 +161,6 @@ export class JobService {
             throw new HttpError(403, "Not authorized to delete this job");
         }
 
-        // Cascade — remove all applications tied to this job
         await applicationRepository.deleteByJob(jobId);
 
         return await jobRepository.deleteOneJob(jobId);

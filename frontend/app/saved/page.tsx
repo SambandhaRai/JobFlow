@@ -61,7 +61,6 @@ export default async function SavedJobsPage() {
                 <TopBar userName={fullName} />
 
                 <main className="px-4 py-5 sm:px-6 sm:py-6">
-                    {/* Header */}
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Saved jobs</h1>
                         {jobs.length > 0 && (

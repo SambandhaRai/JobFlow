@@ -1,4 +1,5 @@
 import type { JobDetailsUser } from "../../../jobs/[id]/_components/jobDetailsData";
+import { resolveAvatarUrl } from "../../../../lib/avatar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
 
@@ -151,9 +152,7 @@ const fetchJson = async <TData>(path: string, token: string | null) => {
         try {
             const body = await response.json() as ApiResponse<TData>;
             message = body.message || message;
-        } catch {
-            // Keep the status-based message when the API does not return JSON.
-        }
+        } catch {}
 
         const error = new Error(message) as HttpError;
         error.status = response.status;
@@ -180,7 +179,7 @@ const mapCompany = (company: BackendCompany): CompanyDetails => ({
     name: company.name ?? "Company",
     website: ensureWebsiteHref(company.website),
     websiteLabel: stripWebsiteScheme(company.website),
-    logoUrl: company.logoUrl || undefined,
+    logoUrl: resolveAvatarUrl(company.logoUrl) ?? undefined,
     description: company.description?.trim() || undefined,
     industry: company.industry?.trim() || undefined,
     location: company.location?.trim() || undefined,

@@ -114,9 +114,6 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
         [resumes, selectedResumeId],
     );
 
-    // Close the modal, and only then refresh the page if an application was
-    // submitted — so the page swapping Apply → "Already applied" doesn't unmount
-    // the modal before the success step is shown.
     const closeModal = useCallback(() => {
         onClose();
         if (applicationId) router.refresh();
@@ -244,9 +241,7 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
             }
             await navigator.clipboard.writeText(url);
             toast.success("Job link copied");
-        } catch {
-            // The user dismissed the share sheet — nothing to report.
-        }
+        } catch {}
     };
 
     if (typeof document === "undefined") return null;
@@ -262,10 +257,9 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
             }}
         >
             <div className="my-auto flex w-full max-w-180 flex-col overflow-hidden rounded-xl bg-surface shadow-modal">
-                {/* Header */}
                 <div className="flex items-start justify-between gap-4 px-6 pt-6">
                     <div className="flex min-w-0 items-center gap-3">
-                        <CompanyAvatar name={job.company} size="lg" className="rounded-lg" />
+                        <CompanyAvatar name={job.company} size="lg" imageUrl={job.companyLogo} className="rounded-lg" />
                         <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                                 <h2 className="truncate text-lg font-semibold text-ink-900">{job.title}</h2>
@@ -285,12 +279,10 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
                     </button>
                 </div>
 
-                {/* Steps */}
                 <div className="border-b border-ink-100 px-6 py-5">
                     <StepIndicator steps={STEPS} currentStep={step} />
                 </div>
 
-                {/* Body */}
                 <div className="max-h-[calc(100vh-15rem)] overflow-y-auto px-6 py-6">
                     {step === 1 && (
                         <StepResume
@@ -337,7 +329,6 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="flex items-center justify-between gap-3 border-t border-ink-100 px-6 py-4">
                     {step === 1 && (
                         <>
@@ -423,7 +414,6 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
     return createPortal(overlay, document.body);
 }
 
-/* ---------------- Step 1: Resume ---------------- */
 
 function StepResume({
     resumes,
@@ -523,7 +513,6 @@ function StepResume({
                 </>
             )}
 
-            {/* Upload */}
             <div className="mt-4 rounded-lg border border-dashed border-ink-200 bg-ink-50/50 px-6 py-7 text-center">
                 <input
                     ref={fileInputRef}
@@ -565,7 +554,6 @@ function StepResume({
     );
 }
 
-/* ---------------- Step 2: Review ---------------- */
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
     return <label className="text-sm font-medium text-ink-700">{children}</label>;
@@ -611,7 +599,6 @@ function StepReview({
             <h3 className="text-xl font-semibold tracking-tight text-ink-900">Review your application</h3>
             <p className="mt-1 text-sm text-ink-500">We pre-filled everything from your profile. Edit anything that looks off.</p>
 
-            {/* Selected resume summary */}
             <div className="mt-6 flex items-center gap-3 rounded-lg border border-ink-100 bg-ink-50/60 px-4 py-3">
                 <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cobalt-50 text-cobalt-600">
                     <FileText size={16} />
@@ -641,7 +628,6 @@ function StepReview({
                 </button>
             </div>
 
-            {/* Fields */}
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                     <FieldLabel>Full name</FieldLabel>
@@ -678,7 +664,6 @@ function StepReview({
                 </div>
             </div>
 
-            {/* Application note spans the full width on its own line */}
             <div className="mt-5 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                     <FieldLabel>Why do you want to join {company}?</FieldLabel>
@@ -707,7 +692,6 @@ function StepReview({
     );
 }
 
-/* ---------------- Step 3: Done ---------------- */
 
 function StepDone({
     job,
@@ -733,7 +717,7 @@ function StepDone({
             <div className="mx-auto mt-6 max-w-md rounded-lg border border-ink-100 bg-surface p-5 text-left shadow-card">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                        <CompanyAvatar name={job.company} size="md" className="rounded-md" />
+                        <CompanyAvatar name={job.company} size="md" imageUrl={job.companyLogo} className="rounded-md" />
                         <div className="min-w-0">
                             <p className="truncate text-sm font-medium text-ink-900">{job.title}</p>
                             <p className="truncate text-xs text-ink-500">{job.company} · {job.location}</p>

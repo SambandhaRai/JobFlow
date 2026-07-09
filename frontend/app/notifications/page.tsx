@@ -12,8 +12,6 @@ import NotificationItem from "../_components/NotificationItem";
 
 type NotificationGroup = { label: string; items: NotificationData[] };
 
-// Buckets notifications (already newest-first from the API) into familiar
-// time sections so the feed is easy to scan.
 function groupByDate(items: NotificationData[]): NotificationGroup[] {
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();

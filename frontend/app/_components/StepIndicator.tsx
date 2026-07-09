@@ -6,12 +6,11 @@ interface Step {
 
 interface StepIndicatorProps {
     steps: Step[];
-    currentStep: number; // 1-indexed
+    currentStep: number;
 }
 
 export default function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
     return (
-        // pb leaves room for the absolutely-positioned labels below each circle.
         <div className="flex w-full items-start pb-6">
             {steps.map((step, index) => {
                 const stepNumber = index + 1;
@@ -27,10 +26,6 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
                             isLast ? "flex-none" : "flex-1",
                         ].join(" ")}
                     >
-                        {/* Node: fixed-width circle with the label centered beneath it.
-                            Keeping the label absolute means every node is exactly the
-                            circle's width, so the circles distribute evenly and the
-                            middle step stays centered regardless of label length. */}
                         <div className="relative flex shrink-0 flex-col items-center">
                             <div
                                 className={[
@@ -58,7 +53,6 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
                             </span>
                         </div>
 
-                        {/* Connector line, vertically centered on the circle */}
                         {!isLast && (
                             <div
                                 className="mx-2 h-0.5 flex-1 rounded-full transition-colors duration-200"

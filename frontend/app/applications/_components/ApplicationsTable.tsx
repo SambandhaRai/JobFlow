@@ -49,7 +49,6 @@ export default function ApplicationsTable({ applications }: ApplicationsTablePro
 
     return (
         <div>
-            {/* Tabs */}
             <div className="flex flex-wrap items-center gap-x-1 border-b border-ink-100">
                 {TABS.map((tab) => {
                     const isActive = tab.key === activeTab;
@@ -78,9 +77,7 @@ export default function ApplicationsTable({ applications }: ApplicationsTablePro
                 })}
             </div>
 
-            {/* Table */}
             <div className="mt-4 overflow-hidden rounded-lg border border-ink-100 bg-surface shadow-card">
-                {/* Header (desktop only) */}
                 <div className={`hidden border-b border-ink-100 px-5 py-3 text-xs font-medium uppercase tracking-wide text-ink-400 md:grid md:items-center md:gap-4 ${GRID_COLS}`}>
                     <span>Role</span>
                     <span>Applied</span>
@@ -96,9 +93,8 @@ export default function ApplicationsTable({ applications }: ApplicationsTablePro
                                 key={item.id}
                                 className={`group/row relative grid grid-cols-1 gap-2 px-4 py-4 transition-colors hover:bg-ink-50/60 md:items-center md:gap-4 md:px-5 ${GRID_COLS}`}
                             >
-                                {/* Role */}
                                 <div className="flex min-w-0 items-center gap-3">
-                                    <CompanyAvatar name={item.company} size="md" />
+                                    <CompanyAvatar name={item.company} size="md" imageUrl={item.companyLogo} />
                                     <div className="min-w-0">
                                         <p className="truncate text-sm font-medium text-ink-900">
                                             {item.jobId ? (
@@ -116,25 +112,21 @@ export default function ApplicationsTable({ applications }: ApplicationsTablePro
                                     </div>
                                 </div>
 
-                                {/* Applied */}
                                 <div className="flex items-center gap-2 text-sm text-ink-600">
                                     <span className="text-xs font-medium uppercase tracking-wide text-ink-400 md:hidden">Applied</span>
                                     {item.appliedLabel}
                                 </div>
 
-                                {/* Status */}
                                 <div className="flex items-center gap-2">
                                     <span className="text-xs font-medium uppercase tracking-wide text-ink-400 md:hidden">Status</span>
                                     <StatusBadge status={item.status} />
                                 </div>
 
-                                {/* Last update */}
                                 <div className="flex items-center gap-2 text-sm text-ink-600">
                                     <span className="text-xs font-medium uppercase tracking-wide text-ink-400 md:hidden">Updated</span>
                                     {item.updatedLabel}
                                 </div>
 
-                                {/* View */}
                                 <div className="md:justify-self-end">
                                     {item.jobId && (
                                         <span className="inline-flex items-center gap-1 text-sm font-medium text-cobalt-600">

@@ -68,7 +68,6 @@ export default async function ApplicationsPage() {
                 <ApplicationsRealtimeSync />
 
                 <main className="px-4 py-5 sm:px-6 sm:py-6">
-                    {/* Header */}
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-2xl font-semibold tracking-tight text-ink-900">My applications</h1>
                         {stats.total > 0 && (
@@ -108,7 +107,6 @@ export default async function ApplicationsPage() {
                         </div>
                     ) : (
                         <>
-                            {/* Stats */}
                             <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                                 <StatCard
                                     icon={<Send size={16} />}
@@ -145,7 +143,6 @@ export default async function ApplicationsPage() {
                                 />
                             </div>
 
-                            {/* Tabs + table */}
                             <div className="mt-6">
                                 <ApplicationsTable applications={applications} />
                             </div>
