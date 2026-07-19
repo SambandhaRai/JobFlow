@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import z from "zod";
-import { CreateReportDto } from "../dtos/report.dto";
+import { CreateReportDto, UpdateReportStatusDto } from "../dtos/report.dto";
 import { ReportService } from "../services/report.service";
 import { ReportStatusEnum } from "../types/report.type";
 
@@ -27,6 +27,58 @@ export class ReportController {
                 success: true,
                 data: report,
                 message: "Report submitted successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
+    async getMyReports(req: Request, res: Response) {
+        try {
+            const reporterId = req.user?.id;
+            if (!reporterId) {
+                return res.status(401).json({ success: false, message: "Unauthorized" });
+            }
+
+            const page = parseInt(req.query.page as string) || 1;
+            const size = parseInt(req.query.size as string) || 50;
+
+            const result = await reportService.getMyReports(reporterId, { page, size });
+            return res.status(200).json({
+                success: true,
+                data: result.reports,
+                totalReports: result.totalReports,
+                message: "Reports fetched successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
+    async updateReportStatus(req: Request, res: Response) {
+        try {
+            const parsedData = UpdateReportStatusDto.safeParse(req.body);
+            if (!parsedData.success) {
+                return res.status(400).json({
+                    success: false,
+                    errors: z.prettifyError(parsedData.error),
+                });
+            }
+
+            const report = await reportService.updateStatus(
+                req.params.id as string,
+                parsedData.data.status,
+            );
+            return res.status(200).json({
+                success: true,
+                data: report,
+                message: "Report status updated successfully",
             });
         } catch (error: Error | any) {
             return res.status(error.statusCode || 500).json({

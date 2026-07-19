@@ -6,7 +6,7 @@ const ReportSchema: Schema = new Schema({
     jobId: { type: Schema.Types.ObjectId, ref: "Job", required: true },
     reason: {
         type: String,
-        enum: ["spam", "scam", "inappropriate", "misleading", "other"],
+        enum: ["spam", "scam", "inappropriate", "misleading", "payment_request", "duplicate", "other"],
         default: "other",
     },
     message: { type: String, trim: true, maxLength: 1000 },
@@ -18,6 +18,10 @@ const ReportSchema: Schema = new Schema({
 }, {
     timestamps: true,
 });
+
+// One report per person per job. Guards against double-submits and stops a
+// single user inflating the report count on a listing.
+ReportSchema.index({ reporterId: 1, jobId: 1 }, { unique: true });
 
 export interface IReport extends Omit<ReportType, "reporterId" | "jobId">, Document {
     _id: mongoose.Types.ObjectId;

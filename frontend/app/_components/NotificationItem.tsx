@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarCheck, Eye, Star, XCircle, type LucideIcon } from "lucide-react";
+import { CalendarCheck, Eye, Flag, Star, XCircle, type LucideIcon } from "lucide-react";
 
 import { formatRelativeTime } from "../../lib/relative-time";
 import type { NotificationItem as NotificationData, NotificationKind } from "../../lib/api/notification/notification";
@@ -15,6 +15,7 @@ const META: Record<NotificationKind, Meta> = {
     application_interview_scheduled: { icon: CalendarCheck, iconClass: "bg-cobalt-50 text-cobalt-600" },
     application_not_selected: { icon: XCircle, iconClass: "bg-ink-100 text-ink-500" },
     application_update: { icon: Eye, iconClass: "bg-ink-100 text-ink-500" },
+    report_update: { icon: Flag, iconClass: "bg-warning-50 text-warning-700" },
 };
 
 const resolveHref = (notification: NotificationData) => {

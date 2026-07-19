@@ -8,7 +8,8 @@ export type NotificationKind =
     | "application_shortlisted"
     | "application_interview_scheduled"
     | "application_not_selected"
-    | "application_update";
+    | "application_update"
+    | "report_update";
 
 export type NotificationItem = {
     _id: string;

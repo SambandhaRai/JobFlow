@@ -118,3 +118,18 @@ export const formatDate = (value?: string) => {
 export const reportField = (ref: AdminReportRef, key: "fullName" | "email" | "title") => (
     ref && typeof ref === "object" ? (ref[key] ?? "—") : "—"
 );
+
+const REPORT_REASON_LABELS: Record<string, string> = {
+    scam: "Suspicious or fake listing",
+    misleading: "Misleading salary or details",
+    payment_request: "Employer asked for payment",
+    inappropriate: "Inappropriate or unsafe",
+    duplicate: "Duplicate listing",
+    spam: "Spam",
+    other: "Something else",
+};
+
+/** Falls back to the raw value so older reports still render. */
+export const reportReasonLabel = (reason?: string) => (
+    reason ? (REPORT_REASON_LABELS[reason] ?? reason) : "—"
+);

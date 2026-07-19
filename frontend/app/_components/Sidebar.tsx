@@ -7,6 +7,7 @@ import {
     AlignLeft,
     Bookmark,
     FileText,
+    Flag,
     Bell,
     File,
     LogOut,
@@ -38,6 +39,7 @@ const JOB_SEARCH_NAV: NavItem[] = [
     { label: "Saved", href: "/saved", icon: <Bookmark size={16} /> },
     { label: "Applications", href: "/applications", icon: <FileText size={16} /> },
     { label: "Notifications", href: "/notifications", icon: <Bell size={16} /> },
+    { label: "My reports", href: "/reports", icon: <Flag size={16} /> },
 ];
 
 const PROFILE_NAV: NavItem[] = [

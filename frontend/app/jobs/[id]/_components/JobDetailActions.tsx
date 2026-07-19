@@ -6,9 +6,9 @@ import { toast } from "react-toastify";
 
 import { saveJob, unsaveJob } from "../../../../lib/api/user/user";
 import { navCountsStore } from "../../../../lib/stores/navCounts";
-import { createReport } from "../../../../lib/api/report/report";
 import AppliedButton from "./AppliedButton";
 import ApplyButton from "./ApplyButton";
+import ReportModal from "./ReportModal";
 import type { ApplicantDefaults, ApplicantResume, ApplyJob } from "./jobDetailsData";
 
 interface JobDetailActionsProps {
@@ -32,7 +32,8 @@ export default function JobDetailActions({
 }: JobDetailActionsProps) {
     const [isSaved, setIsSaved] = useState(isInitiallySaved);
     const [isSaving, setIsSaving] = useState(false);
-    const [isReporting, setIsReporting] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [hasReported, setHasReported] = useState(false);
 
     const handleSave = async () => {
         setIsSaving(true);
@@ -73,25 +74,6 @@ export default function JobDetailActions({
         }
     };
 
-    const handleReport = async () => {
-        const message = window.prompt("Why are you reporting this listing? (optional)");
-        if (message === null) return;
-
-        setIsReporting(true);
-        try {
-            await createReport({
-                jobId: applyJob.id,
-                reason: "other",
-                message: message.trim() || undefined,
-            });
-            toast.success("Listing reported — our team will review it.");
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Could not submit report");
-        } finally {
-            setIsReporting(false);
-        }
-    };
-
     return (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-2 sm:flex-row">
@@ -129,13 +111,26 @@ export default function JobDetailActions({
 
             <button
                 type="button"
-                onClick={handleReport}
-                disabled={isReporting}
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50 disabled:opacity-50 sm:self-center"
+                onClick={() => setIsReportOpen(true)}
+                disabled={hasReported}
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-medium text-danger-700 transition-colors hover:bg-danger-50 disabled:cursor-not-allowed disabled:text-ink-400 disabled:hover:bg-transparent sm:self-center"
             >
                 <Flag size={14} />
-                {isReporting ? "Reporting…" : "Report listing"}
+                {hasReported ? "Reported" : "Report listing"}
             </button>
+
+            {isReportOpen && (
+                <ReportModal
+                    jobId={applyJob.id}
+                    title={title}
+                    company={company}
+                    location={applyJob.location}
+                    logoUrl={applyJob.companyLogo}
+                    isVerifiedEmployer={applyJob.isVerified}
+                    onClose={() => setIsReportOpen(false)}
+                    onReported={() => setHasReported(true)}
+                />
+            )}
         </div>
     );
 }
