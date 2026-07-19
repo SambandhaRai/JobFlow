@@ -77,9 +77,64 @@ export class CompanyController {
         }
     }
 
+    async getPublicCompanies(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const size = parseInt(req.query.size as string) || 24;
+
+            const result = await companyService.getPublicCompanies({
+                page,
+                size,
+                search: (req.query.search as string) || undefined,
+                industry: (req.query.industry as string) || undefined,
+                location: (req.query.location as string) || undefined,
+            });
+
+            return res.status(200).json({
+                success: true,
+                data: result.companies,
+                totalCompanies: result.totalCompanies,
+                message: "Companies fetched successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
+    async getPublicCompanyFacets(_req: Request, res: Response) {
+        try {
+            const facets = await companyService.getPublicCompanyFacets();
+            return res.status(200).json({
+                success: true,
+                data: facets,
+                message: "Company filters fetched successfully",
+            });
+        } catch (error: Error | any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error",
+            });
+        }
+    }
+
     async getCompanyById(req: Request, res: Response) {
         try {
             const company = await companyService.getCompanyById(req.params.id as string);
+
+            // Company profiles are public, but recruiter contact details are
+            // only for signed-in users so the page cannot be scraped anonymously.
+            if (!req.user) {
+                const { contacts, email, phone, ownerId, members, ...publicFields } = company.toObject();
+                return res.status(200).json({
+                    success: true,
+                    data: publicFields,
+                    message: "Company fetched successfully",
+                });
+            }
+
             return res.status(200).json({
                 success: true,
                 data: company,

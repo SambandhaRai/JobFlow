@@ -56,6 +56,29 @@ export class CompanyService {
         return await companyRepository.getAllCompanies({ page, size, search: params.search });
     }
 
+    async getPublicCompanies(params: {
+        page?: number;
+        size?: number;
+        search?: string;
+        industry?: string;
+        location?: string;
+    }) {
+        const page = Math.max(1, params.page ?? 1);
+        const size = Math.min(50, Math.max(1, params.size ?? 24));
+
+        return await companyRepository.getPublicCompanies({
+            page,
+            size,
+            search: params.search,
+            industry: params.industry,
+            location: params.location,
+        });
+    }
+
+    async getPublicCompanyFacets() {
+        return await companyRepository.getPublicCompanyFacets();
+    }
+
     async getCompanyById(companyId: string) {
         if (!mongoose.Types.ObjectId.isValid(companyId)) {
             throw new HttpError(400, "Invalid company ID");

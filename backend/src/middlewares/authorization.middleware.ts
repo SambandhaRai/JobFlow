@@ -55,6 +55,37 @@ export const authorizedMiddleware = (req: Request, res: Response, next: NextFunc
     }
 };
 
+/**
+ * Populates req.user when a valid token is present but never rejects the
+ * request. Lets public endpoints vary their response for signed-in callers.
+ */
+export const optionalAuthMiddleware = (req: Request, _res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1];
+
+        if (token) {
+            try {
+                const decoded = jwt.verify(
+                    token,
+                    process.env.JWT_SECRET as string
+                ) as JwtPayload;
+
+                req.user = {
+                    id: decoded.id,
+                    email: decoded.email,
+                    role: decoded.role,
+                };
+            } catch {
+                // Invalid or expired token is treated the same as no token.
+            }
+        }
+    }
+
+    next();
+};
+
 export const adminOnlyMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.user) {
