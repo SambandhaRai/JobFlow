@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+// Job search and the employer console both require a session, so the public
+// navbar sends visitors to the matching login rather than a route that would
+// only bounce them there. Companies is the one genuinely public destination.
 const navLinks = [
-    { href: "/discover", label: "Find jobs" },
+    { href: "/login", label: "Find jobs" },
     { href: "/companies", label: "Companies" },
-    { href: "/career-guide", label: "Career guide" },
-    { href: "/employers", label: "For employers" },
+    { href: "/employer-login", label: "For employers" },
 ];
 
 export default function Navbar() {
