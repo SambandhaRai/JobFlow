@@ -37,7 +37,7 @@ import {
     type ApplyJob,
 } from "./jobDetailsData";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 const STEPS = [
     { label: "Resume" },

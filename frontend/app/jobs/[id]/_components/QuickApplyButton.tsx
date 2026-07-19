@@ -14,7 +14,7 @@ import { navCountsStore } from "../../../../lib/stores/navCounts";
 import { isValidPhone } from "../../../../lib/validation/phone";
 import type { ApplicantDefaults, ApplicantResume, ApplyJob } from "./jobDetailsData";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 interface QuickApplyButtonProps {
     job: ApplyJob;
