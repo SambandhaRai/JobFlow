@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 type ApiResponse = {
     success?: boolean;
@@ -94,7 +94,7 @@ const safeList = async <T>(
 };
 
 export const fetchAdminJobs = (token: string | null) =>
-    safeList<AdminJob>("/api/jobs?size=100", token, "totalJobs");
+    safeList<AdminJob>("/api/jobs?size=100&includeExpired=true", token, "totalJobs");
 
 export const fetchAdminUsers = (token: string | null) =>
     safeList<AdminUser>("/api/users?role=user&size=100", token, "totalUsers");
