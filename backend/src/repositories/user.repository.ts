@@ -28,6 +28,8 @@ export interface IUserRepository {
     getUserByEmail(email: string): Promise<IUser | null>;
     getUserByPhone(phone: string): Promise<IUser | null>;
 
+    updatePassword(userId: string, passwordHash: string): Promise<IUser | null>;
+
     addResume(userId: string, resume: Partial<ResumeType>): Promise<IJobSeeker | null>;
     removeResume(userId: string, resumeId: string): Promise<IJobSeeker | null>;
     setDefaultResume(userId: string, resumeId: string): Promise<IJobSeeker | null>;
@@ -111,6 +113,14 @@ export class UserRepository implements IUserRepository {
     async getUserByPhone(phone: string): Promise<IUser | null> {
         const user = await UserModel.findOne({ phone });
         return user;
+    }
+
+    async updatePassword(userId: string, passwordHash: string): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(
+            userId,
+            { password: passwordHash },
+            { returnDocument: "after" }
+        );
     }
 
     async addResume(userId: string, resume: Partial<ResumeType>): Promise<IJobSeeker | null> {

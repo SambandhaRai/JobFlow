@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, FileText, Loader2, Star, Trash2, UploadCloud } from "lucide-react";
+import { CheckCircle2, FileText, Loader2, Sparkles, Star, Trash2, UploadCloud } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { addResume, removeResume, setDefaultResume } from "../../../lib/api/user/user";
@@ -119,6 +120,24 @@ export default function ResumesCard({ resumes: initialResumes }: ResumesCardProp
             icon={<FileText size={16} />}
         >
             <div className="space-y-3">
+                <div className="flex flex-col gap-3 rounded-lg border border-cobalt-200 bg-cobalt-50/60 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                            <Sparkles size={15} className="text-cobalt-600" />
+                            Create from your profile
+                        </p>
+                        <p className="mt-1 text-xs text-ink-500">
+                            Turn your education, experience, and skills into a polished résumé.
+                        </p>
+                    </div>
+                    <Link
+                        href="/profile/resume"
+                        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md bg-cobalt-500 px-4 text-sm font-medium text-white transition-colors hover:bg-cobalt-600"
+                    >
+                        Open creator
+                    </Link>
+                </div>
+
                 {resumes.length > 0 ? (
                     resumes.map((resume) => {
                         const uploadedDate = formatUploadedDate(resume.uploadedAt);

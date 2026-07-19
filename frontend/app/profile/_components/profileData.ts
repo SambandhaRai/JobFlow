@@ -75,6 +75,20 @@ export type ProfileCompletion = {
     items: Array<{ label: string; done: boolean }>;
 };
 
+export const parseUserCookie = (value?: string): RawProfileUser | null => {
+    if (!value) return null;
+
+    try {
+        return JSON.parse(value) as RawProfileUser;
+    } catch {
+        try {
+            return JSON.parse(decodeURIComponent(value)) as RawProfileUser;
+        } catch {
+            return null;
+        }
+    }
+};
+
 const fetchJson = async <TData>(path: string, token: string | null) => {
     const response = await fetch(`${API_BASE_URL}${path}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,

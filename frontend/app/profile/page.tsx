@@ -15,24 +15,10 @@ import {
     fetchProfileUser,
     getProfileCompletion,
     mapProfile,
-    type RawProfileUser,
+    parseUserCookie,
 } from "./_components/profileData";
 
 export const dynamic = "force-dynamic";
-
-const parseUserCookie = (value?: string): RawProfileUser | null => {
-    if (!value) return null;
-
-    try {
-        return JSON.parse(value) as RawProfileUser;
-    } catch {
-        try {
-            return JSON.parse(decodeURIComponent(value)) as RawProfileUser;
-        } catch {
-            return null;
-        }
-    }
-};
 
 const roleLabel = (role: string) => (
     {
