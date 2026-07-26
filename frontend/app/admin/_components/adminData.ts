@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 type ApiResponse = {
     success?: boolean;
@@ -94,7 +94,7 @@ const safeList = async <T>(
 };
 
 export const fetchAdminJobs = (token: string | null) =>
-    safeList<AdminJob>("/api/jobs?size=100", token, "totalJobs");
+    safeList<AdminJob>("/api/jobs?size=100&includeExpired=true", token, "totalJobs");
 
 export const fetchAdminUsers = (token: string | null) =>
     safeList<AdminUser>("/api/users?role=user&size=100", token, "totalUsers");
@@ -117,4 +117,19 @@ export const formatDate = (value?: string) => {
 
 export const reportField = (ref: AdminReportRef, key: "fullName" | "email" | "title") => (
     ref && typeof ref === "object" ? (ref[key] ?? "—") : "—"
+);
+
+const REPORT_REASON_LABELS: Record<string, string> = {
+    scam: "Suspicious or fake listing",
+    misleading: "Misleading salary or details",
+    payment_request: "Employer asked for payment",
+    inappropriate: "Inappropriate or unsafe",
+    duplicate: "Duplicate listing",
+    spam: "Spam",
+    other: "Something else",
+};
+
+/** Falls back to the raw value so older reports still render. */
+export const reportReasonLabel = (reason?: string) => (
+    reason ? (REPORT_REASON_LABELS[reason] ?? reason) : "—"
 );

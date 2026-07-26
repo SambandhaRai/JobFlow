@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { NotificationRepository } from "../repositories/notification.repository";
 import { INotification } from "../models/notification.model";
 import { IApplication } from "../models/application.model";
@@ -87,6 +88,32 @@ export class NotificationService {
         });
 
         const userId = application.userId.toString();
+        sendToUser(userId, "notification", notification);
+        await this.pushUnreadCount(userId);
+
+        return notification;
+    }
+
+    async notifyReportStatus(
+        reporterId: mongoose.Types.ObjectId,
+        status: "reviewed" | "dismissed",
+        jobTitle?: string,
+        jobId?: mongoose.Types.ObjectId,
+    ): Promise<INotification | undefined> {
+        const listing = jobTitle ? ` for "${jobTitle}"` : "";
+        const message = status === "reviewed"
+            ? `Thanks — we reviewed your report${listing} and acted on it.`
+            : `We looked into your report${listing} and found no violation of our guidelines.`;
+
+        const notification = await notificationRepository.createNotification({
+            userId: reporterId,
+            type: "report_update",
+            title: status === "reviewed" ? "Report reviewed" : "Report closed",
+            message,
+            jobId,
+        });
+
+        const userId = reporterId.toString();
         sendToUser(userId, "notification", notification);
         await this.pushUnreadCount(userId);
 

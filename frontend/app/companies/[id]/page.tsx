@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import BackButton from "../../_components/BackButton";
 import ScrollToTop from "../../_components/ScrollToTop";
 import DetailSection from "../../jobs/[id]/_components/DetailSection";
-import DetailShell from "../../jobs/[id]/_components/DetailShell";
+import CompanyDetailShell from "../_components/CompanyDetailShell";
 import type { JobDetailsUser } from "../../jobs/[id]/_components/jobDetailsData";
 import CompanyErrorState from "./_components/CompanyErrorState";
 import CompanyHero from "./_components/CompanyHero";
@@ -37,7 +38,10 @@ export default async function CompanyDetailsPage({ params }: CompanyDetailsPageP
     const { id } = await params;
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value ?? null;
-    const cookieUser = parseUserCookie(cookieStore.get("user_data")?.value);
+    // "user_data" is unsigned and not httpOnly, so it can outlive the token
+    // (expiry, partial logout) or be set by hand. Without a token there is no
+    // session, and this public page must not render the signed-in shell.
+    const cookieUser = token ? parseUserCookie(cookieStore.get("user_data")?.value) : null;
 
     let data;
     try {
@@ -47,9 +51,9 @@ export default async function CompanyDetailsPage({ params }: CompanyDetailsPageP
 
         const message = error instanceof Error ? error.message : "The backend did not return this company.";
         return (
-            <DetailShell user={cookieUser}>
+            <CompanyDetailShell user={cookieUser}>
                 <CompanyErrorState message={message} />
-            </DetailShell>
+            </CompanyDetailShell>
         );
     }
 
@@ -57,14 +61,14 @@ export default async function CompanyDetailsPage({ params }: CompanyDetailsPageP
     const user = data.user ?? cookieUser;
 
     return (
-        <DetailShell user={user}>
+        <CompanyDetailShell user={user}>
             <ScrollToTop trigger={company.id} />
             <main className="px-4 py-5 sm:px-6 sm:py-6">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <BackButton fallbackHref="/discover" />
+                    <BackButton fallbackHref="/companies" />
                     <span className="h-4 w-px bg-ink-200" aria-hidden="true" />
                     <nav className="flex flex-wrap items-center gap-2 text-sm text-ink-400">
-                        <span>Companies</span>
+                        <Link href="/companies" className="transition-colors hover:text-ink-700">Companies</Link>
                         <span>/</span>
                         <span className="text-ink-700">{company.name}</span>
                     </nav>
@@ -123,6 +127,6 @@ export default async function CompanyDetailsPage({ params }: CompanyDetailsPageP
                     <CompanyJobsSection companyName={company.name} jobs={jobs} totalJobs={totalJobs} />
                 </div>
             </main>
-        </DetailShell>
+        </CompanyDetailShell>
     );
 }

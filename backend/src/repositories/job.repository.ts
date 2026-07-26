@@ -18,6 +18,7 @@ interface GetAllJobsParams {
     postedByUserId?: string;
     companyId?: string;
     hiringType?: HiringTypeType;
+    includeExpired?: boolean;
 }
 
 export interface IJobRepository {
@@ -54,6 +55,7 @@ export class JobRepository implements IJobRepository {
         postedByUserId,
         companyId,
         hiringType,
+        includeExpired,
     }: GetAllJobsParams): Promise<{ jobs: IJob[], totalJobs: number }> {
         let filter: QueryFilter<IJob> = {};
 
@@ -71,14 +73,34 @@ export class JobRepository implements IJobRepository {
         if (companyId) filter.companyId = new mongoose.Types.ObjectId(companyId);
         if (hiringType) filter.hiringType = hiringType;
 
+        // Both the search and the deadline rule need an $or. Collecting them in
+        // an $and keeps one from overwriting the other on the shared filter key.
+        const conditions: QueryFilter<IJob>[] = [];
+
         if (search) {
-            filter.$or = [
-                { title: { $regex: search, $options: "i" } },
-                { company: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } },
-                { skills: { $regex: search, $options: "i" } },
-            ];
+            conditions.push({
+                $or: [
+                    { title: { $regex: search, $options: "i" } },
+                    { company: { $regex: search, $options: "i" } },
+                    { description: { $regex: search, $options: "i" } },
+                    { skills: { $regex: search, $options: "i" } },
+                ],
+            });
         }
+
+        // Expired listings are hidden by default. Employers and admins opt back
+        // in via includeExpired so they can still manage what they posted.
+        if (!includeExpired) {
+            conditions.push({
+                $or: [
+                    { deadline: { $exists: false } },
+                    { deadline: null },
+                    { deadline: { $gte: new Date() } },
+                ],
+            });
+        }
+
+        if (conditions.length) filter.$and = conditions;
 
         const [jobs, totalJobs] = await Promise.all([
             JobModel.find(filter)

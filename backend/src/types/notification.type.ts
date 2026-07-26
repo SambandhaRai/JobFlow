@@ -6,6 +6,7 @@ export const NotificationTypeEnum = z.enum([
     "application_interview_scheduled",
     "application_not_selected",
     "application_update",
+    "report_update",
 ]);
 
 export const NotificationSchema = z.object({

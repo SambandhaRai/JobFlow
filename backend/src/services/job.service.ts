@@ -27,6 +27,7 @@ interface GetAllJobsServiceParams {
     postedByUserId?: string;
     companyId?: string;
     hiringType?: HiringTypeType;
+    includeExpired?: boolean;
 }
 
 export class JobService {

@@ -166,7 +166,7 @@ export const categoryOptions: Array<FilterOption<JobCategory>> = [
     { label: "Media & Communication", value: "Media & Communication" },
 ];
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 const getFirstParam = (value: string | string[] | undefined) => (
     Array.isArray(value) ? value[0] : value

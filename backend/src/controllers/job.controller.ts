@@ -142,6 +142,9 @@ export class JobController {
                 req.query.isVerified === "true" ? true
                     : req.query.isVerified === "false" ? false
                         : undefined;
+            // Opt-in only: anything other than an explicit "true" hides expired
+            // listings, so job seeker surfaces stay filtered by default.
+            const includeExpired = req.query.includeExpired === "true";
 
             const result = await jobService.getAllJobs({
                 page,
@@ -159,6 +162,7 @@ export class JobController {
                 postedByUserId,
                 companyId,
                 hiringType,
+                includeExpired,
             });
 
             return res.status(200).json({

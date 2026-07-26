@@ -17,13 +17,13 @@ export default function EmployerCTA() {
                     </div>
                     <div className="flex flex-wrap items-center gap-3 shrink-0">
                         <Link
-                            href="/employers/pricing"
+                            href="/employer-login"
                             className="h-10 px-4 inline-flex items-center justify-center rounded-md border border-white/40 text-sm font-medium text-white hover:bg-white/10 transition-colors"
                         >
-                            See pricing
+                            Employer login
                         </Link>
                         <Link
-                            href="/employers/post-job"
+                            href="/employer-signup"
                             className="h-10 px-4 inline-flex items-center justify-center gap-2 rounded-md bg-white text-sm font-medium text-cobalt-600 hover:bg-cobalt-50 transition-colors"
                         >
                             Post a job

@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { LogOut, Search, Settings, X } from "lucide-react";
+import { LogOut, Search, X } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import { resolveAvatarUrl } from "../../lib/avatar";
@@ -157,15 +157,6 @@ function TopBarContent({
                                 role="menu"
                                 className="overflow-hidden rounded-lg border border-ink-100 bg-surface py-1 shadow-popover"
                             >
-                                <Link
-                                    href="/profile/setup"
-                                    role="menuitem"
-                                    onClick={() => setIsProfileMenuOpen(false)}
-                                    className="flex min-h-10 items-center gap-2 px-3 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 hover:text-ink-900"
-                                >
-                                    <Settings size={15} className="text-ink-400" />
-                                    Settings
-                                </Link>
                                 <button
                                     type="button"
                                     role="menuitem"

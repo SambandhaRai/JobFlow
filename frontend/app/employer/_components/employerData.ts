@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 type ApiResponse = {
     success?: boolean;
@@ -66,7 +66,7 @@ export const fetchEmployerJobs = async (
         const userId = meData?._id ?? meData?.id;
         if (!userId) return { jobs: [], error: "Could not resolve your account." };
 
-        const response = await fetchJson(`/api/jobs?postedByUserId=${userId}&size=100`, token);
+        const response = await fetchJson(`/api/jobs?postedByUserId=${userId}&size=100&includeExpired=true`, token);
         return { jobs: (Array.isArray(response.data) ? response.data : []) as EmployerJob[], error: null };
     } catch (err) {
         return { jobs: [], error: err instanceof Error ? err.message : "Failed to load your jobs" };

@@ -14,6 +14,10 @@ const userRoutes = [
     "/saved",
     "/applications",
     "/notifications",
+    "/reports",
+    // Job details render the signed-in app shell, so they need a session too.
+    // Public entry points are "/" and the /companies directory.
+    "/jobs",
 ];
 
 const parseUserCookie = (value?: string): CookieUser | null => {
@@ -35,7 +39,7 @@ const startsWithRoute = (pathname: string, routes: string[]) => (
 );
 
 export function proxy(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+    const { pathname, search } = request.nextUrl;
     const token = request.cookies.get("auth_token")?.value ?? null;
     const user = token ? parseUserCookie(request.cookies.get("user_data")?.value) : null;
 
@@ -46,7 +50,11 @@ export function proxy(request: NextRequest) {
     const isHomeRoute = pathname === "/";
 
     if (!token && (isAdminRoute || isEmployerRoute || isUserRoute)) {
-        return NextResponse.redirect(new URL("/login", request.url));
+        // Employers get their own login; everyone else the job seeker one.
+        const loginUrl = new URL(isEmployerRoute ? "/employer-login" : "/login", request.url);
+        // Remember the destination so login can return them to it.
+        loginUrl.searchParams.set("next", `${pathname}${search}`);
+        return NextResponse.redirect(loginUrl);
     }
 
     if (token && user?.role === "admin") {
@@ -80,11 +88,13 @@ export const config = {
         "/admin/:path*",
         "/employer/:path*",
         "/discover/:path*",
+        "/jobs/:path*",
         "/profile/:path*",
         "/for-you/:path*",
         "/saved/:path*",
         "/applications/:path*",
         "/notifications/:path*",
+        "/reports/:path*",
         "/login",
         "/sign-up",
         "/employer-login",

@@ -2,8 +2,9 @@ import { cookies } from "next/headers";
 
 import AdminSection from "../_components/AdminSection";
 import AdminTable from "../_components/AdminTable";
+import ReportActions from "../_components/ReportActions";
 import ReportStatusTag from "../_components/ReportStatusTag";
-import { fetchAdminReports, formatDate, reportField } from "../_components/adminData";
+import { fetchAdminReports, formatDate, reportField, reportReasonLabel } from "../_components/adminData";
 
 export const dynamic = "force-dynamic";
 
@@ -14,15 +15,16 @@ export default async function AdminReportsPage() {
     return (
         <AdminSection title="Reports" count={total} error={error}>
             <AdminTable
-                headers={["Job", "Reported by", "Reason", "Message", "Status", "Date"]}
+                headers={["Job", "Reported by", "Reason", "Message", "Status", "Date", "Actions"]}
                 empty="No reports."
                 rows={items.map((report) => [
                     reportField(report.jobId, "title"),
                     reportField(report.reporterId, "fullName"),
-                    report.reason ?? "—",
+                    reportReasonLabel(report.reason),
                     report.message ? report.message : "—",
                     <ReportStatusTag key="s" status={report.status} />,
                     formatDate(report.createdAt),
+                    <ReportActions key="a" reportId={report._id ?? ""} status={report.status} />,
                 ])}
             />
         </AdminSection>

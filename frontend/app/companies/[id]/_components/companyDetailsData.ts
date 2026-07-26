@@ -1,7 +1,7 @@
 import type { JobDetailsUser } from "../../../jobs/[id]/_components/jobDetailsData";
 import { resolveAvatarUrl } from "../../../../lib/avatar";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5051";
 
 type ApiResponse<TData> = {
     success?: boolean;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,13 +24,24 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const getRedirectPath = (role?: string) => {
-    if (role === "user") return "/discover";
+/**
+ * Only same-origin absolute paths are honoured, so a crafted
+ * "?next=https://evil.example" cannot turn login into an open redirect.
+ */
+const getSafeNextPath = (next: string | null) => {
+    if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
+    return next;
+};
+
+const getRedirectPath = (role?: string, next?: string | null) => {
+    const safeNext = getSafeNextPath(next ?? null);
+    if (role === "user") return safeNext ?? "/discover";
     return "/";
 };
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { checkAuth } = useAuth();
     const [serverError, setServerError] = useState<string | null>(null);
 
@@ -68,7 +79,7 @@ export default function LoginForm() {
 
         await checkAuth();
         toast.success("Login successful");
-        router.replace(getRedirectPath(result.data?.role));
+        router.replace(getRedirectPath(result.data?.role, searchParams.get("next")));
     }
 
     return (

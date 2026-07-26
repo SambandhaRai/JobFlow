@@ -11,6 +11,7 @@ const NotificationSchema: Schema = new Schema({
             "application_interview_scheduled",
             "application_not_selected",
             "application_update",
+            "report_update",
         ],
         required: true,
     },
