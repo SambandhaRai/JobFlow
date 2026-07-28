@@ -11,6 +11,7 @@
     "seed:institutions": "ts-node --files src/scripts/seed-institutions.ts",
     "seed:hiring": "ts-node --files src/scripts/seed-hiring-data.ts",
     "seed:jobs": "ts-node --files src/scripts/seed-fresh-jobs.ts",
+    "seed:applications": "ts-node --files src/scripts/seed-user-applications.ts",
     "seed:hiring:reset": "ts-node --files src/scripts/seed-hiring-data.ts --reset"
   },
   "keywords": [],
