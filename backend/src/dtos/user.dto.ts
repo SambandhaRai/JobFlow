@@ -1,5 +1,5 @@
 import z from "zod";
-import { BaseUserSchema, JobSeekerSchema, ResumeSchema } from "../types/user.type";
+import { BaseUserSchema, EducationSchema, ExperienceSchema, ResumeSchema } from "../types/user.type";
 
 const CreateUserBaseDto = BaseUserSchema.pick({
     fullName: true,
@@ -70,8 +70,11 @@ export const UpdateUserDto = BaseUserSchema.pick({
     phone: true,
     profilePicture: true,
 }).extend({
-    educations: JobSeekerSchema.shape.educations,
-    experiences: JobSeekerSchema.shape.experiences,
+    // Use plain optional arrays (no .default([])) so an absent key stays absent.
+    // A .default([]) here would make a basic-info-only update wipe the user's
+    // stored educations/experiences via findByIdAndUpdate.
+    educations: z.array(EducationSchema).optional(),
+    experiences: z.array(ExperienceSchema).optional(),
     skills: z.array(z.string().trim()).optional(),
 }).partial();
 export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
