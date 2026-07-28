@@ -15,6 +15,7 @@ import {
     PanelLeftClose,
     PanelLeftOpen,
     UserRound,
+    CircleHelp,
 } from "lucide-react";
 import CompanyAvatar from "./CompanyAvatar";
 import { getSavedJobs } from "../../lib/api/user/user";
@@ -45,6 +46,10 @@ const JOB_SEARCH_NAV: NavItem[] = [
 const PROFILE_NAV: NavItem[] = [
     { label: "Profile", href: "/profile", icon: <UserRound size={16} /> },
     { label: "Resume", href: "/profile/resume", icon: <File size={16} /> },
+];
+
+const SUPPORT_NAV: NavItem[] = [
+    { label: "Help Centre", href: "/help", icon: <CircleHelp size={16} /> },
 ];
 
 interface ProfileCompletion {
@@ -263,6 +268,19 @@ export default function Sidebar({ user, profileCompletion }: SidebarProps) {
                 )}
                 <ul className="space-y-0.5">
                     {PROFILE_NAV.map((item) => (
+                        <li key={item.href}>
+                            <NavLink item={item} active={pathname === item.href} compact={isCollapsed} />
+                        </li>
+                    ))}
+                </ul>
+
+                {!isCollapsed && (
+                    <p className="mt-5 px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-ink-400">
+                        Support
+                    </p>
+                )}
+                <ul className={isCollapsed ? "mt-5 space-y-0.5" : "space-y-0.5"}>
+                    {SUPPORT_NAV.map((item) => (
                         <li key={item.href}>
                             <NavLink item={item} active={pathname === item.href} compact={isCollapsed} />
                         </li>

@@ -1,6 +1,11 @@
 import Link from "next/link";
 
-const footerLinks = ["About", "Trust & safety", "Help center", "Privacy"];
+const footerLinks = [
+    { label: "About", href: "#" },
+    { label: "Trust & safety", href: "#" },
+    { label: "Help center", href: "/help" },
+    { label: "Privacy", href: "#" },
+];
 
 export default function Footer() {
     return (
@@ -15,8 +20,8 @@ export default function Footer() {
                 </div>
                 <div className="flex flex-wrap items-center gap-5 text-xs text-ink-500">
                     {footerLinks.map((link) => (
-                        <Link key={link} href="#" className="hover:text-ink-800 transition-colors">
-                            {link}
+                        <Link key={link.label} href={link.href} className="hover:text-ink-800 transition-colors">
+                            {link.label}
                         </Link>
                     ))}
                 </div>

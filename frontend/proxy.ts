@@ -15,6 +15,7 @@ const userRoutes = [
     "/applications",
     "/notifications",
     "/reports",
+    "/help",
     // Job details render the signed-in app shell, so they need a session too.
     // Public entry points are "/" and the /companies directory.
     "/jobs",
@@ -95,6 +96,7 @@ export const config = {
         "/applications/:path*",
         "/notifications/:path*",
         "/reports/:path*",
+        "/help/:path*",
         "/login",
         "/sign-up",
         "/employer-login",
