@@ -23,7 +23,7 @@ export default function SkillTag({ label, required = false, onRemove, className 
                 <button
                     type="button"
                     onClick={onRemove}
-                    className="ml-0.5 text-ink-400 hover:text-ink-700 transition-colors"
+                    className="-mr-1 ml-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full text-ink-400 transition-colors hover:bg-ink-200 hover:text-ink-700"
                     aria-label={`Remove ${label}`}
                 >
                     <X size={11} strokeWidth={2.5} />

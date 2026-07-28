@@ -413,7 +413,7 @@ export const getProfileCompletion = (user: JobDetailsUser | null) => {
     const hasSkills = Array.isArray(user.skills) && user.skills.length > 0;
     const hasResume = Array.isArray(user.resumes) && user.resumes.length > 0;
     const completed = [Boolean(user.fullName), hasEducation, hasSkills, hasResume].filter(Boolean).length;
-    const percent = Math.max(25, Math.round((completed / 4) * 100));
+    const percent = Math.round((completed / 4) * 100);
 
     return {
         percent,

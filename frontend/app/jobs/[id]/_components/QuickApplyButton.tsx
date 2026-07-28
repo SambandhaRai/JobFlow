@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, FileText, Info, Loader2, PencilLine, X } from "lucide-react";
+import { CheckCircle2, FileText, Info, Loader2, PencilLine, Share2, X } from "lucide-react";
 import { toast } from "react-toastify";
 
 import CompanyAvatar from "../../../_components/CompanyAvatar";
@@ -47,6 +48,8 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
     const [open, setOpen] = useState(false);
     const [showFullFlow, setShowFullFlow] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [applicationId, setApplicationId] = useState<string | null>(null);
 
     const defaultResume = resumes.find((resume) => resume.isDefault) ?? resumes[0] ?? null;
     const fullName = defaults.fullName.trim();
@@ -67,7 +70,8 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
     const closeConfirm = useCallback(() => {
         if (submitting) return;
         setOpen(false);
-    }, [submitting]);
+        if (submitted) router.refresh();
+    }, [submitting, submitted, router]);
 
     useEffect(() => {
         if (!open) return;
@@ -96,23 +100,36 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
 
         setSubmitting(true);
         try {
-            await applyToJob({
+            const response = await applyToJob({
                 jobId: job.id,
                 resumeUrl: defaultResume.fileUrl,
                 fullName,
                 email,
                 phone,
             });
+            const created = response?.data as { _id?: string; id?: string } | undefined;
+            setApplicationId(created?._id ?? created?.id ?? null);
             navCountsStore.adjustApplications(1);
             toast.success("Application sent 🎉");
-            setOpen(false);
-            router.refresh();
+            setSubmitted(true);
         } catch (error) {
             const message = error instanceof Error ? error.message : "Could not submit your application";
             toast.error(message);
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleShare = async () => {
+        const url = window.location.href;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: job.title, text: `${job.title} at ${job.company}`, url });
+                return;
+            }
+            await navigator.clipboard.writeText(url);
+            toast.success("Job link copied");
+        } catch {}
     };
 
     const subtitle = [job.company, job.location, job.salary].filter(Boolean).join(" · ");
@@ -156,6 +173,52 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
                             </button>
                         </div>
 
+                        {submitted ? (
+                            <>
+                                <div className="px-6 py-6 text-center">
+                                    <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-success-50 text-success-700">
+                                        <CheckCircle2 size={28} />
+                                    </span>
+                                    <h3 className="mt-4 text-xl font-semibold tracking-tight text-ink-900">Application sent 🎉</h3>
+                                    <p className="mt-1.5 text-sm text-ink-500">
+                                        Your application for <span className="font-medium text-ink-700">{job.title}</span> at{" "}
+                                        <span className="font-medium text-ink-700">{job.company}</span> is on its way. We&apos;ve added it to your tracker.
+                                    </p>
+                                    <div className="mx-auto mt-5 max-w-sm rounded-lg border border-ink-100 bg-surface p-4 text-left shadow-card">
+                                        <div className="space-y-2.5 text-sm">
+                                            {applicationId && (
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <span className="text-ink-500">Application ID</span>
+                                                    <span className="truncate rounded-md bg-ink-50 px-2 py-0.5 font-mono text-xs text-ink-700">{applicationId}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex items-center justify-between gap-3">
+                                                <span className="text-ink-500">Status</span>
+                                                <span className="font-medium text-ink-900">Submitted</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-100 px-6 py-4">
+                                    <button
+                                        type="button"
+                                        onClick={handleShare}
+                                        className="inline-flex h-10 items-center gap-2 rounded-md border border-ink-200 bg-surface px-4 text-sm font-medium text-ink-800 transition-colors hover:border-cobalt-100 hover:bg-cobalt-50"
+                                    >
+                                        <Share2 size={15} />
+                                        Share
+                                    </button>
+                                    <Link
+                                        href="/applications"
+                                        className="inline-flex h-10 items-center gap-2 rounded-md bg-cobalt-500 px-5 text-sm font-medium text-white transition-colors hover:bg-cobalt-600"
+                                    >
+                                        Track application
+                                    </Link>
+                                </div>
+                            </>
+                        ) : (
+                        <>
                         <div className="px-6 py-5">
                             <h3 className="text-base font-semibold text-ink-900">
                                 {canQuickApply ? "Review and send" : "Almost there"}
@@ -252,6 +315,8 @@ export default function QuickApplyButton({ job, defaults, resumes, className, ch
                                 </button>
                             )}
                         </div>
+                        </>
+                        )}
                     </div>
                 </div>,
                 document.body,

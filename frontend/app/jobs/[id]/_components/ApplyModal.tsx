@@ -47,6 +47,7 @@ const STEPS = [
 
 const MAX_APPLICATION_NOTE = 300;
 const ACCEPTED_FILES = ".pdf,.doc,.docx";
+const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx"];
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
 interface ApplyModalProps {
@@ -137,6 +138,11 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
     const subtitle = [job.company, job.location, job.salary].filter(Boolean).join(" · ");
 
     const handleUpload = async (file: File) => {
+        const isAcceptedType = ACCEPTED_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext));
+        if (!isAcceptedType) {
+            toast.error("Upload a PDF, DOC, or DOCX file");
+            return;
+        }
         if (file.size > MAX_FILE_BYTES) {
             toast.error("Resume must be 5 MB or smaller");
             return;
@@ -222,6 +228,7 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
             const created = response?.data as { _id?: string; id?: string } | undefined;
             setApplicationId(created?._id ?? created?.id ?? null);
             navCountsStore.adjustApplications(1);
+            toast.success("Application sent 🎉");
             setStep(3);
         } catch (error) {
             const message = error instanceof Error ? error.message : "Could not submit your application";
@@ -296,6 +303,7 @@ export default function ApplyModal({ job, defaults, resumes: initialResumes, onC
                             uploading={uploading}
                             fileInputRef={fileInputRef}
                             onFileInputChange={onFileInputChange}
+                            onDropFile={(file) => void handleUpload(file)}
                             onBrowse={() => fileInputRef.current?.click()}
                             selectedResume={selectedResume}
                             company={job.company}
@@ -423,6 +431,7 @@ function StepResume({
     uploading,
     fileInputRef,
     onFileInputChange,
+    onDropFile,
     onBrowse,
     selectedResume,
     company,
@@ -434,10 +443,13 @@ function StepResume({
     uploading: boolean;
     fileInputRef: React.RefObject<HTMLInputElement | null>;
     onFileInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onDropFile: (file: File) => void;
     onBrowse: () => void;
     selectedResume: ApplicantResume | null;
     company: string;
 }) {
+    const [isDragging, setIsDragging] = useState(false);
+
     return (
         <div>
             <h3 className="text-xl font-semibold tracking-tight text-ink-900">Pick a resume to send</h3>
@@ -513,7 +525,27 @@ function StepResume({
                 </>
             )}
 
-            <div className="mt-4 rounded-lg border border-dashed border-ink-200 bg-ink-50/50 px-6 py-7 text-center">
+            <div
+                onDragOver={(event) => {
+                    event.preventDefault();
+                    if (!uploading) setIsDragging(true);
+                }}
+                onDragLeave={(event) => {
+                    event.preventDefault();
+                    setIsDragging(false);
+                }}
+                onDrop={(event) => {
+                    event.preventDefault();
+                    setIsDragging(false);
+                    if (uploading) return;
+                    const file = event.dataTransfer.files?.[0];
+                    if (file) onDropFile(file);
+                }}
+                className={[
+                    "mt-4 rounded-lg border border-dashed px-6 py-7 text-center transition-colors",
+                    isDragging ? "border-cobalt-400 bg-cobalt-50" : "border-ink-200 bg-ink-50/50",
+                ].join(" ")}
+            >
                 <input
                     ref={fileInputRef}
                     type="file"

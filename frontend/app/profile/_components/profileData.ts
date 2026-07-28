@@ -184,7 +184,7 @@ export const getProfileCompletion = (profile: ProfileData | null): ProfileComple
         { label: "Résumé", done: (profile?.resumes.length ?? 0) > 0 },
     ];
     const completed = items.filter((item) => item.done).length;
-    const percent = Math.max(25, Math.round((completed / items.length) * 100));
+    const percent = Math.round((completed / items.length) * 100);
 
     return {
         percent,

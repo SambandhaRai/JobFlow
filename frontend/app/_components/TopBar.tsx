@@ -114,7 +114,7 @@ function TopBarContent({
                             type="button"
                             onClick={handleSearchClear}
                             aria-label="Clear search"
-                            className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-ink-400 transition-colors hover:bg-ink-200 hover:text-ink-700"
+                            className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-ink-400 transition-colors hover:bg-ink-200 hover:text-ink-700"
                         >
                             <X size={13} />
                         </button>
