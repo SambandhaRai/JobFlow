@@ -30,7 +30,7 @@ const TABS: Array<{ key: TabKey; label: string }> = [
     { key: "closed", label: "Closed" },
 ];
 
-const GRID_COLS = "md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_auto_minmax(0,1fr)_auto]";
+const GRID_COLS = "md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_180px_minmax(0,1fr)_auto]";
 
 export default function ApplicationsTable({ applications }: ApplicationsTableProps) {
     const [activeTab, setActiveTab] = useState<TabKey>("all");
