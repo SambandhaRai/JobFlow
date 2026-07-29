@@ -10,6 +10,7 @@ import DiscoverPagination from "./_components/DiscoverPagination";
 import FilterChips from "./_components/FilterChips";
 import JobCard from "./_components/JobCard";
 import WelcomeBanner from "./_components/WelcomeBanner";
+import LoginSuccessToast from "./_components/LoginSuccessToast";
 import {
     JOBS_PER_DISCOVER_PAGE,
     fetchDiscoverData,
@@ -111,6 +112,8 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
 
     return (
         <div className="min-h-screen bg-background">
+            <LoginSuccessToast />
+
             <Sidebar
                 user={{ name: fullName, subtitle: user?.email ?? "Student" }}
                 profileCompletion={getProfileCompletion(user)}

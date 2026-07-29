@@ -6,6 +6,8 @@ const authController = new AuthController();
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.get("/google/start", authController.googleStart);
+router.post("/google/callback", authController.googleCallback);
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
 

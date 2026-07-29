@@ -1,8 +1,14 @@
 "use server";
 
-import { loginUser, registerUser } from "../api/auth";
+import { googleCallback, googleStart, loginUser, registerUser } from "../api/auth";
 import type { LoginPayload, RegisterPayload, UserRole } from "../api/endpoints";
-import { setAuthToken, setUserData } from "../cookie";
+import {
+    clearGoogleState,
+    getGoogleState,
+    setAuthToken,
+    setGoogleState,
+    setUserData,
+} from "../cookie";
 
 type AuthUser = {
     _id?: string;
@@ -74,6 +80,60 @@ export const handleRegister = async (
         return {
             success: false,
             message: getActionErrorMessage(err, "Registration Failed"),
+        };
+    }
+};
+
+export const startGoogleLogin = async (): Promise<string> => {
+    const result = await googleStart() as AuthApiResult<{ url: string; state: string }>;
+    if (!result.success || !result.data?.url || !result.data?.state) {
+        throw new Error(result.message || "Could not start Google sign-in");
+    }
+    await setGoogleState(result.data.state);
+    return result.data.url;
+};
+
+export const completeGoogleLogin = async (
+    code: string,
+    state: string,
+): Promise<AuthActionResult<AuthUser>> => {
+    try {
+        const stateCookie = await getGoogleState();
+        if (!stateCookie) {
+            return {
+                success: false,
+                message: "Your Google sign-in expired, please try again",
+            };
+        }
+
+        const result = await googleCallback(code, state, stateCookie) as AuthApiResult<AuthUser>;
+        await clearGoogleState();
+
+        if (result.success) {
+            if (result.token) {
+                await setAuthToken(result.token);
+            }
+            if (result.data) {
+                await setUserData(result.data);
+            }
+
+            return {
+                success: true,
+                data: result.data,
+                token: result.token,
+                message: "Login Successful",
+            };
+        }
+
+        return {
+            success: false,
+            message: result.message || "Google Login Failed",
+        };
+    } catch (err) {
+        await clearGoogleState();
+        return {
+            success: false,
+            message: getActionErrorMessage(err, "Google Login Failed"),
         };
     }
 };

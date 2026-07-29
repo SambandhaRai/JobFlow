@@ -118,13 +118,13 @@ export default function SignUpForm() {
                 Start applying to verified internships and entry-level roles.
             </p>
 
-            <button
-                type="button"
+            <a
+                href="/api/auth/google"
                 className="w-full h-11 flex items-center justify-center gap-3 border border-ink-200 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors mb-5"
             >
                 <GoogleIcon />
                 Sign up with Google
-            </button>
+            </a>
 
             <div className="flex items-center gap-3 mb-5">
                 <div className="flex-1 h-px bg-ink-100" />

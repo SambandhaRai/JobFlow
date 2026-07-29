@@ -93,6 +93,7 @@ export const BaseUserSchema = z.object({
     password: z.string().trim().min(6, "Password must be at least 6 characters"),
     role: UserRoleEnum.default("user"),
     profilePicture: z.string().trim().optional(),
+    googleId: z.string().trim().optional(),
 });
 
 export const JobSeekerSchema = BaseUserSchema.extend({

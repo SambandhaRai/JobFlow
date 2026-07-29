@@ -27,6 +27,8 @@ export interface IUserRepository {
 
     getUserByEmail(email: string): Promise<IUser | null>;
     getUserByPhone(phone: string): Promise<IUser | null>;
+    getUserByGoogleId(googleId: string): Promise<IUser | null>;
+    linkGoogleAccount(userId: string, googleId: string): Promise<IUser | null>;
 
     updatePassword(userId: string, passwordHash: string): Promise<IUser | null>;
 
@@ -113,6 +115,19 @@ export class UserRepository implements IUserRepository {
     async getUserByPhone(phone: string): Promise<IUser | null> {
         const user = await UserModel.findOne({ phone });
         return user;
+    }
+
+    async getUserByGoogleId(googleId: string): Promise<IUser | null> {
+        const user = await UserModel.findOne({ googleId });
+        return user;
+    }
+
+    async linkGoogleAccount(userId: string, googleId: string): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(
+            userId,
+            { googleId },
+            { returnDocument: "after" }
+        );
     }
 
     async updatePassword(userId: string, passwordHash: string): Promise<IUser | null> {

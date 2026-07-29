@@ -47,6 +47,13 @@ export const LoginUserDto = z.object({
 });
 export type LoginUserDto = z.infer<typeof LoginUserDto>;
 
+export const GoogleCallbackDto = z.object({
+    code: z.string().trim().min(1, "Missing Google authorization code"),
+    state: z.string().trim().min(1, "Missing Google sign-in state"),
+    stateCookie: z.string().trim().min(1, "Missing Google sign-in state"),
+});
+export type GoogleCallbackDto = z.infer<typeof GoogleCallbackDto>;
+
 export const ForgotPasswordDto = z.object({
     email: z.email("Invalid email address"),
 });

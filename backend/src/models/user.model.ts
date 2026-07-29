@@ -52,7 +52,9 @@ const UserSchema: Schema = new Schema({
     fullName: { type: String, required: true, trim: true, minLength: 2 },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     phone: { type: String, trim: true, minLength: 10, maxLength: 15 },
-    password: { type: String, required: true, minLength: 6 },
+    // Optional so accounts created via Google sign-in (which have no password) are valid.
+    password: { type: String, minLength: 6 },
+    googleId: { type: String, trim: true, unique: true, sparse: true },
     role: { type: String, enum: ["user", "employer", "admin"], default: "user" },
     profilePicture: { type: String },
     isVerified: { type: Boolean, default: false },

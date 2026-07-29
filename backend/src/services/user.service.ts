@@ -5,6 +5,7 @@ import { HttpError } from "../errors/http-error";
 import { FRONTEND_URL, JWT_SECRET } from "../config";
 import { sendEmail } from "../config/email";
 import { ResumeType, UserRoleType } from "../types/user.type";
+import { GoogleIdentity } from "./google.service";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -77,6 +78,51 @@ export class UserService {
         const token = this.createAuthToken(existingUser);
 
         return { token, user: existingUser };
+    }
+
+    async loginWithGoogle(identity: GoogleIdentity) {
+        let user = await userRepository.getUserByGoogleId(identity.googleId);
+
+        if (!user) {
+            const existingUser = await userRepository.getUserByEmail(identity.email);
+
+            if (existingUser) {
+                if (existingUser.googleId && existingUser.googleId !== identity.googleId) {
+                    throw new HttpError(409, "This email is already linked to another Google account");
+                }
+                if (!identity.emailVerified) {
+                    throw new HttpError(401, "Your Google account has not verified this email address, so it cannot be linked to an existing JobFlow account");
+                }
+                user = await userRepository.linkGoogleAccount(existingUser._id.toString(), identity.googleId);
+            } else {
+                if (!identity.emailVerified) {
+                    throw new HttpError(401, "Your Google account has not verified this email address, so it cannot be used to sign in");
+                }
+                try {
+                    user = await userRepository.createUser({
+                        fullName: identity.name,
+                        email: identity.email,
+                        googleId: identity.googleId,
+                        role: "user",
+                    });
+                } catch (error: unknown) {
+                    // A concurrent sign-in may have created the account first; fall back to it.
+                    if (!(error && typeof error === "object" && (error as { code?: number }).code === 11000)) {
+                        throw error;
+                    }
+                    user = await userRepository.getUserByGoogleId(identity.googleId)
+                        ?? await userRepository.getUserByEmail(identity.email);
+                }
+            }
+        }
+
+        if (!user) {
+            throw new HttpError(500, "Unable to sign in with Google");
+        }
+
+        const token = this.createAuthToken(user);
+
+        return { token, user };
     }
 
     private brandedEmailHtml(kicker: string, title: string, body: string) {

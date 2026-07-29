@@ -37,6 +37,24 @@ export const loginUser = async (loginData: LoginPayload) => {
     }
 };
 
+export const googleStart = async () => {
+    try {
+        const response = await axios.get(API.AUTH.GOOGLE_START);
+        return response.data;
+    } catch (err) {
+        throw new Error(getAuthErrorMessage(err, "Could not start Google sign-in"));
+    }
+};
+
+export const googleCallback = async (code: string, state: string, stateCookie: string) => {
+    try {
+        const response = await axios.post(API.AUTH.GOOGLE_CALLBACK, { code, state, stateCookie });
+        return response.data;
+    } catch (err) {
+        throw new Error(getAuthErrorMessage(err, "Google Login Failed"));
+    }
+};
+
 export const requestPasswordReset = async (payload: ForgotPasswordPayload) => {
     try {
         const response = await axios.post(API.AUTH.FORGOT_PASSWORD, payload);

@@ -227,6 +227,8 @@ export const API = {
     AUTH: {
         REGISTER: "/api/auth/register",
         LOGIN: "/api/auth/login",
+        GOOGLE_START: "/api/auth/google/start",
+        GOOGLE_CALLBACK: "/api/auth/google/callback",
         FORGOT_PASSWORD: "/api/auth/forgot-password",
         RESET_PASSWORD: "/api/auth/reset-password",
     },

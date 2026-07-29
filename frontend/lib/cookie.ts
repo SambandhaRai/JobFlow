@@ -5,7 +5,9 @@ import { cookies } from "next/headers";
 const AUTH_TOKEN_COOKIE = "auth_token";
 const USER_DATA_COOKIE = "user_data";
 const USER_LOCATION_COOKIE = "user_location";
+const GOOGLE_STATE_COOKIE = "google_state";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+const GOOGLE_STATE_MAX_AGE = 60 * 10;
 
 export const setAuthToken = async (token: string) => {
     const cookieStore = await cookies();
@@ -48,6 +50,29 @@ export const getUserData = async () => {
     } catch {
         return null;
     }
+};
+
+export const setGoogleState = async (state: string) => {
+    const cookieStore = await cookies();
+    cookieStore.set({
+        name: GOOGLE_STATE_COOKIE,
+        value: state,
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: GOOGLE_STATE_MAX_AGE,
+        secure: process.env.NODE_ENV === "production",
+    });
+};
+
+export const getGoogleState = async () => {
+    const cookieStore = await cookies();
+    return cookieStore.get(GOOGLE_STATE_COOKIE)?.value || null;
+};
+
+export const clearGoogleState = async () => {
+    const cookieStore = await cookies();
+    cookieStore.delete(GOOGLE_STATE_COOKIE);
 };
 
 export type UserLocationCookie = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
@@ -58,6 +58,14 @@ export default function LoginForm() {
 
     const remember = useWatch({ control, name: "remember" });
 
+    useEffect(() => {
+        const error = searchParams.get("error");
+        if (error) {
+            setServerError(error);
+            toast.error(error);
+        }
+    }, [searchParams]);
+
     async function onSubmit(data: FormValues) {
         setServerError(null);
         const result = await handleLogin({
@@ -93,13 +101,13 @@ export default function LoginForm() {
                 Login to continue your job search.
             </p>
 
-            <button
-                type="button"
+            <a
+                href="/api/auth/google"
                 className="w-full h-11 flex items-center justify-center gap-3 border border-ink-200 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors mb-5"
             >
                 <GoogleIcon />
                 Continue with Google
-            </button>
+            </a>
 
             <div className="flex items-center gap-3 mb-5">
                 <div className="flex-1 h-px bg-ink-100" />
