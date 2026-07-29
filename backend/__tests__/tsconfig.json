@@ -1,0 +1,12 @@
+{
+    // Editor-only config: the TS language server uses the nearest tsconfig when
+    // it opens a file, so test files pick up the Jest globals from here. The
+    // `tsc` build still uses ../tsconfig.json (src/** only) and ts-jest uses
+    // ../tsconfig.jest.json, so neither is affected by this file.
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "..",
+        "types": ["jest", "node"]
+    },
+    "include": ["**/*.ts", "../src/**/*.ts"]
+}

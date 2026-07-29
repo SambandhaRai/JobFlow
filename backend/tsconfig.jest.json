@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        // The build tsconfig pins rootDir to ./src, which would reject test
+        // files living under __tests__/. Drop it for the test compile.
+        "rootDir": ".",
+        "types": ["jest", "node"]
+    },
+    "include": ["src/**/*", "__tests__/**/*"]
+}

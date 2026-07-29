@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node --files src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand",
     "start": "node dist/index.js",
     "build": "tsc",
     "seed:institutions": "ts-node --files src/scripts/seed-institutions.ts",
@@ -19,15 +21,22 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^7.2.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "google-auth-library": "^10.9.1",
+    "jest": "^30.4.2",
     "jsonwebtoken": "^9.0.3",
+    "mongodb-memory-server": "^11.2.0",
     "mongoose": "^9.6.3",
     "multer": "^2.1.1",
     "nodemailer": "^9.0.3",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.12",
     "zod": "^4.4.3"
   },
   "devDependencies": {

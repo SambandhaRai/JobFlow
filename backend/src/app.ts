@@ -5,7 +5,6 @@ import cors, { CorsOptions } from "cors";
 import path from "path";
 
 dotenv.config();
-console.log(process.env.PORT);
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
